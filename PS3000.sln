@@ -1,0 +1,31 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.9.34728.123
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "PS3000", "PS3000.csproj", "{6A39E359-8F70-43E8-B021-51CC702E46FD}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "PS3000.Desktop", "..\PS3000.Desktop\PS3000.Desktop.csproj", "{E1889BF0-741B-4E0B-A8C9-FB04A9D1655B}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{6A39E359-8F70-43E8-B021-51CC702E46FD}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{6A39E359-8F70-43E8-B021-51CC702E46FD}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{6A39E359-8F70-43E8-B021-51CC702E46FD}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{6A39E359-8F70-43E8-B021-51CC702E46FD}.Release|Any CPU.Build.0 = Release|Any CPU
+		{E1889BF0-741B-4E0B-A8C9-FB04A9D1655B}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{E1889BF0-741B-4E0B-A8C9-FB04A9D1655B}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{E1889BF0-741B-4E0B-A8C9-FB04A9D1655B}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{E1889BF0-741B-4E0B-A8C9-FB04A9D1655B}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {6637420B-5478-4A65-A1E8-C6E0E74B2C75}
+	EndGlobalSection
+EndGlobal

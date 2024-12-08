@@ -9,11 +9,15 @@ using System.Diagnostics;
 using System.Runtime.InteropServices;
 using PS3000.ViewModels;
 using System.Collections.ObjectModel;
+using System.Globalization;
 
 namespace PS3000.Views;
 
 public partial class MainView : UserControl
 {
+
+
+
     public MainView()
     {
         InitializeComponent();

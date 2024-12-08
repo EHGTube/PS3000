@@ -1,4 +1,5 @@
 ﻿using System.Collections.ObjectModel;
+using static PS3000.Views.MainView;
 
 namespace PS3000.ViewModels;
 
@@ -11,6 +12,7 @@ public class MainViewModel : ViewModelBase
     public MainViewModel()
     {
         // Example data
+
         SurchargeData = new ObservableCollection<Surcharges>
         {
             new Surcharges { Zuschlagsart = "Pro Auftrag", Beschreibung = "Werkszeugnis", Menge = 12.80 },
@@ -38,16 +40,17 @@ public class MainViewModel : ViewModelBase
             new Positions { PosNumber = 3 },
         };
     }
+
+    public class Surcharges
+    {
+        public string Zuschlagsart { get; set; }
+        public string Beschreibung { get; set; }
+        public double Menge { get; set; }
+    }
+
+    public class Positions
+    {
+        public int PosNumber { get; set; }
+    }
 }
 
-public class Surcharges
-{
-    public string Zuschlagsart { get; set; }
-    public string Beschreibung { get; set; }
-    public double Menge { get; set; }
-}
-
-public class Positions
-{
-    public int PosNumber { get; set; }
-}

@@ -1,6 +1,7 @@
 ﻿using Avalonia.Controls;
 using MsBox.Avalonia.Enums;
 using MsBox.Avalonia;
+using Avalonia.Controls;
 using System;
 using MsBox.Avalonia.Dto;
 using MsBox.Avalonia.Models;
@@ -38,12 +39,6 @@ public partial class MainView : UserControl
 
         var result = await box.ShowAsync();
 
-        var second = MessageBoxManager.GetMessageBoxCustom(
-                    new MessageBoxCustomParams
-                    {
-                        ContentMessage = result.ToString(),
-                    });
-
-        var secondresult = await second.ShowAsync();
+        var availableSize = new Avalonia.Size(double.PositiveInfinity, double.PositiveInfinity);
     }
 }

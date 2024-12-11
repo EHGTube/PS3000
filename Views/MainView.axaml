@@ -667,7 +667,7 @@
 								<RowDefinition Height="*"></RowDefinition>
 							</Grid.RowDefinitions>
 							<StackPanel Grid.Column="0" Grid.Row="0">
-								<Grid>
+								<Grid Name="First" >
 									<Grid.ColumnDefinitions>
 										<ColumnDefinition Width="Auto"/>
 										<ColumnDefinition Width="Auto"/>
@@ -701,7 +701,7 @@
 									</StackPanel>
 								</Grid>
 
-								<Grid>
+								<Grid Name="Second">
 									<Grid.ColumnDefinitions>
 										<ColumnDefinition Width="50*"/>
 										<ColumnDefinition Width="50*"/>
@@ -732,11 +732,10 @@
 									</StackPanel>
 								</Grid>
 
-								<TextBlock >Bemerkungen:</TextBlock>
-								<TextBox AcceptsReturn="True" TextWrapping="Wrap" />
+								<TextBlock Name="Third" >Bemerkungen:</TextBlock>
+								<TextBox VerticalAlignment="Stretch" Name="Notes" AcceptsReturn="True" TextWrapping="Wrap"/>
 
 							</StackPanel>
-
 
 						</Grid>
 					</TabItem>

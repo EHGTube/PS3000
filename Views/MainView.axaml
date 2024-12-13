@@ -16,12 +16,6 @@
 	<TabControl Margin="4">
 		<TabItem Header="Aufträge">
 			<ScrollViewer HorizontalScrollBarVisibility="Visible" VerticalScrollBarVisibility="Visible">
-			<Grid>
-				<Grid.RowDefinitions>
-					<RowDefinition Height="Auto"></RowDefinition>
-					<RowDefinition Height="Auto"></RowDefinition>
-					<RowDefinition Height="Auto"></RowDefinition>
-				</Grid.RowDefinitions>
 				<TabControl Margin="5">
 					<TabItem Header="Aufträge">
 						<Grid>
@@ -666,8 +660,8 @@
 							<Grid.RowDefinitions>
 								<RowDefinition Height="*"></RowDefinition>
 							</Grid.RowDefinitions>
-							<StackPanel Grid.Column="0" Grid.Row="0">
-								<Grid Name="First" >
+							<DockPanel Grid.Column="0" Grid.Row="0">
+								<Grid Name="First" DockPanel.Dock="Top">
 									<Grid.ColumnDefinitions>
 										<ColumnDefinition Width="Auto"/>
 										<ColumnDefinition Width="Auto"/>
@@ -701,7 +695,7 @@
 									</StackPanel>
 								</Grid>
 
-								<Grid Name="Second">
+								<Grid DockPanel.Dock="Top" Name="Second">
 									<Grid.ColumnDefinitions>
 										<ColumnDefinition Width="50*"/>
 										<ColumnDefinition Width="50*"/>
@@ -732,10 +726,23 @@
 									</StackPanel>
 								</Grid>
 
-								<TextBlock Name="Third" >Bemerkungen:</TextBlock>
-								<TextBox VerticalAlignment="Stretch" Name="Notes" AcceptsReturn="True" TextWrapping="Wrap"/>
+								<TextBlock DockPanel.Dock="Top" Name="Third" >Bemerkungen:</TextBlock>
+								
+								<Grid Name="Fourth">
+									<Grid.ColumnDefinitions>
+										<ColumnDefinition Width="80*"/>
+										<ColumnDefinition Width="20*"/>
+									</Grid.ColumnDefinitions>
+									<Grid.RowDefinitions>
+										<RowDefinition Height="50*"></RowDefinition>
+										<RowDefinition Height="50*"></RowDefinition>
+									</Grid.RowDefinitions>
+									<TextBox VerticalAlignment="Stretch" Grid.Column="0" Grid.Row="0" Grid.RowSpan="2" Name="Notes" AcceptsReturn="True" TextWrapping="Wrap"/>
+									<Button Grid.Column="1" Grid.Row="0" >Auftrag Speichern</Button>
+									<Button Grid.Column="1" Grid.Row="1" >PDF Erzeugen</Button>
+								</Grid>
 
-							</StackPanel>
+							</DockPanel>
 
 						</Grid>
 					</TabItem>
@@ -743,7 +750,6 @@
 						<TextBlock Margin="5">This is tab 3 content</TextBlock>
 					</TabItem>
 				</TabControl>
-			</Grid>
 			</ScrollViewer>
 		</TabItem>
 

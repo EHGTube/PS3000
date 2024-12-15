@@ -1,7 +1,6 @@
 ﻿using Avalonia.Controls;
 using MsBox.Avalonia.Enums;
 using MsBox.Avalonia;
-using Avalonia.Controls;
 using System;
 using MsBox.Avalonia.Dto;
 using MsBox.Avalonia.Models;
@@ -22,13 +21,13 @@ public partial class MainView : UserControl
     public MainView()
     {
         InitializeComponent();
-        MyButton.Click += ButtonClick;
+        //MyButton.Click += ButtonClick;
 
-        DataContext = new MainViewModel();
+        //DataContext = new MainViewModel();
 
-        ListCustomersCustomerList.Items.Add("afaegfsrrgse");
+        //ListCustomersCustomerList.Items.Add("afaegfsrrgse");
 
-        ListCustomersDeliveryAdressList.Items.Add("asdas");
+        //ListCustomersDeliveryAdressList.Items.Add("asdas");
     }
 
     public async void ButtonClick(object? sender, EventArgs e)

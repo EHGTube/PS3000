@@ -18,9 +18,9 @@
 		<DockPanel Grid.Column="0" Grid.Row="0">
 			<Grid Name="First" DockPanel.Dock="Top">
 				<Grid.ColumnDefinitions>
-					<ColumnDefinition Width="Auto"/>
-					<ColumnDefinition Width="Auto"/>
-					<ColumnDefinition Width="Auto"/>
+					<ColumnDefinition Width="33*"/>
+					<ColumnDefinition Width="33*"/>
+					<ColumnDefinition Width="33*"/>
 
 				</Grid.ColumnDefinitions>
 				<Grid.RowDefinitions>
@@ -36,9 +36,9 @@
 
 				<ListBox x:Name="ListInquiryCadsaustomerList" Width="200" Grid.Column="0" Grid.Row="3"/>
 
-				<StackPanel Grid.Column="3" Grid.Row="3">
+				<StackPanel Grid.Column="1" Grid.Row="3">
 					<TextBlock Text="Kontakt:" TextAlignment="End" VerticalAlignment="Center"/>
-					<TextBox  Watermark="Kontakt" />
+					<TextBox  Watermark="Kontakt"/>
 					<TextBlock Text="Straße:" TextAlignment="End" VerticalAlignment="Center"/>
 					<TextBox  Watermark="Straße"/>
 					<TextBlock Text="Hausnummer:" TextAlignment="End" VerticalAlignment="Center"/>
@@ -63,11 +63,14 @@
 					<RowDefinition Height="Auto"></RowDefinition>
 				</Grid.RowDefinitions>
 				<TextBlock Text="Lieferanschrift:" TextAlignment="End" Grid.Row="0" Grid.Column="0" VerticalAlignment="Center"/>
-				<TextBox  Watermark="Lieferanschrift" Grid.Row="1" Grid.Column="0"/>
 
-				<ListBox x:Name="ListInquiryCfefaeadsaustomerList" Width="200" Grid.Column="0" Grid.Row="2"/>
+				<CheckBox Grid.Row="0" Grid.Column="1" HorizontalAlignment="Right" Checked="chkOrdersDeliveryEXW_Checked" Unchecked="chkOrdersDeliveryEXW_Checked" >Ab Werk</CheckBox>
 
-				<StackPanel Grid.Column="1" Grid.Row="2">
+				<ListBox x:Name="ListInquiryDeliveryNames" Width="200" Grid.Column="0" Grid.Row="2" />
+
+				<TextBox x:Name="TxtInquiryDeliverySearch" Watermark="Lieferanschrift" Grid.Row="1" Grid.Column="0"/>
+
+				<StackPanel x:Name="StackPanelInquiryDeliveryDetails" Grid.Column="1" Grid.Row="2">
 					<TextBlock Text="Kontakt:" TextAlignment="End" VerticalAlignment="Center"/>
 					<TextBox  Watermark="Kontakt" />
 					<TextBlock Text="Straße:" TextAlignment="End" VerticalAlignment="Center"/>
@@ -77,27 +80,28 @@
 					<TextBlock Text="PLZ:" TextAlignment="End" VerticalAlignment="Center"/>
 					<TextBox  Watermark="PLZ"/>
 					<TextBlock Text="Stadt:" TextAlignment="End" VerticalAlignment="Center"/>
-					<TextBox  Watermark="Stadt" />
+					<TextBox  Watermark="Stadt"/>
 					<TextBlock Text="Land:" TextAlignment="End" VerticalAlignment="Center"/>
 					<TextBox  Watermark="Land"/>
 				</StackPanel>
 			</Grid>
 
-			<TextBlock DockPanel.Dock="Top" Name="Third" >Bemerkungen:</TextBlock>
+			<UniformGrid Rows="1" Columns="2" DockPanel.Dock="Top" Margin="10">
+				<Button DockPanel.Dock="Top" Height="60" Grid.Column="0" Grid.Row="0" HorizontalAlignment="Center" VerticalAlignment="Top">
+					<TextBlock TextWrapping="Wrap" TextAlignment="Center">
+						Position<LineBreak/>Speichern
+					</TextBlock>
+				</Button>
 
-			<TextBox VerticalAlignment="Stretch" Grid.Column="0" Grid.Row="0" Grid.RowSpan="2" Name="Notes" AcceptsReturn="True" TextWrapping="Wrap"/>
+				<Button DockPanel.Dock="Top" Height="60" Grid.Column="1" Grid.Row="0" HorizontalAlignment="Center" VerticalAlignment="Top">
+					<TextBlock TextWrapping="Wrap" TextAlignment="Center">
+						PDF<LineBreak/>Erzeugen
+					</TextBlock>
+				</Button>
+			</UniformGrid>		
 		</DockPanel>
 
 		<DockPanel Grid.Column="1" Grid.Row="0" Margin="10 0 0 0">
-
-			<Grid DockPanel.Dock="Top">
-				<Grid.ColumnDefinitions>
-					<ColumnDefinition Width="50*"/>
-					<ColumnDefinition Width="50*"/>
-				</Grid.ColumnDefinitions>
-				<Button Grid.Column="0" Grid.Row="0" Height="50" HorizontalAlignment="Center"  >Auftrag Speichern</Button>
-				<Button Grid.Column="1" Grid.Row="0" Height="50" HorizontalAlignment="Center" >PDF Erzeugen</Button>
-			</Grid>
 
 			<Rectangle DockPanel.Dock="Top" Height="50"> </Rectangle>
 
@@ -117,18 +121,28 @@
 			<TextBlock DockPanel.Dock="Top" Text="Menge:" TextAlignment="End" Grid.Row="9" Grid.Column="5" Margin="20 0 0 5" VerticalAlignment="Center"/>
 			<TextBox DockPanel.Dock="Top" Watermark="Menge" Grid.Row="9" Grid.Column="6" Margin="20 0 0 10"/>
 
-			<Button DockPanel.Dock="Top" Grid.Row="6" Grid.Column="5" Height="60" VerticalAlignment="Center" HorizontalAlignment="Center">
-				<TextBlock TextWrapping="Wrap" TextAlignment="Center">
-					Zuschlag<LineBreak/>Speichern
-				</TextBlock>
-			</Button>
+			<UniformGrid Rows="1" Columns="2" DockPanel.Dock="Top">
+				<Button DockPanel.Dock="Top" Height="60" Grid.Column="0" Grid.Row="0" HorizontalAlignment="Center">
+					<TextBlock TextWrapping="Wrap" TextAlignment="Center">
+						Zuschlag<LineBreak/>Speichern
+					</TextBlock>
+				</Button>
+
+				<Button DockPanel.Dock="Top" Height="60" Grid.Column="1" Grid.Row="0" HorizontalAlignment="Center">
+					<TextBlock TextWrapping="Wrap" TextAlignment="Center">
+						Zuschlag<LineBreak/>Speichern
+					</TextBlock>
+				</Button>
+			</UniformGrid>
+			
+
 
 			<TextBlock DockPanel.Dock="Top" >Zuschläge:</TextBlock>
 
 			<DataGrid ItemsSource="{Binding SurchargeData}"
 				AutoGenerateColumns="True"
 				GridLinesVisibility="All"
-				BorderThickness="1" BorderBrush="Gray">
+				BorderThickness="1" BorderBrush="Gray" IsReadOnly="True">
 			</DataGrid>
 		</DockPanel>
 
@@ -151,7 +165,7 @@
 				<DataGrid HeadersVisibility="None" Width="50" Grid.Row="0" Grid.RowSpan="2" Grid.Column="0" ColumnWidth="50" HorizontalScrollBarVisibility="Hidden" Height="160" ItemsSource="{Binding InquiryPositions}"
 					AutoGenerateColumns="True"
 					GridLinesVisibility="All"
-					BorderThickness="1" BorderBrush="Gray">
+					BorderThickness="1" BorderBrush="Gray" IsReadOnly="True">
 				</DataGrid>
 
 				<Button Grid.Row="1" Grid.Column="1" Height="60" VerticalAlignment="Center" HorizontalAlignment="Center">
@@ -165,7 +179,7 @@
 
 			<TextBlock Text="Außendurchmesser:" TextAlignment="Left" VerticalAlignment="Center"/>
 
-			<ComboBox MaxDropDownHeight="200" PlaceholderText="AD">
+			<ComboBox MaxDropDownHeight="200" PlaceholderText="AD" HorizontalAlignment="Stretch" >
 				<ComboBoxItem>42,4</ComboBoxItem>
 				<ComboBoxItem>33,7</ComboBoxItem>
 				<ComboBoxItem>168,3</ComboBoxItem>
@@ -174,7 +188,7 @@
 
 			<TextBlock Text="Wandstärke:" TextAlignment="Left" VerticalAlignment="Center"/>
 
-			<ComboBox MaxDropDownHeight="200" PlaceholderText="WS">
+			<ComboBox MaxDropDownHeight="200" PlaceholderText="WS" HorizontalAlignment="Stretch" >
 				<ComboBoxItem>1,00</ComboBoxItem>
 				<ComboBoxItem>1,5</ComboBoxItem>
 				<ComboBoxItem>2,0</ComboBoxItem>
@@ -183,16 +197,16 @@
 
 			<TextBlock Text="Werkstoff:" TextAlignment="Left" VerticalAlignment="Center"/>
 
-			<ComboBox MaxDropDownHeight="200" PlaceholderText="Werkstoff">
+			<ComboBox MaxDropDownHeight="200" PlaceholderText="Werkstoff" HorizontalAlignment="Stretch" >
 				<ComboBoxItem>1.4301</ComboBoxItem>
 				<ComboBoxItem>1.4541</ComboBoxItem>
 				<ComboBoxItem>1.4571</ComboBoxItem>
 				<ComboBoxItem>1.4845</ComboBoxItem>
 			</ComboBox>
 
-			<TextBlock Text="Norm:" TextAlignment="Left" VerticalAlignment="Center"/>
+			<TextBlock Text="Norm:" TextAlignment="Left" VerticalAlignment="Center" />
 
-			<ComboBox PlaceholderText="Norm">
+			<ComboBox PlaceholderText="Norm" HorizontalAlignment="Stretch">
 				<ComboBoxItem>EN10217-7</ComboBoxItem>
 				<ComboBoxItem>EN10296-2</ComboBoxItem>
 				<ComboBoxItem>SEW470</ComboBoxItem>
@@ -200,9 +214,9 @@
 				<ComboBoxItem>ASME SA-312</ComboBoxItem>
 			</ComboBox>
 
-			<TextBlock Text="Ausführung:" TextAlignment="Left" VerticalAlignment="Center"/>
+			<TextBlock Text="Ausführung:" TextAlignment="Left" VerticalAlignment="Center" />
 
-			<ComboBox PlaceholderText="Ausführung">
+			<ComboBox PlaceholderText="Ausführung" HorizontalAlignment="Stretch" >
 				<ComboBoxItem>W0</ComboBoxItem>
 				<ComboBoxItem>W1</ComboBoxItem>
 				<ComboBoxItem>W2</ComboBoxItem>
@@ -213,7 +227,7 @@
 
 			<TextBlock Text="Zeugnis:" TextAlignment="Left" VerticalAlignment="Center"/>
 
-			<ComboBox PlaceholderText="Zeugnis">
+			<ComboBox PlaceholderText="Zeugnis" HorizontalAlignment="Stretch">
 				<ComboBoxItem>EN10204/3.1</ComboBoxItem>
 				<ComboBoxItem>EN10204/3.2</ComboBoxItem>
 				<ComboBoxItem>EN10204/3.1 + AD2000-W2</ComboBoxItem>
@@ -359,7 +373,7 @@
 			<TextBlock Text="KL Max.:"/>
 			<TextBox Watermark="KL Max."/>
 
-			<Grid>
+			<Grid HorizontalAlignment="Stretch">
 
 				<Grid.ColumnDefinitions>
 					<ColumnDefinition Width="Auto"/>
@@ -377,160 +391,59 @@
 
 			<CheckBox>Vorrat?</CheckBox>
 
-			<Grid>
+			<TextBlock Grid.Row="0" Grid.Column="0" Text="Preis:" TextAlignment="Left" VerticalAlignment="Center"/>
+
+			<UniformGrid Rows="1" Columns="2" DockPanel.Dock="Top">
+				<TextBox  Watermark="Preis" Grid.Row="1" Grid.Column="0"/>
+
+				<ComboBox Grid.Row="1" Grid.Column="1" HorizontalAlignment="Stretch">
+					<ComboBoxItem>€/m</ComboBoxItem>
+					<ComboBoxItem>€/Stk.</ComboBoxItem>
+					<ComboBoxItem>€/kg</ComboBoxItem>
+				</ComboBox>
+			</UniformGrid>
+
+			<TextBlock  Text="Liefertermin"/>
+			<CalendarDatePicker HorizontalAlignment="Stretch"/>
+		</StackPanel>
+
+		<DockPanel Grid.Column="4" Grid.Row="0" HorizontalAlignment="Stretch" VerticalAlignment="Stretch">
+			<Grid DockPanel.Dock="Top" HorizontalAlignment="Stretch">
 				<Grid.ColumnDefinitions>
+					<ColumnDefinition Width="Auto"/>
+					<ColumnDefinition Width="Auto"/>
 					<ColumnDefinition Width="Auto"/>
 					<ColumnDefinition Width="Auto"/>
 				</Grid.ColumnDefinitions>
 				<Grid.RowDefinitions>
 					<RowDefinition Height="Auto"></RowDefinition>
 					<RowDefinition Height="Auto"></RowDefinition>
+					<RowDefinition Height="Auto"></RowDefinition>
+					<RowDefinition Height="Auto"></RowDefinition>
+					<RowDefinition Height="Auto"></RowDefinition>
 				</Grid.RowDefinitions>
-				<TextBlock Grid.Row="0" Grid.Column="0" Text="Preis:" TextAlignment="Left" VerticalAlignment="Center"/>
-				<TextBox  Watermark="Preis" Grid.Row="1" Grid.Column="0"/>
 
-				<ComboBox Grid.Row="1" Grid.Column="1">
-					<ComboBoxItem>€/m</ComboBoxItem>
-					<ComboBoxItem>€/Stk.</ComboBoxItem>
-					<ComboBoxItem>€/kg</ComboBoxItem>
-				</ComboBox>
+
+				<TextBlock Grid.Row="0" Grid.Column="0" >Notizen für Auftrag:</TextBlock>
+				<Button Grid.Row="1" Grid.Column="0" HorizontalAlignment="Stretch" >Notizen für Auftrag Extern</Button>
+				<Button Grid.Row="2" Grid.Column="0" HorizontalAlignment="Stretch" >Notizen für Auftrag Intern</Button>
+
+				<TextBlock Grid.Row="0" Grid.Column="1" >Notizen für Positionen:</TextBlock>
+				<Button Grid.Row="1" Grid.Column="1" HorizontalAlignment="Stretch" >Notizen Spaltplan</Button>
+				<Button Grid.Row="2" Grid.Column="1" HorizontalAlignment="Stretch" >Notizen Spalten</Button>
+				<Button Grid.Row="3" Grid.Column="1" HorizontalAlignment="Stretch" >Notizen Rohrstraße</Button>
+				<Button Grid.Row="0" Grid.Column="2" HorizontalAlignment="Stretch" >Notizen Glühofen</Button>
+				<Button Grid.Row="1" Grid.Column="2" HorizontalAlignment="Stretch" >Notizen Richten</Button>
+				<Button Grid.Row="2" Grid.Column="2" HorizontalAlignment="Stretch" >Notizen Sägen</Button>
+				<Button Grid.Row="3" Grid.Column="2" HorizontalAlignment="Stretch" >Notizen Schleifen</Button>
+				<Button Grid.Row="0" Grid.Column="3" HorizontalAlignment="Stretch" >Notizen Prüfen</Button>
+				<Button Grid.Row="1" Grid.Column="3" HorizontalAlignment="Stretch" >Notizen Werkszeugnis</Button>
+				<Button Grid.Row="2" Grid.Column="3" HorizontalAlignment="Stretch" >Notizen Lieferschein</Button>
+				<Button Grid.Row="3" Grid.Column="3" HorizontalAlignment="Stretch" >Notizen Rechnung</Button>
 			</Grid>
 
-			<TextBlock  Text="Liefertermin"/>
-			<CalendarDatePicker/>
-		</StackPanel>
-
-		<!-- <StackPanel Grid.Column="4" Grid.Row="0">
-			<Expander VerticalAlignment="Stretch" HorizontalAlignment="Stretch">
-				<Expander.Header>
-					Notizen für Extern
-				</Expander.Header>
-				<TextBox Watermark="Beschreibung" AcceptsReturn="True" TextWrapping="Wrap" VerticalAlignment="Stretch"/>
-			</Expander>
-
-			<Expander VerticalAlignment="Top" HorizontalAlignment="Stretch">
-				<Expander.Header>
-					Notizen Spaltplan
-				</Expander.Header>
-				<TextBox Height="290" Watermark="Beschreibung" AcceptsReturn="True" TextWrapping="Wrap"/>
-			</Expander>
-
-			<Expander VerticalAlignment="Top" HorizontalAlignment="Stretch">
-				<Expander.Header>
-					Notizen Spalten
-				</Expander.Header>
-				<TextBox Height="290" Watermark="Beschreibung" AcceptsReturn="True" TextWrapping="Wrap"/>
-			</Expander>
-
-			<Expander VerticalAlignment="Top" HorizontalAlignment="Stretch">
-				<Expander.Header>
-					Notizen Rohrstraße
-				</Expander.Header>
-				<TextBox Height="290" Watermark="Beschreibung" AcceptsReturn="True" TextWrapping="Wrap"/>
-			</Expander>
-
-			<Expander VerticalAlignment="Top" HorizontalAlignment="Stretch">
-				<Expander.Header>
-					Notizen Glühofen
-				</Expander.Header>
-				<TextBox Height="290" Watermark="Beschreibung" AcceptsReturn="True" TextWrapping="Wrap"/>
-			</Expander>
-
-			<Expander VerticalAlignment="Top" HorizontalAlignment="Stretch">
-				<Expander.Header>
-					Notizen Richten
-				</Expander.Header>
-				<TextBox Height="290" Watermark="Beschreibung" AcceptsReturn="True" TextWrapping="Wrap"/>
-			</Expander>
-
-			<Expander VerticalAlignment="Top" HorizontalAlignment="Stretch">
-				<Expander.Header>
-					Notizen Prüfen
-				</Expander.Header>
-				<TextBox Height="290" Watermark="Beschreibung" AcceptsReturn="True" TextWrapping="Wrap"/>
-			</Expander>
-
-			<Expander VerticalAlignment="Top" HorizontalAlignment="Stretch">
-				<Expander.Header>
-					Notizen Schleifen
-				</Expander.Header>
-				<TextBox Height="290" Watermark="Beschreibung" AcceptsReturn="True" TextWrapping="Wrap"/>
-			</Expander>
-
-			<Expander VerticalAlignment="Top" HorizontalAlignment="Stretch">
-				<Expander.Header>
-					Notizen Sägen
-				</Expander.Header>
-				<TextBox Height="290" Watermark="Beschreibung" AcceptsReturn="True" TextWrapping="Wrap"/>
-			</Expander>
-
-			<Expander VerticalAlignment="Top" HorizontalAlignment="Stretch">
-				<Expander.Header>
-					Notizen Verpacken
-				</Expander.Header>
-				<TextBox Height="290" Watermark="Beschreibung" AcceptsReturn="True" TextWrapping="Wrap"/>
-			</Expander>
-
-			<Expander VerticalAlignment="Top" HorizontalAlignment="Stretch">
-				<Expander.Header>
-					Notizen Werkszeugnis
-				</Expander.Header>
-				<TextBox Height="290" Watermark="Beschreibung" AcceptsReturn="True" TextWrapping="Wrap"/>
-			</Expander>
-
-			<Expander VerticalAlignment="Top" HorizontalAlignment="Stretch">
-				<Expander.Header>
-					Notizen Lieferschein
-				</Expander.Header>
-				<TextBox Height="290" Watermark="Beschreibung" AcceptsReturn="True" TextWrapping="Wrap"/>
-			</Expander>
-
-			<Expander VerticalAlignment="Top" HorizontalAlignment="Stretch">
-				<Expander.Header>
-					Notizen Berechnung
-				</Expander.Header>
-				<TextBox Height="290" Watermark="Beschreibung" AcceptsReturn="True" TextWrapping="Wrap"/>
-			</Expander>
-		</StackPanel>
-		-->
-
-		<Grid Grid.Column="4" Grid.Row="0">
-			<Grid.RowDefinitions>
-				<RowDefinition Height="Auto" />
-				<RowDefinition Height="Auto" />
-				<RowDefinition Height="Auto" />
-				<RowDefinition Height="Auto" />
-			</Grid.RowDefinitions>
-
-			<Expander VerticalAlignment="Stretch" HorizontalAlignment="Stretch" Grid.Row="0">
-				<Expander.Header>
-					Notizen für Extern
-				</Expander.Header>
-				<TextBox Watermark="Beschreibung" AcceptsReturn="True" TextWrapping="Wrap" VerticalAlignment="Stretch"/>
-			</Expander>
-
-			<Expander VerticalAlignment="Stretch" HorizontalAlignment="Stretch" Grid.Row="1">
-				<Expander.Header>
-					Notizen Spaltplan
-				</Expander.Header>
-				<TextBox Watermark="Beschreibung" AcceptsReturn="True" TextWrapping="Wrap"/>
-			</Expander>
-
-			<Expander VerticalAlignment="Stretch" HorizontalAlignment="Stretch" Grid.Row="2">
-				<Expander.Header>
-					Notizen Spalten
-				</Expander.Header>
-				<TextBox Watermark="Beschreibung" AcceptsReturn="True" TextWrapping="Wrap"/>
-			</Expander>
-
-			<Expander VerticalAlignment="Stretch" HorizontalAlignment="Stretch" Grid.Row="3">
-				<Expander.Header>
-					Notizen Rohrstraße
-				</Expander.Header>
-				<TextBox Watermark="Beschreibung" AcceptsReturn="True" TextWrapping="Wrap"/>
-			</Expander>
-
-		</Grid>
+			<TextBox AcceptsReturn="True" TextWrapping="Wrap" HorizontalAlignment="Stretch" VerticalAlignment="Stretch"/>
+		</DockPanel>
 
 	</Grid>
 </UserControl>

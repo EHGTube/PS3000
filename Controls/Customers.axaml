@@ -5,8 +5,8 @@
              mc:Ignorable="d" d:DesignWidth="1920" d:DesignHeight="1080"
              x:Class="PS3000.Customers">
 	<ScrollViewer HorizontalScrollBarVisibility="Visible" VerticalScrollBarVisibility="Visible">
-		<Grid ColumnDefinitions="200,200,200,200,200,200,Auto" RowDefinitions="Auto,Auto,Auto,Auto,Auto,Auto,Auto,Auto,Auto,Auto,Auto,Auto,Auto,Auto,Auto,Auto,Auto,Auto,Auto,Auto,Auto"  Margin="10">
-			<TextBox  Watermark="Lieferanschrift" Grid.Row="0" Grid.ColumnSpan="2" Margin="0 30 0 10"/>
+		<Grid ColumnDefinitions="200,200,200,200,200,200,*" RowDefinitions="Auto,Auto,Auto,Auto,Auto,Auto,Auto,Auto,Auto,Auto,Auto,Auto,Auto,Auto,Auto,Auto,Auto,Auto,Auto,Auto,Auto"  Margin="10">
+			<TextBox  Watermark="Lieferanschrift" Grid.Row="0" Grid.ColumnSpan="2" Margin="0 30 0 10" />
 			<ListBox x:Name="ListCustomersDeliveryAdressList" Height="200" Width="400" Grid.Row="1" Grid.RowSpan="5" Grid.Column="0" Grid.ColumnSpan="2" Margin="0 0 0 10"/>
 			<TextBlock Text="Lieferanschrift Details:" TextAlignment="Center" Grid.Row="6" Grid.Column="0" Grid.ColumnSpan="2" Margin="0 0 0 10"/>
 			<TextBlock Text="Lieferanschrift Nr.:" TextAlignment="End" Grid.Row="8" Grid.Column="0" Margin="0 0 10 5" VerticalAlignment="Center"/>
@@ -29,7 +29,7 @@
 			<TextBlock Text="Avis. Telefonnummer" TextAlignment="End" Grid.Row="16" Grid.Column="0" Margin="0 0 10 5" VerticalAlignment="Center"/>
 			<TextBox  Watermark="Avis. E-Mail" Grid.Row="17" Grid.Column="1" Margin="0 0 0 10"/>
 			<TextBlock Text="Avis. E-Mail:" TextAlignment="End" Grid.Row="17" Grid.Column="0" Margin="0 0 10 5" VerticalAlignment="Center"/>
-			<Button Content="Lieferanschrift Speichern" Grid.Row="18" Grid.Column="1" Grid.RowSpan="0" Grid.ColumnSpan="1" />
+			<Button Content="Lieferanschrift Speichern" Grid.Row="18" Grid.Column="1" Grid.RowSpan="0" Grid.ColumnSpan="1" Click="btnCustomersSaveDeliveryAdress" />
 
 			<TextBox  Watermark="Kunde" Grid.Row="0" Grid.ColumnSpan="2" Grid.Column="2" Margin="0 30 0 10"/>
 			<ListBox x:Name="ListCustomersCustomerList" Height="200" Width="400" HorizontalAlignment="Right" Grid.Row="1" Grid.RowSpan="5" Grid.Column="2" Grid.ColumnSpan="2" Margin="0 0 0 10"/>
@@ -74,7 +74,7 @@
 			<TextBox  Watermark="Nettofrist" Grid.Row="19" Grid.Column="5" Margin="0 0 0 10"/>
 			<TextBlock Text="Nettofrist:" TextAlignment="End" Grid.Row="19" Grid.Column="4" Margin="0 0 10 5" VerticalAlignment="Center"/>
 			<TextBlock Margin="20 30 0 10" Grid.Row="0" Grid.Column="6" >Notizen:</TextBlock>
-			<TextBox Margin="20 -10 0 -50" AcceptsReturn="True" Grid.RowSpan="19" Grid.Row="1" Grid.Column="7" Width="500" TextWrapping="Wrap"/>
+			<TextBox Margin="20 -10 0 -50" AcceptsReturn="True" Grid.RowSpan="19" Grid.Row="1" Grid.Column="7" TextWrapping="Wrap" HorizontalAlignment="Stretch" VerticalAlignment="Stretch"/>
 			<Button Content="Kundendaten Speichern" Grid.Row="18" Grid.Column="3" Grid.RowSpan="0" Grid.ColumnSpan="2" />
 
 			<Button Content="SpansCol1-2Row1-2" Name="MyButton" Grid.Row="18" Grid.Column="0" Grid.RowSpan="2" Grid.ColumnSpan="2" />

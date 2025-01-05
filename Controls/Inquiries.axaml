@@ -19,7 +19,7 @@
 			<ColumnDefinition Width="Auto"></ColumnDefinition>
 			<ColumnDefinition Width="Auto"></ColumnDefinition>
 			<ColumnDefinition Width="Auto"></ColumnDefinition>
-			<ColumnDefinition Width="Auto"></ColumnDefinition>
+			<ColumnDefinition Width="*"></ColumnDefinition>
 		</Grid.ColumnDefinitions>
 		<Grid.RowDefinitions>
 			<RowDefinition Height="Auto"></RowDefinition>
@@ -269,15 +269,15 @@
 		<TextBlock Text="Lieferzeit:" TextAlignment="Center" Grid.Row="7" Grid.Column="11" Margin="20 0 0 5" VerticalAlignment="Center"/>
 		<TextBox  Watermark="Lieferzeit" Grid.Row="8" Grid.Column="11" Margin="20 0 0 10"/>
 
-		<StackPanel Margin="10" Width="320" Grid.RowSpan="30" Grid.Column="12" Grid.Row="0">
-			<Expander VerticalAlignment="Top" Width="320">
+		<StackPanel Margin="10" HorizontalAlignment="Stretch" Grid.RowSpan="30" Grid.Column="12" Grid.Row="0">
+			<Expander VerticalAlignment="Top" HorizontalAlignment="Stretch">
 				<Expander.Header>
 					Notizen für Extern
 				</Expander.Header>
 				<TextBox Height="300" Watermark="Beschreibung"/>
 			</Expander>
 
-			<Expander VerticalAlignment="Top" Width="320">
+			<Expander VerticalAlignment="Top" HorizontalAlignment="Stretch">
 				<Expander.Header>
 					Notizen für Intern
 				</Expander.Header>

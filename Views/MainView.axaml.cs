@@ -28,6 +28,7 @@ public partial class MainView : UserControl
         //ListCustomersCustomerList.Items.Add("afaegfsrrgse");
 
         //ListCustomersDeliveryAdressList.Items.Add("asdas");
+
     }
 
     public async void ButtonClick(object? sender, EventArgs e)
@@ -37,7 +38,5 @@ public partial class MainView : UserControl
               ButtonEnum.YesNo);
 
         var result = await box.ShowAsync();
-
-        var availableSize = new Avalonia.Size(double.PositiveInfinity, double.PositiveInfinity);
     }
 }

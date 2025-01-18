@@ -6,28 +6,28 @@
              x:Class="PS3000.Customers">
 	<ScrollViewer HorizontalScrollBarVisibility="Visible" VerticalScrollBarVisibility="Visible">
 		<Grid ColumnDefinitions="200,200,200,200,200,200,*" RowDefinitions="Auto,Auto,Auto,Auto,Auto,Auto,Auto,Auto,Auto,Auto,Auto,Auto,Auto,Auto,Auto,Auto,Auto,Auto,Auto,Auto,Auto"  Margin="10">
-			<TextBox  Watermark="Lieferanschrift" Grid.Row="0" Grid.ColumnSpan="2" Margin="0 30 0 10" />
-			<ListBox x:Name="ListCustomersDeliveryAdressList" Height="200" Width="400" Grid.Row="1" Grid.RowSpan="5" Grid.Column="0" Grid.ColumnSpan="2" Margin="0 0 0 10"/>
+			<TextBox  Watermark="Lieferanschrift" Name="textCustomersDeliveryAdressSearch" TextChanged="textCustomersDeliveryAdressSearch_TextChanged" Grid.Row="0" Grid.ColumnSpan="2" Margin="0 30 0 10" />
+			<ListBox x:Name="ListCustomersDeliveryAdressList" SelectionChanged="DeliveryAdressSearchBox_TextChanged" Height="200" Width="400" Grid.Row="1" Grid.RowSpan="5" Grid.Column="0" Grid.ColumnSpan="2" Margin="0 0 0 10"/>
 			<TextBlock Text="Lieferanschrift Details:" TextAlignment="Center" Grid.Row="6" Grid.Column="0" Grid.ColumnSpan="2" Margin="0 0 0 10"/>
 			<TextBlock Text="Lieferanschrift Nr.:" TextAlignment="End" Grid.Row="8" Grid.Column="0" Margin="0 0 10 5" VerticalAlignment="Center"/>
-			<TextBox  Watermark="Lieferanschrift Nr." Grid.Row="8" Grid.Column="1" Margin="0 0 0 10"/>
-			<TextBox  Watermark="Firma" Grid.Row="9" Grid.Column="1" Margin="0 0 0 10"/>
+			<TextBox  Watermark="Lieferanschrift Nr." Name="textCustomersDeliveryAdressNumber" Grid.Row="8" Grid.Column="1" Margin="0 0 0 10"/>
+			<TextBox  Watermark="Firma" Name="textCustomersDeliveryAdressCompany" Grid.Row="9" Grid.Column="1" Margin="0 0 0 10"/>
 			<TextBlock Text="Firma" TextAlignment="End" Grid.Row="9" Grid.Column="0" Margin="0 0 10 5" VerticalAlignment="Center"/>
-			<TextBox  Watermark="Straße" Grid.Row="10" Grid.Column="1" Margin="0 0 0 10"/>
+			<TextBox  Watermark="Straße" Name="textCustomersDeliveryAdressStreet" Grid.Row="10" Grid.Column="1" Margin="0 0 0 10"/>
 			<TextBlock Text="Straße" TextAlignment="End" Grid.Row="10" Grid.Column="0" Margin="0 0 10 5" VerticalAlignment="Center"/>
-			<TextBox  Watermark="Hausnummer" Grid.Row="11" Grid.Column="1" Margin="0 0 0 10"/>
+			<TextBox  Watermark="Hausnummer" Name="textCustomersDeliveryAdressHouseNo" Grid.Row="11" Grid.Column="1" Margin="0 0 0 10"/>
 			<TextBlock Text="Hausnummer" TextAlignment="End" Grid.Row="11" Grid.Column="0" Margin="0 0 10 5" VerticalAlignment="Center"/>
-			<TextBox  Watermark="PLZ" Grid.Row="12" Grid.Column="1" Margin="0 0 0 10"/>
+			<TextBox  Watermark="PLZ" Name="textCustomersDeliveryAdressPostCode" Grid.Row="12" Grid.Column="1" Margin="0 0 0 10"/>
 			<TextBlock Text="PLZ:" TextAlignment="End" Grid.Row="12" Grid.Column="0" Margin="0 0 10 5" VerticalAlignment="Center"/>
 			<TextBlock Text="Stadt:" Grid.Row="13" TextAlignment="End" Grid.Column="0" Margin="0 0 10 5" VerticalAlignment="Center"/>
-			<TextBox  Watermark="Stadt" Grid.Row="13" Grid.Column="1" Margin="0 0 0 10"/>
-			<TextBox  Watermark="Land" Grid.Row="14" Grid.Column="1" Margin="0 0 0 10"/>
+			<TextBox  Watermark="Stadt" Name="textCustomersDeliveryAdressCity" Grid.Row="13" Grid.Column="1" Margin="0 0 0 10"/>
+			<TextBox  Watermark="Land" Name="textCustomersDeliveryAdressCountry" Grid.Row="14" Grid.Column="1" Margin="0 0 0 10"/>
 			<TextBlock Text="Land" Grid.Row="14" TextAlignment="End" Grid.Column="0" Margin="0 0 10 5" VerticalAlignment="Center"/>
-			<TextBox  Watermark="Avis. Ansprechpartner" Grid.Row="15" Grid.Column="1" Margin="0 0 0 10"/>
+			<TextBox  Watermark="Avis. Ansprechpartner" Name="textCustomersDeliveryAdressContactName" Grid.Row="15" Grid.Column="1" Margin="0 0 0 10"/>
 			<TextBlock Text="Avis. Ansprechpartner" TextAlignment="End" Grid.Row="15" Grid.Column="0" Margin="0 0 10 5" VerticalAlignment="Center"/>
-			<TextBox  Watermark="Avis. Telefonnummer" Grid.Row="16" Grid.Column="1" Margin="0 0 0 10"/>
+			<TextBox  Watermark="Avis. Telefonnummer" Name="textCustomersDeliveryAdressContactPhone" Grid.Row="16" Grid.Column="1" Margin="0 0 0 10"/>
 			<TextBlock Text="Avis. Telefonnummer" TextAlignment="End" Grid.Row="16" Grid.Column="0" Margin="0 0 10 5" VerticalAlignment="Center"/>
-			<TextBox  Watermark="Avis. E-Mail" Grid.Row="17" Grid.Column="1" Margin="0 0 0 10"/>
+			<TextBox  Watermark="Avis. E-Mail" Name="textCustomersDeliveryAdressContactMail" Grid.Row="17" Grid.Column="1" Margin="0 0 0 10"/>
 			<TextBlock Text="Avis. E-Mail:" TextAlignment="End" Grid.Row="17" Grid.Column="0" Margin="0 0 10 5" VerticalAlignment="Center"/>
 			<Button Content="Lieferanschrift Speichern" Grid.Row="18" Grid.Column="1" Grid.RowSpan="0" Grid.ColumnSpan="1" Click="btnCustomersSaveDeliveryAdress" />
 

@@ -142,8 +142,9 @@
 			<DataGrid ItemsSource="{Binding SurchargeData}"
 				AutoGenerateColumns="True"
 				GridLinesVisibility="All"
-				BorderThickness="1" BorderBrush="Gray" IsReadOnly="True">
+				BorderThickness="1" BorderBrush="Gray">
 			</DataGrid>
+		
 		</DockPanel>
 
 		<StackPanel Grid.Column="2" Margin="10 0 0 0" >

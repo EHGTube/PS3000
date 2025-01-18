@@ -5,15 +5,42 @@ using MsBox.Avalonia.Enums;
 using MsBox.Avalonia;
 using System;
 using System.Collections.Generic;
+using MySql;
+using MySql.Data.MySqlClient;
 
 namespace PS3000;
 
 public partial class Customers : UserControl
 {
+    string connectionString = "Server=127.0.0.1;Port=3306;Database=prostahl;Uid=root;Pwd=1234;";
+
     public Customers()
     {
         InitializeComponent();
     }
+
+    private string GetFieldValue(string returnColumn, string Keyphrase, string table, string searchcolumn)
+    {
+        string query = $"SELECT `{returnColumn}` FROM `prostahl`.`{table}` WHERE `{searchcolumn}` LIKE '{Keyphrase}' ORDER BY `{searchcolumn}` ASC LIMIT 1";
+
+        try
+        {
+            using (MySqlConnection connection = new MySqlConnection(connectionString))
+            {
+                connection.Open();
+                MySqlCommand command = new MySqlCommand(query, connection);
+                object result = command.ExecuteScalar();
+
+                return result?.ToString() ?? "";
+            }
+        }
+        catch (Exception ex)
+        {
+            //Add Serilog here at some point? 
+            return "";
+        }
+    }
+
 
     //Following is all for Delivery Adress Information on Customer Tab
 
@@ -49,7 +76,7 @@ public partial class Customers : UserControl
         //{
         //    try
         //    {
-        //using (MySqlConnection connection = new MySqlConnection(connectionString))
+        //using (MySql.Data.MySqlClient.MySqlConnection connection = new MySql.Data.MySqlClient.MySqlConnection(connectionString))
         //        {
         //            connection.Open();
 
@@ -58,7 +85,7 @@ public partial class Customers : UserControl
         //                    VALUES
         //                    (@Firmenname, @Straﬂe, @Hausnummer, @PLZ, @Stadt, @Land, @Ansprechpartner, @AnsprechpartnerTelefon, @AnsprechpartnerMail);";
 
-        //            MySqlCommand command = new MySqlCommand(query, connection);
+        //            MySql.Data.MySqlClient.MySqlCommand command = new MySql.Data.MySqlClient.MySqlCommand(query, connection);
 
         //            // Add parameters
         //            command.Parameters.AddWithValue("@Firmenname", txtNewDeliveryAdressCompany.Text);
@@ -94,29 +121,34 @@ public partial class Customers : UserControl
         //}
     }
 
-    //private void listCustomersDeliveryAdresses_SelectedIndexChanged(object sender, EventArgs e)
-    //{
-    //    if (listCustomersDeliveryAdresses.SelectedItem != null)
-    //    {
+    private void DeliveryAdressSearchBox_TextChanged(object? sender, Avalonia.Interactivity.RoutedEventArgs e)
+    {
+        if (ListCustomersDeliveryAdressList.SelectedItem != null)
+        {
+            string ID = ListCustomersDeliveryAdressList.SelectedItem.ToString();
+            textCustomersDeliveryAdressCompany.Text = GetFieldValue("Firmenname", ID, "lieferanschrift", "Firmenname");
+            textCustomersDeliveryAdressStreet.Text = GetFieldValue("Straﬂe", ID, "lieferanschrift", "Firmenname");
+            textCustomersDeliveryAdressHouseNo.Text = GetFieldValue("Hausnummer", ID, "lieferanschrift", "Firmenname");
+            textCustomersDeliveryAdressPostCode.Text = GetFieldValue("PLZ", ID, "lieferanschrift", "Firmenname");
+            textCustomersDeliveryAdressCity.Text = GetFieldValue("Stadt", ID, "lieferanschrift", "Firmenname");
+            textCustomersDeliveryAdressCountry.Text = GetFieldValue("Land", ID, "lieferanschrift", "Firmenname");
+            textCustomersDeliveryAdressContactName.Text = GetFieldValue("Ansprechpartner", ID, "lieferanschrift", "Firmenname");
+            textCustomersDeliveryAdressContactPhone.Text = GetFieldValue("Ansprechpartner_Telefon", ID, "lieferanschrift", "Firmenname");
+            textCustomersDeliveryAdressContactMail.Text = GetFieldValue("Ansprechpartner_Mail", ID, "lieferanschrift", "Firmenname");
+            textCustomersDeliveryAdressNumber.Text = GetFieldValue("Lieferanschrift_Nummer", ID, "lieferanschrift", "Firmenname");
+        }
+    }
 
-    //        string ID = listCustomersDeliveryAdresses.SelectedItem.ToString();
-    //        txtNewDeliveryAdressCompany.Text = GetFieldValue("Firmenname", ID, "lieferanschrift", "Firmenname");
-    //        txtNewDeliveryAdressStreet.Text = GetFieldValue("Straﬂe", ID, "lieferanschrift", "Firmenname");
-    //        txtNewDeliveryAdressNumber.Text = GetFieldValue("Hausnummer", ID, "lieferanschrift", "Firmenname");
-    //        txtNewDeliveryAdressPostCode.Text = GetFieldValue("PLZ", ID, "lieferanschrift", "Firmenname");
-    //        txtNewDeliveryAdressCity.Text = GetFieldValue("Stadt", ID, "lieferanschrift", "Firmenname");
-    //        txtNewDeliveryAdressCountry.Text = GetFieldValue("Land", ID, "lieferanschrift", "Firmenname");
-    //        txtNewDeliveryAdressContactName.Text = GetFieldValue("Ansprechpartner", ID, "lieferanschrift", "Firmenname");
-    //        txtNewDeliveryAdressContactPhone.Text = GetFieldValue("Ansprechpartner_Telefon", ID, "lieferanschrift", "Firmenname");
-    //        txtNewDeliveryAdressContactMail.Text = GetFieldValue("Ansprechpartner_Mail", ID, "lieferanschrift", "Firmenname");
-    //        txtLieferanschriftID.Text = GetFieldValue("Lieferanschrift_Nummer", ID, "lieferanschrift", "Firmenname");
-    //    }
-    //}
 
-    //private void textCustomersDeliveryAdressSearch_TextChanged(object sender, EventArgs e)
-    //{
-    //    CustomerDeliveryAdressSearchList();
-    //}
+    private void listCustomersDeliveryAdresses_SelectedIndexChanged(object sender, EventArgs e)
+    {
+
+    }
+
+    private void textCustomersDeliveryAdressSearch_TextChanged(object? sender, Avalonia.Interactivity.RoutedEventArgs e)
+    {
+        CustomerDeliveryAdressSearchList();
+    }
 
     //private void btnCustomerDeliveryAdressChange_Click(object sender, EventArgs e)
     //{
@@ -145,10 +177,10 @@ public partial class Customers : UserControl
 
     //            try
     //            {
-    //                using (MySqlConnection connection = new MySqlConnection(connectionString))
+    //                using (MySql.Data.MySqlClient.MySqlConnection connection = new MySql.Data.MySqlClient.MySqlConnection(connectionString))
     //                {
     //                    connection.Open();
-    //                    MySqlCommand command = new MySqlCommand(updateQuery, connection);
+    //                    MySql.Data.MySqlClient.MySqlCommand command = new MySql.Data.MySqlClient.MySqlCommand(updateQuery, connection);
 
     //                    command.ExecuteNonQuery();
     //                }
@@ -162,10 +194,10 @@ public partial class Customers : UserControl
 
     //            try
     //            {
-    //                using (MySqlConnection connection = new MySqlConnection(connectionString))
+    //                using (MySql.Data.MySqlClient.MySqlConnection connection = new MySql.Data.MySqlClient.MySqlConnection(connectionString))
     //                {
     //                    connection.Open();
-    //                    MySqlCommand command = new MySqlCommand(updateQuery, connection);
+    //                    MySql.Data.MySqlClient.MySqlCommand command = new MySql.Data.MySqlClient.MySqlCommand(updateQuery, connection);
 
     //                    command.ExecuteNonQuery();
     //                }
@@ -182,10 +214,10 @@ public partial class Customers : UserControl
 
     //            try
     //            {
-    //                using (MySqlConnection connection = new MySqlConnection(connectionString))
+    //                using (MySql.Data.MySqlClient.MySqlConnection connection = new MySql.Data.MySqlClient.MySqlConnection(connectionString))
     //                {
     //                    connection.Open();
-    //                    MySqlCommand command = new MySqlCommand(updateQuery, connection);
+    //                    MySql.Data.MySqlClient.MySqlCommand command = new MySql.Data.MySqlClient.MySqlCommand(updateQuery, connection);
 
     //                    command.ExecuteNonQuery();
     //                }
@@ -201,10 +233,10 @@ public partial class Customers : UserControl
 
     //            try
     //            {
-    //                using (MySqlConnection connection = new MySqlConnection(connectionString))
+    //                using (MySql.Data.MySqlClient.MySqlConnection connection = new MySql.Data.MySqlClient.MySqlConnection(connectionString))
     //                {
     //                    connection.Open();
-    //                    MySqlCommand command = new MySqlCommand(updateQuery, connection);
+    //                    MySql.Data.MySqlClient.MySqlCommand command = new MySql.Data.MySqlClient.MySqlCommand(updateQuery, connection);
 
     //                    command.ExecuteNonQuery();
     //                }
@@ -220,10 +252,10 @@ public partial class Customers : UserControl
 
     //            try
     //            {
-    //                using (MySqlConnection connection = new MySqlConnection(connectionString))
+    //                using (MySql.Data.MySqlClient.MySqlConnection connection = new MySql.Data.MySqlClient.MySqlConnection(connectionString))
     //                {
     //                    connection.Open();
-    //                    MySqlCommand command = new MySqlCommand(updateQuery, connection);
+    //                    MySql.Data.MySqlClient.MySqlCommand command = new MySql.Data.MySqlClient.MySqlCommand(updateQuery, connection);
 
     //                    command.ExecuteNonQuery();
     //                }
@@ -240,10 +272,10 @@ public partial class Customers : UserControl
 
     //            try
     //            {
-    //                using (MySqlConnection connection = new MySqlConnection(connectionString))
+    //                using (MySql.Data.MySqlClient.MySqlConnection connection = new MySql.Data.MySqlClient.MySqlConnection(connectionString))
     //                {
     //                    connection.Open();
-    //                    MySqlCommand command = new MySqlCommand(updateQuery, connection);
+    //                    MySql.Data.MySqlClient.MySqlCommand command = new MySql.Data.MySqlClient.MySqlCommand(updateQuery, connection);
 
     //                    command.ExecuteNonQuery();
     //                }
@@ -259,10 +291,10 @@ public partial class Customers : UserControl
 
     //            try
     //            {
-    //                using (MySqlConnection connection = new MySqlConnection(connectionString))
+    //                using (MySql.Data.MySqlClient.MySqlConnection connection = new MySql.Data.MySqlClient.MySqlConnection(connectionString))
     //                {
     //                    connection.Open();
-    //                    MySqlCommand command = new MySqlCommand(updateQuery, connection);
+    //                    MySql.Data.MySqlClient.MySqlCommand command = new MySql.Data.MySqlClient.MySqlCommand(updateQuery, connection);
 
     //                    command.ExecuteNonQuery();
     //                }
@@ -277,7 +309,7 @@ public partial class Customers : UserControl
     //            string firmenname = listCustomersDeliveryAdresses.SelectedItem.ToString();
 
     //            // Ensure the connection is disposed of properly
-    //            using (MySqlConnection connection = new MySqlConnection(connectionString))
+    //            using (MySql.Data.MySqlClient.MySqlConnection connection = new MySql.Data.MySqlClient.MySqlConnection(connectionString))
     //            {
     //                // Open the connection
     //                connection.Open();
@@ -285,8 +317,8 @@ public partial class Customers : UserControl
     //                // Create the SQL command with parameters
     //                updateQuery = $"UPDATE lieferanschrift SET `{tablerow}` = @TxtField WHERE Lieferanschrift_Nummer = '{txtLieferanschriftID.Text}'";
 
-    //                // Create and configure the MySqlCommand
-    //                using (MySqlCommand command = new MySqlCommand(updateQuery, connection))
+    //                // Create and configure the MySql.Data.MySqlClient.MySqlCommand
+    //                using (MySql.Data.MySqlClient.MySqlCommand command = new MySql.Data.MySqlClient.MySqlCommand(updateQuery, connection))
     //                {
     //                    // Add parameters to the command
     //                    command.Parameters.AddWithValue("@TxtField", txtfield);
@@ -308,7 +340,7 @@ public partial class Customers : UserControl
     //            firmenname = listCustomersDeliveryAdresses.SelectedItem.ToString();
 
     //            // Ensure the connection is disposed of properly
-    //            using (MySqlConnection connection = new MySqlConnection(connectionString))
+    //            using (MySql.Data.MySqlClient.MySqlConnection connection = new MySql.Data.MySqlClient.MySqlConnection(connectionString))
     //            {
     //                // Open the connection
     //                connection.Open();
@@ -316,8 +348,8 @@ public partial class Customers : UserControl
     //                // Create the SQL command with parameters
     //                updateQuery = $"UPDATE lieferanschrift SET `{tablerow}` = @TxtField WHERE Lieferanschrift_Nummer = '{txtLieferanschriftID.Text}'";
 
-    //                // Create and configure the MySqlCommand
-    //                using (MySqlCommand command = new MySqlCommand(updateQuery, connection))
+    //                // Create and configure the MySql.Data.MySqlClient.MySqlCommand
+    //                using (MySql.Data.MySqlClient.MySqlCommand command = new MySql.Data.MySqlClient.MySqlCommand(updateQuery, connection))
     //                {
     //                    // Add parameters to the command
     //                    command.Parameters.AddWithValue("@TxtField", txtfield);
@@ -364,48 +396,52 @@ public partial class Customers : UserControl
     //    txtLieferanschriftID.Text = "";
     //}
 
-    //private void CustomerDeliveryAdressSearchList()
-    //{
-    //    //TO ADAPT MORE DB Searches:
-    //    //Change the "lieferanschrift to which table it should look through
-    //    // Change Query String to match all Rows of your DB it should search for.
-    //    //Set the Textbox for Search Code Source
-    //    //Set the supposed readout index value (maybe its earlier or later)
+    private async void CustomerDeliveryAdressSearchList()
+    {
+        //TO ADAPT MORE DB Searches:
+        //Change the "lieferanschrift to which table it should look through
+        // Change Query String to match all Rows of your DB it should search for.
+        //Set the Textbox for Search Code Source
+        //Set the supposed readout index value (maybe its earlier or later)
 
-    //    if (textCustomersDeliveryAdressSearch.Text != null)
-    //    {
-    //        listCustomersDeliveryAdresses.Items.Clear();
+        if (textCustomersDeliveryAdressSearch.Text != null)
+        {
+            ListCustomersDeliveryAdressList.Items.Clear();
 
-    //        try
-    //        {
-    //            using (MySqlConnection connection = new MySqlConnection(connectionString))
-    //            {
-    //                connection.Open();
+            try
+            {
+                using (MySql.Data.MySqlClient.MySqlConnection connection = new MySql.Data.MySqlClient.MySqlConnection(connectionString))
+                {
+                    connection.Open();
 
-    //                string query = $"SELECT * FROM `prostahl`.`lieferanschrift` WHERE CONCAT_WS(' ', `Firmenname`, `Straﬂe`, `Hausnummer`, `PLZ`, `Stadt`, `Land`, `Ansprechpartner`, `Ansprechpartner_Telefon`, `Ansprechpartner_Mail`) LIKE '%{textCustomersDeliveryAdressSearch.Text}%' ORDER BY `Firmenname` ASC LIMIT 1000;\r\n";
-    //                MySqlCommand command = new MySqlCommand(query, connection);
+                    string query = $"SELECT * FROM `prostahl`.`lieferanschrift` WHERE CONCAT_WS(' ', `Firmenname`, `Straﬂe`, `Hausnummer`, `PLZ`, `Stadt`, `Land`, `Ansprechpartner`, `Ansprechpartner_Telefon`, `Ansprechpartner_Mail`) LIKE '%{textCustomersDeliveryAdressSearch.Text}%' ORDER BY `Firmenname` ASC LIMIT 1000;\r\n";
+                    MySql.Data.MySqlClient.MySqlCommand command = new MySql.Data.MySqlClient.MySqlCommand(query, connection);
 
-    //                using (MySqlDataReader reader = command.ExecuteReader())
-    //                {
-    //                    while (reader.Read())
-    //                    {
-    //                        // Read values from columns
-    //                        string readout = reader.GetString(1); // Assuming the searched value is at index 1
+                    using (MySql.Data.MySqlClient.MySqlDataReader reader = command.ExecuteReader())
+                    {
+                        while (reader.Read())
+                        {
+                            // Read values from columns
+                            string readout = reader.GetString(1); // Assuming the searched value is at index 1
 
-    //                        // Do something with the values...
-    //                        listCustomersDeliveryAdresses.Items.Add(readout);
-    //                    }
-    //                }
-    //            }
-    //        }
-    //        catch (Exception ex)
-    //        {
-    //            MessageBox.Show("Error: " + ex.Message);
-    //        }
-    //    }
-    //}
+                            // Do something with the values...
+                            ListCustomersDeliveryAdressList.Items.Add(readout);
+                        }
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                var box = MessageBoxManager
+                  .GetMessageBoxStandard("Error", ex.Message,
+                      ButtonEnum.YesNo);
 
-    ////Following is all for Customer Information on Customer Tab
+                var result = await box.ShowAsync();
+            }
+        }
+    }
+
+    //Following is all for Customer Information on Customer Tab
 
     //private void btnNewCustomer_Click(object sender, EventArgs e)
     //{
@@ -425,10 +461,10 @@ public partial class Customers : UserControl
 
     //            try
     //            {
-    //                using (MySqlConnection connection = new MySqlConnection(connectionString))
+    //                using (MySql.Data.MySqlClient.MySqlConnection connection = new MySql.Data.MySqlClient.MySqlConnection(connectionString))
     //                {
     //                    connection.Open();
-    //                    MySqlCommand command = new MySqlCommand(updateQuery, connection);
+    //                    MySql.Data.MySqlClient.MySqlCommand command = new MySql.Data.MySqlClient.MySqlCommand(updateQuery, connection);
 
     //                    command.ExecuteNonQuery();
     //                }
@@ -444,10 +480,10 @@ public partial class Customers : UserControl
 
     //            try
     //            {
-    //                using (MySqlConnection connection = new MySqlConnection(connectionString))
+    //                using (MySql.Data.MySqlClient.MySqlConnection connection = new MySql.Data.MySqlClient.MySqlConnection(connectionString))
     //                {
     //                    connection.Open();
-    //                    MySqlCommand command = new MySqlCommand(updateQuery, connection);
+    //                    MySql.Data.MySqlClient.MySqlCommand command = new MySql.Data.MySqlClient.MySqlCommand(updateQuery, connection);
 
     //                    command.ExecuteNonQuery();
     //                }
@@ -462,10 +498,10 @@ public partial class Customers : UserControl
     //            updateQuery = $"UPDATE {table} SET {row} = '{textbox}' WHERE Firmenname = '{listKunden.SelectedItem.ToString()}'";
     //            try
     //            {
-    //                using (MySqlConnection connection = new MySqlConnection(connectionString))
+    //                using (MySql.Data.MySqlClient.MySqlConnection connection = new MySql.Data.MySqlClient.MySqlConnection(connectionString))
     //                {
     //                    connection.Open();
-    //                    MySqlCommand command = new MySqlCommand(updateQuery, connection);
+    //                    MySql.Data.MySqlClient.MySqlCommand command = new MySql.Data.MySqlClient.MySqlCommand(updateQuery, connection);
 
     //                    command.ExecuteNonQuery();
     //                }
@@ -481,10 +517,10 @@ public partial class Customers : UserControl
 
     //            try
     //            {
-    //                using (MySqlConnection connection = new MySqlConnection(connectionString))
+    //                using (MySql.Data.MySqlClient.MySqlConnection connection = new MySql.Data.MySqlClient.MySqlConnection(connectionString))
     //                {
     //                    connection.Open();
-    //                    MySqlCommand command = new MySqlCommand(updateQuery, connection);
+    //                    MySql.Data.MySqlClient.MySqlCommand command = new MySql.Data.MySqlClient.MySqlCommand(updateQuery, connection);
 
     //                    command.ExecuteNonQuery();
     //                }
@@ -500,10 +536,10 @@ public partial class Customers : UserControl
 
     //            try
     //            {
-    //                using (MySqlConnection connection = new MySqlConnection(connectionString))
+    //                using (MySql.Data.MySqlClient.MySqlConnection connection = new MySql.Data.MySqlClient.MySqlConnection(connectionString))
     //                {
     //                    connection.Open();
-    //                    MySqlCommand command = new MySqlCommand(updateQuery, connection);
+    //                    MySql.Data.MySqlClient.MySqlCommand command = new MySql.Data.MySqlClient.MySqlCommand(updateQuery, connection);
 
     //                    command.ExecuteNonQuery();
     //                }
@@ -519,10 +555,10 @@ public partial class Customers : UserControl
 
     //            try
     //            {
-    //                using (MySqlConnection connection = new MySqlConnection(connectionString))
+    //                using (MySql.Data.MySqlClient.MySqlConnection connection = new MySql.Data.MySqlClient.MySqlConnection(connectionString))
     //                {
     //                    connection.Open();
-    //                    MySqlCommand command = new MySqlCommand(updateQuery, connection);
+    //                    MySql.Data.MySqlClient.MySqlCommand command = new MySql.Data.MySqlClient.MySqlCommand(updateQuery, connection);
 
     //                    command.ExecuteNonQuery();
     //                }
@@ -538,10 +574,10 @@ public partial class Customers : UserControl
 
     //            try
     //            {
-    //                using (MySqlConnection connection = new MySqlConnection(connectionString))
+    //                using (MySql.Data.MySqlClient.MySqlConnection connection = new MySql.Data.MySqlClient.MySqlConnection(connectionString))
     //                {
     //                    connection.Open();
-    //                    MySqlCommand command = new MySqlCommand(updateQuery, connection);
+    //                    MySql.Data.MySqlClient.MySqlCommand command = new MySql.Data.MySqlClient.MySqlCommand(updateQuery, connection);
 
     //                    command.ExecuteNonQuery();
     //                }
@@ -557,10 +593,10 @@ public partial class Customers : UserControl
 
     //            try
     //            {
-    //                using (MySqlConnection connection = new MySqlConnection(connectionString))
+    //                using (MySql.Data.MySqlClient.MySqlConnection connection = new MySql.Data.MySqlClient.MySqlConnection(connectionString))
     //                {
     //                    connection.Open();
-    //                    MySqlCommand command = new MySqlCommand(updateQuery, connection);
+    //                    MySql.Data.MySqlClient.MySqlCommand command = new MySql.Data.MySqlClient.MySqlCommand(updateQuery, connection);
 
     //                    command.ExecuteNonQuery();
     //                }
@@ -576,10 +612,10 @@ public partial class Customers : UserControl
 
     //            try
     //            {
-    //                using (MySqlConnection connection = new MySqlConnection(connectionString))
+    //                using (MySql.Data.MySqlClient.MySqlConnection connection = new MySql.Data.MySqlClient.MySqlConnection(connectionString))
     //                {
     //                    connection.Open();
-    //                    MySqlCommand command = new MySqlCommand(updateQuery, connection);
+    //                    MySql.Data.MySqlClient.MySqlCommand command = new MySql.Data.MySqlClient.MySqlCommand(updateQuery, connection);
 
     //                    command.ExecuteNonQuery();
     //                }
@@ -595,10 +631,10 @@ public partial class Customers : UserControl
 
     //            try
     //            {
-    //                using (MySqlConnection connection = new MySqlConnection(connectionString))
+    //                using (MySql.Data.MySqlClient.MySqlConnection connection = new MySql.Data.MySqlClient.MySqlConnection(connectionString))
     //                {
     //                    connection.Open();
-    //                    MySqlCommand command = new MySqlCommand(updateQuery, connection);
+    //                    MySql.Data.MySqlClient.MySqlCommand command = new MySql.Data.MySqlClient.MySqlCommand(updateQuery, connection);
 
     //                    command.ExecuteNonQuery();
     //                }
@@ -614,10 +650,10 @@ public partial class Customers : UserControl
 
     //            try
     //            {
-    //                using (MySqlConnection connection = new MySqlConnection(connectionString))
+    //                using (MySql.Data.MySqlClient.MySqlConnection connection = new MySql.Data.MySqlClient.MySqlConnection(connectionString))
     //                {
     //                    connection.Open();
-    //                    MySqlCommand command = new MySqlCommand(updateQuery, connection);
+    //                    MySql.Data.MySqlClient.MySqlCommand command = new MySql.Data.MySqlClient.MySqlCommand(updateQuery, connection);
 
     //                    command.ExecuteNonQuery();
     //                }
@@ -633,10 +669,10 @@ public partial class Customers : UserControl
 
     //            try
     //            {
-    //                using (MySqlConnection connection = new MySqlConnection(connectionString))
+    //                using (MySql.Data.MySqlClient.MySqlConnection connection = new MySql.Data.MySqlClient.MySqlConnection(connectionString))
     //                {
     //                    connection.Open();
-    //                    MySqlCommand command = new MySqlCommand(updateQuery, connection);
+    //                    MySql.Data.MySqlClient.MySqlCommand command = new MySql.Data.MySqlClient.MySqlCommand(updateQuery, connection);
 
     //                    command.ExecuteNonQuery();
     //                }
@@ -652,10 +688,10 @@ public partial class Customers : UserControl
 
     //            try
     //            {
-    //                using (MySqlConnection connection = new MySqlConnection(connectionString))
+    //                using (MySql.Data.MySqlClient.MySqlConnection connection = new MySql.Data.MySqlClient.MySqlConnection(connectionString))
     //                {
     //                    connection.Open();
-    //                    MySqlCommand command = new MySqlCommand(updateQuery, connection);
+    //                    MySql.Data.MySqlClient.MySqlCommand command = new MySql.Data.MySqlClient.MySqlCommand(updateQuery, connection);
 
     //                    command.ExecuteNonQuery();
     //                }
@@ -671,10 +707,10 @@ public partial class Customers : UserControl
 
     //            try
     //            {
-    //                using (MySqlConnection connection = new MySqlConnection(connectionString))
+    //                using (MySql.Data.MySqlClient.MySqlConnection connection = new MySql.Data.MySqlClient.MySqlConnection(connectionString))
     //                {
     //                    connection.Open();
-    //                    MySqlCommand command = new MySqlCommand(updateQuery, connection);
+    //                    MySql.Data.MySqlClient.MySqlCommand command = new MySql.Data.MySqlClient.MySqlCommand(updateQuery, connection);
 
     //                    command.ExecuteNonQuery();
     //                }
@@ -690,10 +726,10 @@ public partial class Customers : UserControl
 
     //            try
     //            {
-    //                using (MySqlConnection connection = new MySqlConnection(connectionString))
+    //                using (MySql.Data.MySqlClient.MySqlConnection connection = new MySql.Data.MySqlClient.MySqlConnection(connectionString))
     //                {
     //                    connection.Open();
-    //                    MySqlCommand command = new MySqlCommand(updateQuery, connection);
+    //                    MySql.Data.MySqlClient.MySqlCommand command = new MySql.Data.MySqlClient.MySqlCommand(updateQuery, connection);
 
     //                    command.ExecuteNonQuery();
     //                }
@@ -713,10 +749,10 @@ public partial class Customers : UserControl
 
     //            try
     //            {
-    //                using (MySqlConnection connection = new MySqlConnection(connectionString))
+    //                using (MySql.Data.MySqlClient.MySqlConnection connection = new MySql.Data.MySqlClient.MySqlConnection(connectionString))
     //                {
     //                    connection.Open();
-    //                    MySqlCommand command = new MySqlCommand(updateQuery, connection);
+    //                    MySql.Data.MySqlClient.MySqlCommand command = new MySql.Data.MySqlClient.MySqlCommand(updateQuery, connection);
 
     //                    command.ExecuteNonQuery();
     //                }
@@ -732,10 +768,10 @@ public partial class Customers : UserControl
 
     //            try
     //            {
-    //                using (MySqlConnection connection = new MySqlConnection(connectionString))
+    //                using (MySql.Data.MySqlClient.MySqlConnection connection = new MySql.Data.MySqlClient.MySqlConnection(connectionString))
     //                {
     //                    connection.Open();
-    //                    MySqlCommand command = new MySqlCommand(updateQuery, connection);
+    //                    MySql.Data.MySqlClient.MySqlCommand command = new MySql.Data.MySqlClient.MySqlCommand(updateQuery, connection);
 
     //                    command.ExecuteNonQuery();
     //                }
@@ -751,10 +787,10 @@ public partial class Customers : UserControl
 
     //            try
     //            {
-    //                using (MySqlConnection connection = new MySqlConnection(connectionString))
+    //                using (MySql.Data.MySqlClient.MySqlConnection connection = new MySql.Data.MySqlClient.MySqlConnection(connectionString))
     //                {
     //                    connection.Open();
-    //                    MySqlCommand command = new MySqlCommand(updateQuery, connection);
+    //                    MySql.Data.MySqlClient.MySqlCommand command = new MySql.Data.MySqlClient.MySqlCommand(updateQuery, connection);
 
     //                    command.ExecuteNonQuery();
     //                }
@@ -788,14 +824,14 @@ public partial class Customers : UserControl
     //                @Eink‰ufer_Name, @Eink‰ufer_Telefonnummer, @Eink‰ufer_Email, @Buchhaltung_Name, @Buchhaltung_Telefonnummer, 
     //                @Buchhaltung_Email, @Werkszeugnis_Email, @Rechnung_Email, @Skonto, @Skontofrist, @Nettofrist)";
 
-    //            // Create MySqlConnection object
-    //            using (MySqlConnection connection = new MySqlConnection(connectionString))
+    //            // Create MySql.Data.MySqlClient.MySqlConnection object
+    //            using (MySql.Data.MySqlClient.MySqlConnection connection = new MySql.Data.MySqlClient.MySqlConnection(connectionString))
     //            {
     //                // Open the connection
     //                connection.Open();
 
-    //                // Create MySqlCommand object
-    //                using (MySqlCommand command = new MySqlCommand(query, connection))
+    //                // Create MySql.Data.MySqlClient.MySqlCommand object
+    //                using (MySql.Data.MySqlClient.MySqlCommand command = new MySql.Data.MySqlClient.MySqlCommand(query, connection))
     //                {
     //                    // Add parameters
     //                    command.Parameters.AddWithValue("@K¸rzel", txtCustomerShortName.Text);
@@ -875,10 +911,10 @@ public partial class Customers : UserControl
 
     //        try
     //        {
-    //            using (MySqlConnection connection = new MySqlConnection(connectionString))
+    //            using (MySql.Data.MySqlClient.MySqlConnection connection = new MySql.Data.MySqlClient.MySqlConnection(connectionString))
     //            {
     //                connection.Open();
-    //                MySqlCommand command = new MySqlCommand(updateQuery, connection);
+    //                MySql.Data.MySqlClient.MySqlCommand command = new MySql.Data.MySqlClient.MySqlCommand(updateQuery, connection);
 
     //                command.ExecuteNonQuery();
     //            }
@@ -925,16 +961,16 @@ public partial class Customers : UserControl
     //        {
     //            string query = $"SELECT * FROM prostahl.kunden WHERE CONCAT_WS(' ', K¸rzel, Firmenname, Rechnung_Straﬂe, Rechnung_Hausnummer, Rechnung_Stadt, Rechnung_PLZ, Rechnung_Land, Eink‰ufer_Name, Eink‰ufer_Telefonnummer, Eink‰ufer_EMail, Buchhaltung_Name, Buchhaltung_Telefonnummer, Buchhaltung_EMail, Werkszeugnis_EMail, Rechnung_EMail, Skonto, Skontofrist, Nettofrist) LIKE @SearchTerm ORDER BY Firmenname ASC LIMIT 1000";
 
-    //            using (MySqlConnection connection = new MySqlConnection(connectionString))
+    //            using (MySql.Data.MySqlClient.MySqlConnection connection = new MySql.Data.MySqlClient.MySqlConnection(connectionString))
     //            {
-    //                using (MySqlCommand command = new MySqlCommand(query, connection))
+    //                using (MySql.Data.MySqlClient.MySqlCommand command = new MySql.Data.MySqlClient.MySqlCommand(query, connection))
     //                {
     //                    command.Parameters.AddWithValue("@SearchTerm", $"%{txtKundenname.Text}%");
 
     //                    try
     //                    {
     //                        connection.Open();
-    //                        using (MySqlDataReader reader = command.ExecuteReader())
+    //                        using (MySql.Data.MySqlClient.MySqlDataReader reader = command.ExecuteReader())
     //                        {
     //                            while (reader.Read())
     //                            {
@@ -959,4 +995,5 @@ public partial class Customers : UserControl
     //        }
     //    }
     //}
+
 }

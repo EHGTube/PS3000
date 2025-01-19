@@ -29,7 +29,7 @@
 			<TextBlock Text="Avis. Telefonnummer" TextAlignment="End" Grid.Row="16" Grid.Column="0" Margin="0 0 10 5" VerticalAlignment="Center"/>
 			<TextBox  Watermark="Avis. E-Mail" Name="textCustomersDeliveryAdressContactMail" Grid.Row="17" Grid.Column="1" Margin="0 0 0 10"/>
 			<TextBlock Text="Avis. E-Mail:" TextAlignment="End" Grid.Row="17" Grid.Column="0" Margin="0 0 10 5" VerticalAlignment="Center"/>
-			<Button Content="Lieferanschrift Speichern" Grid.Row="18" Grid.Column="1" Grid.RowSpan="0" Grid.ColumnSpan="1" Click="btnCustomersSaveDeliveryAdress" />
+			<Button Content="Lieferanschrift Speichern" Click="btnCustomersSaveDeliveryAdress_Click" Grid.Row="18" Grid.Column="1" Grid.RowSpan="0" Grid.ColumnSpan="1" />
 
 			<TextBox  Watermark="Kunde" Grid.Row="0" Grid.ColumnSpan="2" Grid.Column="2" Margin="0 30 0 10"/>
 			<ListBox x:Name="ListCustomersCustomerList" Height="200" Width="400" HorizontalAlignment="Right" Grid.Row="1" Grid.RowSpan="5" Grid.Column="2" Grid.ColumnSpan="2" Margin="0 0 0 10"/>

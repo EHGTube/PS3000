@@ -432,559 +432,739 @@ public partial class Customers : UserControl
         }
     }
 
+    private void btnDeliveryInfoClear_Click(object? sender, Avalonia.Interactivity.RoutedEventArgs e)
+    {
+        CustomerDeliveryAdressInformationClear();
+        textCustomersDeliveryAdressSearch.Text = "";
+        ListCustomersDeliveryAdressList.Items.Clear();
+    }
+
+
+
     //Following is all for Customer Information on Customer Tab
 
-    //private void btnNewCustomer_Click(object sender, EventArgs e)
-    //{
-    //    if (listKunden.SelectedItem != null)
-    //    {
-    //        DialogResult result = MessageBox.Show("Kürzel: " + txtCustomerShortName.Text + Environment.NewLine + "Firmenname: " + txtCustomersNewCustomerCompanyName.Text + Environment.NewLine + "Rechnung Straße: " + txtCustomerAdressStreet.Text + Environment.NewLine + "Rechnung Hausnummer: " + txtCustomerAdressHouseNr.Text + Environment.NewLine + "Rechnung_Stadt: " + txtCustomerAdressCity.Text + Environment.NewLine + "Rechnung_PLZ: " + txtCustomerAdressPostcode.Text + Environment.NewLine + "Rechnung_Land: " + txtCustomerAdressCountry.Text + Environment.NewLine + "Einkäufer_Name: " + txtCustomerPurchaser.Text + Environment.NewLine + "Einkäufer_Telefonnummer: " + txtCustomerPurchaserTelephone.Text + Environment.NewLine + "Einkäufer_EMail: " + txtCustomerPurchaserMail.Text + Environment.NewLine + "Buchhaltung_Name: " + txtCustomerBookkeeperName.Text + Environment.NewLine + "Buchhaltung_Telefonnummer: " + txtCustomerBookkeeperTelephone.Text + Environment.NewLine + "Buchhaltung_EMail: " + txtCustomerBookkeeperMail.Text + Environment.NewLine + "Werkszeugnis_EMail: " + txtCustomerCertificationMail.Text + Environment.NewLine + "Rechnung_EMail: " + txtCustomerInvoiceMail.Text + Environment.NewLine + "Skonto: " + txtCustomerSkonto.Text + Environment.NewLine + "Skontofrist: " + txtCustomerSkontofrist.Text + Environment.NewLine + "Nettofrist: " + txtCustomerNettofrist.Text + Environment.NewLine, "Kunde Ändern", MessageBoxButtons.YesNo);
-
-    //        // Check the Length of the MessageBox
-    //        if (result == DialogResult.Yes)
-    //        {
-    //            // Customer Selected -> offer Change
-    //            string table = "kunden";
-
-    //            string row = "Kürzel";
-    //            string textbox = txtCustomerShortName.Text;
-    //            string updateQuery = $"UPDATE {table} SET {row} = '{textbox}' WHERE Firmenname = '{listKunden.SelectedItem.ToString()}'";
-
-    //            try
-    //            {
-    //                using (MySql.Data.MySqlClient.MySqlConnection connection = new MySql.Data.MySqlClient.MySqlConnection(connectionString))
-    //                {
-    //                    connection.Open();
-    //                    MySql.Data.MySqlClient.MySqlCommand command = new MySql.Data.MySqlClient.MySqlCommand(updateQuery, connection);
-
-    //                    command.ExecuteNonQuery();
-    //                }
-    //            }
-    //            catch (Exception ex)
-    //            {
-    //                MessageBox.Show("Error: " + ex.Message);
-    //            }
-
-    //            row = "Firmenname";
-    //            textbox = txtCustomersNewCustomerCompanyName.Text;
-    //            updateQuery = $"UPDATE {table} SET {row} = '{textbox}' WHERE Firmenname = '{listKunden.SelectedItem.ToString()}'";
-
-    //            try
-    //            {
-    //                using (MySql.Data.MySqlClient.MySqlConnection connection = new MySql.Data.MySqlClient.MySqlConnection(connectionString))
-    //                {
-    //                    connection.Open();
-    //                    MySql.Data.MySqlClient.MySqlCommand command = new MySql.Data.MySqlClient.MySqlCommand(updateQuery, connection);
-
-    //                    command.ExecuteNonQuery();
-    //                }
-    //            }
-    //            catch (Exception ex)
-    //            {
-    //                MessageBox.Show("Error: " + ex.Message);
-    //            }
-
-    //            row = "Rechnung_Straße";
-    //            textbox = txtCustomerAdressStreet.Text;
-    //            updateQuery = $"UPDATE {table} SET {row} = '{textbox}' WHERE Firmenname = '{listKunden.SelectedItem.ToString()}'";
-    //            try
-    //            {
-    //                using (MySql.Data.MySqlClient.MySqlConnection connection = new MySql.Data.MySqlClient.MySqlConnection(connectionString))
-    //                {
-    //                    connection.Open();
-    //                    MySql.Data.MySqlClient.MySqlCommand command = new MySql.Data.MySqlClient.MySqlCommand(updateQuery, connection);
-
-    //                    command.ExecuteNonQuery();
-    //                }
-    //            }
-    //            catch (Exception ex)
-    //            {
-    //                MessageBox.Show("Error: " + ex.Message);
-    //            }
-
-    //            row = "Rechnung_Hausnummer";
-    //            textbox = txtCustomerAdressHouseNr.Text;
-    //            updateQuery = $"UPDATE {table} SET {row} = '{textbox}' WHERE Firmenname = '{listKunden.SelectedItem.ToString()}'";
-
-    //            try
-    //            {
-    //                using (MySql.Data.MySqlClient.MySqlConnection connection = new MySql.Data.MySqlClient.MySqlConnection(connectionString))
-    //                {
-    //                    connection.Open();
-    //                    MySql.Data.MySqlClient.MySqlCommand command = new MySql.Data.MySqlClient.MySqlCommand(updateQuery, connection);
-
-    //                    command.ExecuteNonQuery();
-    //                }
-    //            }
-    //            catch (Exception ex)
-    //            {
-    //                MessageBox.Show("Error: " + ex.Message);
-    //            }
-
-    //            row = "Rechnung_Stadt";
-    //            textbox = txtCustomerAdressCity.Text;
-    //            updateQuery = $"UPDATE {table} SET {row} = '{textbox}' WHERE Firmenname = '{listKunden.SelectedItem.ToString()}'";
-
-    //            try
-    //            {
-    //                using (MySql.Data.MySqlClient.MySqlConnection connection = new MySql.Data.MySqlClient.MySqlConnection(connectionString))
-    //                {
-    //                    connection.Open();
-    //                    MySql.Data.MySqlClient.MySqlCommand command = new MySql.Data.MySqlClient.MySqlCommand(updateQuery, connection);
-
-    //                    command.ExecuteNonQuery();
-    //                }
-    //            }
-    //            catch (Exception ex)
-    //            {
-    //                MessageBox.Show("Error: " + ex.Message);
-    //            }
-
-    //            row = "Rechnung_PLZ";
-    //            textbox = txtCustomerAdressPostcode.Text;
-    //            updateQuery = $"UPDATE {table} SET {row} = '{textbox}' WHERE Firmenname = '{listKunden.SelectedItem.ToString()}'";
-
-    //            try
-    //            {
-    //                using (MySql.Data.MySqlClient.MySqlConnection connection = new MySql.Data.MySqlClient.MySqlConnection(connectionString))
-    //                {
-    //                    connection.Open();
-    //                    MySql.Data.MySqlClient.MySqlCommand command = new MySql.Data.MySqlClient.MySqlCommand(updateQuery, connection);
-
-    //                    command.ExecuteNonQuery();
-    //                }
-    //            }
-    //            catch (Exception ex)
-    //            {
-    //                MessageBox.Show("Error: " + ex.Message);
-    //            }
-
-    //            row = "Rechnung_Land";
-    //            textbox = txtCustomerAdressCountry.Text;
-    //            updateQuery = $"UPDATE {table} SET {row} = '{textbox}' WHERE Firmenname = '{listKunden.SelectedItem.ToString()}'";
-
-    //            try
-    //            {
-    //                using (MySql.Data.MySqlClient.MySqlConnection connection = new MySql.Data.MySqlClient.MySqlConnection(connectionString))
-    //                {
-    //                    connection.Open();
-    //                    MySql.Data.MySqlClient.MySqlCommand command = new MySql.Data.MySqlClient.MySqlCommand(updateQuery, connection);
-
-    //                    command.ExecuteNonQuery();
-    //                }
-    //            }
-    //            catch (Exception ex)
-    //            {
-    //                MessageBox.Show("Error: " + ex.Message);
-    //            }
-
-    //            row = "Einkäufer_Name";
-    //            textbox = txtCustomerPurchaser.Text;
-    //            updateQuery = $"UPDATE {table} SET {row} = '{textbox}' WHERE Firmenname = '{listKunden.SelectedItem.ToString()}'";
-
-    //            try
-    //            {
-    //                using (MySql.Data.MySqlClient.MySqlConnection connection = new MySql.Data.MySqlClient.MySqlConnection(connectionString))
-    //                {
-    //                    connection.Open();
-    //                    MySql.Data.MySqlClient.MySqlCommand command = new MySql.Data.MySqlClient.MySqlCommand(updateQuery, connection);
-
-    //                    command.ExecuteNonQuery();
-    //                }
-    //            }
-    //            catch (Exception ex)
-    //            {
-    //                MessageBox.Show("Error: " + ex.Message);
-    //            }
-
-    //            row = "Einkäufer_Telefonnummer";
-    //            textbox = txtCustomerPurchaserTelephone.Text;
-    //            updateQuery = $"UPDATE {table} SET {row} = '{textbox}' WHERE Firmenname = '{listKunden.SelectedItem.ToString()}'";
-
-    //            try
-    //            {
-    //                using (MySql.Data.MySqlClient.MySqlConnection connection = new MySql.Data.MySqlClient.MySqlConnection(connectionString))
-    //                {
-    //                    connection.Open();
-    //                    MySql.Data.MySqlClient.MySqlCommand command = new MySql.Data.MySqlClient.MySqlCommand(updateQuery, connection);
-
-    //                    command.ExecuteNonQuery();
-    //                }
-    //            }
-    //            catch (Exception ex)
-    //            {
-    //                MessageBox.Show("Error: " + ex.Message);
-    //            }
-
-    //            row = "Einkäufer_Email";
-    //            textbox = txtCustomerPurchaserMail.Text;
-    //            updateQuery = $"UPDATE {table} SET {row} = '{textbox}' WHERE Firmenname = '{listKunden.SelectedItem.ToString()}'";
-
-    //            try
-    //            {
-    //                using (MySql.Data.MySqlClient.MySqlConnection connection = new MySql.Data.MySqlClient.MySqlConnection(connectionString))
-    //                {
-    //                    connection.Open();
-    //                    MySql.Data.MySqlClient.MySqlCommand command = new MySql.Data.MySqlClient.MySqlCommand(updateQuery, connection);
-
-    //                    command.ExecuteNonQuery();
-    //                }
-    //            }
-    //            catch (Exception ex)
-    //            {
-    //                MessageBox.Show("Error: " + ex.Message);
-    //            }
-
-    //            row = "Buchhaltung_Name";
-    //            textbox = txtCustomerBookkeeperName.Text;
-    //            updateQuery = $"UPDATE {table} SET {row} = '{textbox}' WHERE Firmenname = '{listKunden.SelectedItem.ToString()}'";
-
-    //            try
-    //            {
-    //                using (MySql.Data.MySqlClient.MySqlConnection connection = new MySql.Data.MySqlClient.MySqlConnection(connectionString))
-    //                {
-    //                    connection.Open();
-    //                    MySql.Data.MySqlClient.MySqlCommand command = new MySql.Data.MySqlClient.MySqlCommand(updateQuery, connection);
-
-    //                    command.ExecuteNonQuery();
-    //                }
-    //            }
-    //            catch (Exception ex)
-    //            {
-    //                MessageBox.Show("Error: " + ex.Message);
-    //            }
-
-    //            row = "Buchhaltung_Telefonnummer";
-    //            textbox = txtCustomerBookkeeperTelephone.Text;
-    //            updateQuery = $"UPDATE {table} SET {row} = '{textbox}' WHERE Firmenname = '{listKunden.SelectedItem.ToString()}'";
-
-    //            try
-    //            {
-    //                using (MySql.Data.MySqlClient.MySqlConnection connection = new MySql.Data.MySqlClient.MySqlConnection(connectionString))
-    //                {
-    //                    connection.Open();
-    //                    MySql.Data.MySqlClient.MySqlCommand command = new MySql.Data.MySqlClient.MySqlCommand(updateQuery, connection);
-
-    //                    command.ExecuteNonQuery();
-    //                }
-    //            }
-    //            catch (Exception ex)
-    //            {
-    //                MessageBox.Show("Error: " + ex.Message);
-    //            }
-
-    //            row = "Buchhaltung_Email";
-    //            textbox = txtCustomerBookkeeperMail.Text;
-    //            updateQuery = $"UPDATE {table} SET {row} = '{textbox}' WHERE Firmenname = '{listKunden.SelectedItem.ToString()}'";
-
-    //            try
-    //            {
-    //                using (MySql.Data.MySqlClient.MySqlConnection connection = new MySql.Data.MySqlClient.MySqlConnection(connectionString))
-    //                {
-    //                    connection.Open();
-    //                    MySql.Data.MySqlClient.MySqlCommand command = new MySql.Data.MySqlClient.MySqlCommand(updateQuery, connection);
-
-    //                    command.ExecuteNonQuery();
-    //                }
-    //            }
-    //            catch (Exception ex)
-    //            {
-    //                MessageBox.Show("Error: " + ex.Message);
-    //            }
-
-    //            row = "Werkszeugnis_Email";
-    //            textbox = txtCustomerCertificationMail.Text;
-    //            updateQuery = $"UPDATE {table} SET {row} = '{textbox}' WHERE Firmenname = '{listKunden.SelectedItem.ToString()}'";
-
-    //            try
-    //            {
-    //                using (MySql.Data.MySqlClient.MySqlConnection connection = new MySql.Data.MySqlClient.MySqlConnection(connectionString))
-    //                {
-    //                    connection.Open();
-    //                    MySql.Data.MySqlClient.MySqlCommand command = new MySql.Data.MySqlClient.MySqlCommand(updateQuery, connection);
-
-    //                    command.ExecuteNonQuery();
-    //                }
-    //            }
-    //            catch (Exception ex)
-    //            {
-    //                MessageBox.Show("Error: " + ex.Message);
-    //            }
-
-    //            row = "Rechnung_Email";
-    //            textbox = txtCustomerInvoiceMail.Text;
-    //            updateQuery = $"UPDATE {table} SET {row} = '{textbox}' WHERE Firmenname = '{listKunden.SelectedItem.ToString()}'";
-
-    //            try
-    //            {
-    //                using (MySql.Data.MySqlClient.MySqlConnection connection = new MySql.Data.MySqlClient.MySqlConnection(connectionString))
-    //                {
-    //                    connection.Open();
-    //                    MySql.Data.MySqlClient.MySqlCommand command = new MySql.Data.MySqlClient.MySqlCommand(updateQuery, connection);
-
-    //                    command.ExecuteNonQuery();
-    //                }
-    //            }
-    //            catch (Exception ex)
-    //            {
-    //                MessageBox.Show("Error: " + ex.Message);
-    //            }
-
-
-
-
-
-    //            row = "Skonto";
-    //            textbox = txtCustomerSkonto.Text.Replace(',', '.');
-    //            updateQuery = $"UPDATE {table} SET {row} = '{textbox}' WHERE Firmenname = '{listKunden.SelectedItem.ToString()}'";
-
-    //            try
-    //            {
-    //                using (MySql.Data.MySqlClient.MySqlConnection connection = new MySql.Data.MySqlClient.MySqlConnection(connectionString))
-    //                {
-    //                    connection.Open();
-    //                    MySql.Data.MySqlClient.MySqlCommand command = new MySql.Data.MySqlClient.MySqlCommand(updateQuery, connection);
-
-    //                    command.ExecuteNonQuery();
-    //                }
-    //            }
-    //            catch (Exception ex)
-    //            {
-    //                MessageBox.Show("Error: " + ex.Message);
-    //            }
-
-    //            row = "Skontofrist";
-    //            textbox = txtCustomerSkontofrist.Text;
-    //            updateQuery = $"UPDATE {table} SET {row} = '{textbox}' WHERE Firmenname = '{listKunden.SelectedItem.ToString()}'";
-
-    //            try
-    //            {
-    //                using (MySql.Data.MySqlClient.MySqlConnection connection = new MySql.Data.MySqlClient.MySqlConnection(connectionString))
-    //                {
-    //                    connection.Open();
-    //                    MySql.Data.MySqlClient.MySqlCommand command = new MySql.Data.MySqlClient.MySqlCommand(updateQuery, connection);
-
-    //                    command.ExecuteNonQuery();
-    //                }
-    //            }
-    //            catch (Exception ex)
-    //            {
-    //                MessageBox.Show("Error: " + ex.Message);
-    //            }
-
-    //            row = "Nettofrist";
-    //            textbox = txtCustomerNettofrist.Text;
-    //            updateQuery = $"UPDATE {table} SET {row} = '{textbox}' WHERE Firmenname = '{listKunden.SelectedItem.ToString()}'";
-
-    //            try
-    //            {
-    //                using (MySql.Data.MySqlClient.MySqlConnection connection = new MySql.Data.MySqlClient.MySqlConnection(connectionString))
-    //                {
-    //                    connection.Open();
-    //                    MySql.Data.MySqlClient.MySqlCommand command = new MySql.Data.MySqlClient.MySqlCommand(updateQuery, connection);
-
-    //                    command.ExecuteNonQuery();
-    //                }
-    //            }
-    //            catch (Exception ex)
-    //            {
-    //                MessageBox.Show("Error: " + ex.Message);
-    //            }
-
-    //            CustomerCustomerInformationClear();
-    //            CustomerCustomerCreationSearchList();
-    //        }
-    //    }
-    //    else
-    //    {
-
-    //        // Display a MessageBox with two buttons
-    //        DialogResult result = MessageBox.Show("Kürzel: " + txtCustomerShortName.Text + Environment.NewLine + "Firmenname: " + txtCustomersNewCustomerCompanyName.Text + Environment.NewLine + "Rechnung Straße: " + txtCustomerAdressStreet.Text + Environment.NewLine + "Rechnung Hausnummer: " + txtCustomerAdressHouseNr.Text + Environment.NewLine + "Rechnung_Stadt: " + txtCustomerAdressCity.Text + Environment.NewLine + "Rechnung_PLZ: " + txtCustomerAdressPostcode.Text + Environment.NewLine + "Rechnung_Land: " + txtCustomerAdressCountry.Text + Environment.NewLine + "Einkäufer_Name: " + txtCustomerPurchaser.Text + Environment.NewLine + "Einkäufer_Telefonnummer: " + txtCustomerPurchaserTelephone.Text + Environment.NewLine + "Einkäufer_EMail: " + txtCustomerPurchaserMail.Text + Environment.NewLine + "Buchhaltung_Name: " + txtCustomerBookkeeperName.Text + Environment.NewLine + "Buchhaltung_Telefonnummer: " + txtCustomerBookkeeperTelephone.Text + Environment.NewLine + "Buchhaltung_EMail: " + txtCustomerBookkeeperMail.Text + Environment.NewLine + "Werkszeugnis_EMail: " + txtCustomerCertificationMail.Text + Environment.NewLine + "Rechnung_EMail: " + txtCustomerInvoiceMail.Text + Environment.NewLine + "Skonto: " + txtCustomerSkonto.Text + Environment.NewLine + "Skontofrist: " + txtCustomerSkontofrist.Text + Environment.NewLine + "Nettofrist: " + txtCustomerNettofrist.Text + Environment.NewLine, "Kunde Anlegen", MessageBoxButtons.YesNo);
-
-    //        // Check the Length of the MessageBox
-    //        if (result == DialogResult.Yes)
-    //        {
-
-    //            // SQL query
-    //            string query = @"INSERT INTO kunden 
-    //                (Kürzel, Firmenname, `Rechnung_Straße`, `Rechnung_Hausnummer`, `Rechnung_Stadt`, `Rechnung_PLZ`, `Rechnung_Land`, 
-    //                `Einkäufer_Name`, `Einkäufer_Telefonnummer`, `Einkäufer_EMail`, `Buchhaltung_Name`, `Buchhaltung_Telefonnummer`, 
-    //                `Buchhaltung_EMail`, `Werkszeugnis_EMail`, `Rechnung_EMail`, `Skonto`, `Skontofrist`, `Nettofrist`) 
-    //                VALUES 
-    //                (@Kürzel, @Firmenname, @Rechnung_Straße, @Rechnung_Hausnummer, @Rechnung_Stadt, @Rechnung_PLZ, @Rechnung_Land, 
-    //                @Einkäufer_Name, @Einkäufer_Telefonnummer, @Einkäufer_Email, @Buchhaltung_Name, @Buchhaltung_Telefonnummer, 
-    //                @Buchhaltung_Email, @Werkszeugnis_Email, @Rechnung_Email, @Skonto, @Skontofrist, @Nettofrist)";
-
-    //            // Create MySql.Data.MySqlClient.MySqlConnection object
-    //            using (MySql.Data.MySqlClient.MySqlConnection connection = new MySql.Data.MySqlClient.MySqlConnection(connectionString))
-    //            {
-    //                // Open the connection
-    //                connection.Open();
-
-    //                // Create MySql.Data.MySqlClient.MySqlCommand object
-    //                using (MySql.Data.MySqlClient.MySqlCommand command = new MySql.Data.MySqlClient.MySqlCommand(query, connection))
-    //                {
-    //                    // Add parameters
-    //                    command.Parameters.AddWithValue("@Kürzel", txtCustomerShortName.Text);
-    //                    command.Parameters.AddWithValue("@Firmenname", txtCustomersNewCustomerCompanyName.Text);
-    //                    command.Parameters.AddWithValue("@Rechnung_Straße", txtCustomerAdressStreet.Text);
-    //                    command.Parameters.AddWithValue("@Rechnung_Hausnummer", txtCustomerAdressHouseNr.Text);
-    //                    command.Parameters.AddWithValue("@Rechnung_Stadt", txtCustomerAdressCity.Text);
-    //                    command.Parameters.AddWithValue("@Rechnung_PLZ", txtCustomerAdressPostcode.Text);
-    //                    command.Parameters.AddWithValue("@Rechnung_Land", txtCustomerAdressCountry.Text);
-    //                    command.Parameters.AddWithValue("@Einkäufer_Name", txtCustomerPurchaser.Text);
-    //                    command.Parameters.AddWithValue("@Einkäufer_Telefonnummer", txtCustomerPurchaserTelephone.Text);
-    //                    command.Parameters.AddWithValue("@Einkäufer_Email", txtCustomerPurchaserMail.Text);
-    //                    command.Parameters.AddWithValue("@Buchhaltung_Name", txtCustomerBookkeeperName.Text);
-    //                    command.Parameters.AddWithValue("@Buchhaltung_Telefonnummer", txtCustomerBookkeeperTelephone.Text);
-    //                    command.Parameters.AddWithValue("@Buchhaltung_Email", txtCustomerBookkeeperMail.Text);
-    //                    command.Parameters.AddWithValue("@Werkszeugnis_Email", txtCustomerCertificationMail.Text);
-    //                    command.Parameters.AddWithValue("@Rechnung_Email", txtCustomerInvoiceMail.Text);
-    //                    command.Parameters.AddWithValue("@Skonto", txtCustomerSkonto.Text);
-    //                    command.Parameters.AddWithValue("@Skontofrist", txtCustomerSkontofrist.Text);
-    //                    command.Parameters.AddWithValue("@Nettofrist", txtCustomerNettofrist.Text);
-
-
-    //                    // Execute the query
-    //                    command.ExecuteNonQuery();
-    //                }
-    //            }
-    //            CustomerCustomerInformationClear();
-    //            CustomerCustomerCreationSearchList();
-    //        }
-    //    }
-    //}
-
-    //private void txtKundenname_TextChanged(object sender, EventArgs e)
-    //{
-    //    CustomerCustomerCreationSearchList();
-    //}
-
-    //private void listKunden_SelectedIndexChanged(object sender, EventArgs e)
-    //{
-    //    if (listKunden.SelectedItem != null)
-    //    {
-    //        string firmenname = listKunden.SelectedItem.ToString();
-
-    //        textBox102.Text = GetFieldValue("Kundennummer", firmenname, "kunden", "Firmenname");
-    //        txtCustomerAdressStreet.Text = GetFieldValue("Rechnung_Straße", firmenname, "kunden", "Firmenname");
-    //        txtCustomerAdressHouseNr.Text = GetFieldValue("Rechnung_Hausnummer", firmenname, "kunden", "Firmenname");
-    //        txtCustomerShortName.Text = GetFieldValue("Kürzel", firmenname, "kunden", "Firmenname");
-    //        txtCustomerAdressCity.Text = GetFieldValue("Rechnung_Stadt", firmenname, "kunden", "Firmenname");
-    //        txtCustomerAdressPostcode.Text = GetFieldValue("Rechnung_PLZ", firmenname, "kunden", "Firmenname");
-    //        txtCustomerAdressCountry.Text = GetFieldValue("Rechnung_Land", firmenname, "kunden", "Firmenname");
-    //        txtCustomerPurchaser.Text = GetFieldValue("Einkäufer_Name", firmenname, "kunden", "Firmenname");
-    //        txtCustomerPurchaserTelephone.Text = GetFieldValue("Einkäufer_Telefonnummer", firmenname, "kunden", "Firmenname");
-    //        txtCustomerPurchaserMail.Text = GetFieldValue("Einkäufer_EMail", firmenname, "kunden", "Firmenname");
-    //        txtCustomerBookkeeperName.Text = GetFieldValue("Buchhaltung_Name", firmenname, "kunden", "Firmenname");
-    //        txtCustomerBookkeeperTelephone.Text = GetFieldValue("Buchhaltung_Telefonnummer", firmenname, "kunden", "Firmenname");
-    //        txtCustomerBookkeeperMail.Text = GetFieldValue("Buchhaltung_EMail", firmenname, "kunden", "Firmenname");
-    //        txtCustomerCertificationMail.Text = GetFieldValue("Werkszeugnis_EMail", firmenname, "kunden", "Firmenname");
-    //        txtCustomerInvoiceMail.Text = GetFieldValue("Rechnung_EMail", firmenname, "kunden", "Firmenname");
-    //        txtCustomersNewCustomerCompanyName.Text = GetFieldValue("Firmenname", firmenname, "kunden", "Firmenname");
-    //        txtCustomerNotes.Text = GetFieldValue("Notizen", firmenname, "kunden", "Firmenname");
-    //        txtCustomerSkonto.Text = GetFieldValue("Skonto", firmenname, "kunden", "Firmenname");
-    //        txtCustomerSkontofrist.Text = GetFieldValue("Skontofrist", firmenname, "kunden", "Firmenname");
-    //        txtCustomerNettofrist.Text = GetFieldValue("Nettofrist", firmenname, "kunden", "Firmenname");
-    //    }
-    //}
-
-    //private void txtCustomerNotes_LostFocus(object sender, EventArgs e)
-    //{
-    //    if (listKunden.SelectedItem != null)
-    //    {
-    //        // Customer Selected -> offer Change
-    //        string table = "kunden";
-
-    //        string row = "Notizen";
-    //        string textbox = txtCustomerNotes.Text;
-    //        string updateQuery = $"UPDATE {table} SET {row} = '{textbox}' WHERE Firmenname = '{listKunden.SelectedItem.ToString()}'";
-
-    //        try
-    //        {
-    //            using (MySql.Data.MySqlClient.MySqlConnection connection = new MySql.Data.MySqlClient.MySqlConnection(connectionString))
-    //            {
-    //                connection.Open();
-    //                MySql.Data.MySqlClient.MySqlCommand command = new MySql.Data.MySqlClient.MySqlCommand(updateQuery, connection);
-
-    //                command.ExecuteNonQuery();
-    //            }
-    //        }
-    //        catch (Exception ex)
-    //        {
-    //            MessageBox.Show("Error: " + ex.Message);
-    //        }
-    //    }
-    //    CustomerCustomerInformationClear();
-    //    CustomerCustomerCreationSearchList();
-    //}
-
-    //private void CustomerCustomerInformationClear()
-    //{
-    //    txtCustomerPurchaser.Text = "";
-    //    txtCustomerPurchaserTelephone.Text = "";
-    //    txtCustomerPurchaserMail.Text = "";
-    //    txtCustomerBookkeeperName.Text = "";
-    //    txtCustomerBookkeeperTelephone.Text = "";
-    //    txtCustomerBookkeeperMail.Text = "";
-    //    txtCustomerCertificationMail.Text = "";
-    //    txtCustomerInvoiceMail.Text = "";
-    //    txtCustomerShortName.Text = "";
-    //    txtCustomerAdressStreet.Text = "";
-    //    txtCustomerAdressHouseNr.Text = "";
-    //    txtCustomerAdressCity.Text = "";
-    //    txtCustomerAdressPostcode.Text = "";
-    //    txtCustomerAdressCountry.Text = "";
-    //    txtCustomersNewCustomerCompanyName.Text = "";
-    //    txtCustomerNotes.Text = "";
-    //    txtCustomerSkonto.Text = "";
-    //    txtCustomerSkontofrist.Text = "";
-    //    txtCustomerNettofrist.Text = "";
-    //}
-
-    //private void CustomerCustomerCreationSearchList()
-    //{
-    //    if (txtKundenname.Text != null)
-    //    {
-    //        listKunden.Items.Clear();
-
-    //        try
-    //        {
-    //            string query = $"SELECT * FROM prostahl.kunden WHERE CONCAT_WS(' ', Kürzel, Firmenname, Rechnung_Straße, Rechnung_Hausnummer, Rechnung_Stadt, Rechnung_PLZ, Rechnung_Land, Einkäufer_Name, Einkäufer_Telefonnummer, Einkäufer_EMail, Buchhaltung_Name, Buchhaltung_Telefonnummer, Buchhaltung_EMail, Werkszeugnis_EMail, Rechnung_EMail, Skonto, Skontofrist, Nettofrist) LIKE @SearchTerm ORDER BY Firmenname ASC LIMIT 1000";
-
-    //            using (MySql.Data.MySqlClient.MySqlConnection connection = new MySql.Data.MySqlClient.MySqlConnection(connectionString))
-    //            {
-    //                using (MySql.Data.MySqlClient.MySqlCommand command = new MySql.Data.MySqlClient.MySqlCommand(query, connection))
-    //                {
-    //                    command.Parameters.AddWithValue("@SearchTerm", $"%{txtKundenname.Text}%");
-
-    //                    try
-    //                    {
-    //                        connection.Open();
-    //                        using (MySql.Data.MySqlClient.MySqlDataReader reader = command.ExecuteReader())
-    //                        {
-    //                            while (reader.Read())
-    //                            {
-    //                                // Read values from columns
-    //                                string firmenname = reader.GetString(2); // Assuming `Firmenname` is at index 2
-
-    //                                // Do something with the values...
-    //                                listKunden.Items.Add(firmenname);
-    //                            }
-    //                        }
-    //                    }
-    //                    catch (Exception ex)
-    //                    {
-    //                        MessageBox.Show("Error executing SQL query: " + ex.Message);
-    //                    }
-    //                }
-    //            }
-    //        }
-    //        catch (Exception ex)
-    //        {
-    //            MessageBox.Show("Error: " + ex.Message);
-    //        }
-    //    }
-    //}
-
+    private async void btnNewCustomer_Click(object? sender, Avalonia.Interactivity.RoutedEventArgs e)
+    {
+        if (ListCustomersCustomerList.SelectedItem != null)
+        {
+            var box = MessageBoxManager
+                .GetMessageBoxStandard("Bestätigung",
+                    $"Kundennummer: {textCustomerNumber.Text}{Environment.NewLine}" +
+                    $"Firmenname: {textCustomerName.Text}{Environment.NewLine}" +
+                    $"Kürzel: {textCustomerShortName.Text}{Environment.NewLine}" +
+                    $"Straße: {textCustomerStreet.Text}{Environment.NewLine}" +
+                    $"Hausnummer: {textCustomerHouseNo.Text}{Environment.NewLine}" +
+                    $"PLZ: {textCustomerPostCode.Text}{Environment.NewLine}" +
+                    $"Stadt: {textCustomerCity.Text}{Environment.NewLine}" +
+                    $"Land: {textCustomerCountry.Text}{Environment.NewLine}" +
+                    $"Einkäufer: {textCustomersPurchaserName.Text}{Environment.NewLine}" +
+                    $"Einkäufer Telefon: {textCustomersPurchaserPhone.Text}{Environment.NewLine}" +
+                    $"Einkäufer E-Mail: {textCustomersPurchaserMail.Text}{Environment.NewLine}" +
+                    $"Buchhaltung Name: {textCustomersBookkeeperName.Text}{Environment.NewLine}" +
+                    $"Buchhalung Telefon: {textCustomersBookkeeperPhone.Text}{Environment.NewLine}" +
+                    $"Buchhalung E-Mail: {textCustomersBookkeeperMail.Text}{Environment.NewLine}" +
+                    $"Werkszeugnis E-Mail: {textCustomersCertificateMail.Text}{Environment.NewLine}" +
+                    $"Rechung E-Mail: {textCustomersInvoiceMail.Text}{Environment.NewLine}" +
+                    $"Skonto: {textCustomerSkonto.Text}{Environment.NewLine}" +
+                    $"Skontofrist: {textCustomerSkontoTerm.Text}{Environment.NewLine}" +
+                    $"Nettofrist: {textCustomerNettoTerm.Text}",
+                ButtonEnum.YesNo);
+
+            var result = await box.ShowAsync();
+
+            if (result == ButtonResult.Yes)
+            {
+                string table = "kunden";
+
+                string row = "Kürzel";
+                string textbox = textCustomerShortName.Text;
+                string updateQuery = $"UPDATE {table} SET {row} = '{textbox}' WHERE Kundennummer = '{textCustomerNumber.Text}'";
+
+                try
+                {
+                    using (MySql.Data.MySqlClient.MySqlConnection connection = new MySql.Data.MySqlClient.MySqlConnection(connectionString))
+                    {
+                        connection.Open();
+                        MySql.Data.MySqlClient.MySqlCommand command = new MySql.Data.MySqlClient.MySqlCommand(updateQuery, connection);
+
+                        command.ExecuteNonQuery();
+                    }
+                }
+                catch (Exception ex)
+                {
+                    var error = MessageBoxManager
+                        .GetMessageBoxStandard("Fehler",
+                            $"Ein Fehler ist aufgetreten:{Environment.NewLine}{Environment.NewLine}{ex.Message}",
+                            ButtonEnum.Ok,
+                            Icon.Error);
+
+                    await error.ShowAsync();
+                }
+
+                row = "Firmenname";
+                textbox = textCustomerName.Text;
+                updateQuery = $"UPDATE {table} SET {row} = '{textbox}' WHERE Kundennummer = '{textCustomerNumber.Text}'";
+
+                try
+                {
+                    using (MySql.Data.MySqlClient.MySqlConnection connection = new MySql.Data.MySqlClient.MySqlConnection(connectionString))
+                    {
+                        connection.Open();
+                        MySql.Data.MySqlClient.MySqlCommand command = new MySql.Data.MySqlClient.MySqlCommand(updateQuery, connection);
+
+                        command.ExecuteNonQuery();
+                    }
+                }
+                catch (Exception ex)
+                {
+                    var error = MessageBoxManager
+                        .GetMessageBoxStandard("Fehler",
+                            $"Ein Fehler ist aufgetreten:{Environment.NewLine}{Environment.NewLine}{ex.Message}",
+                            ButtonEnum.Ok,
+                            Icon.Error);
+
+                    await error.ShowAsync();
+                }
+
+                row = "Rechnung_Straße";
+                textbox = textCustomerStreet.Text;
+                updateQuery = $"UPDATE {table} SET {row} = '{textbox}' WHERE Kundennummer = '{textCustomerNumber.Text}'";
+
+                try
+                {
+                    using (MySql.Data.MySqlClient.MySqlConnection connection = new MySql.Data.MySqlClient.MySqlConnection(connectionString))
+                    {
+                        connection.Open();
+                        MySql.Data.MySqlClient.MySqlCommand command = new MySql.Data.MySqlClient.MySqlCommand(updateQuery, connection);
+
+                        command.ExecuteNonQuery();
+                    }
+                }
+                catch (Exception ex)
+                {
+                    var error = MessageBoxManager
+                        .GetMessageBoxStandard("Fehler",
+                            $"Ein Fehler ist aufgetreten:{Environment.NewLine}{Environment.NewLine}{ex.Message}",
+                            ButtonEnum.Ok,
+                            Icon.Error);
+
+                    await error.ShowAsync();
+                }
+
+                row = "Rechnung_Hausnummer";
+                textbox = textCustomerHouseNo.Text;
+                updateQuery = $"UPDATE {table} SET {row} = '{textbox}' WHERE Kundennummer = '{textCustomerNumber.Text}'";
+
+                try
+                {
+                    using (MySql.Data.MySqlClient.MySqlConnection connection = new MySql.Data.MySqlClient.MySqlConnection(connectionString))
+                    {
+                        connection.Open();
+                        MySql.Data.MySqlClient.MySqlCommand command = new MySql.Data.MySqlClient.MySqlCommand(updateQuery, connection);
+
+                        command.ExecuteNonQuery();
+                    }
+                }
+                catch (Exception ex)
+                {
+                    var error = MessageBoxManager
+                        .GetMessageBoxStandard("Fehler",
+                            $"Ein Fehler ist aufgetreten:{Environment.NewLine}{Environment.NewLine}{ex.Message}",
+                            ButtonEnum.Ok,
+                            Icon.Error);
+
+                    await error.ShowAsync();
+                }
+
+                row = "Rechnung_Stadt";
+                textbox = textCustomerCity.Text;
+                updateQuery = $"UPDATE {table} SET {row} = '{textbox}' WHERE Kundennummer = '{textCustomerNumber.Text}'";
+
+                try
+                {
+                    using (MySql.Data.MySqlClient.MySqlConnection connection = new MySql.Data.MySqlClient.MySqlConnection(connectionString))
+                    {
+                        connection.Open();
+                        MySql.Data.MySqlClient.MySqlCommand command = new MySql.Data.MySqlClient.MySqlCommand(updateQuery, connection);
+
+                        command.ExecuteNonQuery();
+                    }
+                }
+                catch (Exception ex)
+                {
+                    var error = MessageBoxManager
+                        .GetMessageBoxStandard("Fehler",
+                            $"Ein Fehler ist aufgetreten:{Environment.NewLine}{Environment.NewLine}{ex.Message}",
+                            ButtonEnum.Ok,
+                            Icon.Error);
+
+                    await error.ShowAsync();
+                }
+
+                row = "Rechnung_PLZ";
+                textbox = textCustomerPostCode.Text;
+                updateQuery = $"UPDATE {table} SET {row} = '{textbox}' WHERE Kundennummer = '{textCustomerNumber.Text}'";
+
+                try
+                {
+                    using (MySql.Data.MySqlClient.MySqlConnection connection = new MySql.Data.MySqlClient.MySqlConnection(connectionString))
+                    {
+                        connection.Open();
+                        MySql.Data.MySqlClient.MySqlCommand command = new MySql.Data.MySqlClient.MySqlCommand(updateQuery, connection);
+
+                        command.ExecuteNonQuery();
+                    }
+                }
+                catch (Exception ex)
+                {
+                    var error = MessageBoxManager
+                        .GetMessageBoxStandard("Fehler",
+                            $"Ein Fehler ist aufgetreten:{Environment.NewLine}{Environment.NewLine}{ex.Message}",
+                            ButtonEnum.Ok,
+                            Icon.Error);
+
+                    await error.ShowAsync();
+                }
+
+                row = "Rechnung_Land";
+                textbox = textCustomerCountry.Text;
+                updateQuery = $"UPDATE {table} SET {row} = '{textbox}' WHERE Kundennummer = '{textCustomerNumber.Text}'";
+
+                try
+                {
+                    using (MySql.Data.MySqlClient.MySqlConnection connection = new MySql.Data.MySqlClient.MySqlConnection(connectionString))
+                    {
+                        connection.Open();
+                        MySql.Data.MySqlClient.MySqlCommand command = new MySql.Data.MySqlClient.MySqlCommand(updateQuery, connection);
+
+                        command.ExecuteNonQuery();
+                    }
+                }
+                catch (Exception ex)
+                {
+                    var error = MessageBoxManager
+                        .GetMessageBoxStandard("Fehler",
+                            $"Ein Fehler ist aufgetreten:{Environment.NewLine}{Environment.NewLine}{ex.Message}",
+                            ButtonEnum.Ok,
+                            Icon.Error);
+
+                    await error.ShowAsync();
+                }
+
+                row = "Einkäufer_Name";
+                textbox = textCustomersPurchaserName.Text;
+                updateQuery = $"UPDATE {table} SET {row} = '{textbox}' WHERE Kundennummer = '{textCustomerNumber.Text}'";
+
+                try
+                {
+                    using (MySql.Data.MySqlClient.MySqlConnection connection = new MySql.Data.MySqlClient.MySqlConnection(connectionString))
+                    {
+                        connection.Open();
+                        MySql.Data.MySqlClient.MySqlCommand command = new MySql.Data.MySqlClient.MySqlCommand(updateQuery, connection);
+
+                        command.ExecuteNonQuery();
+                    }
+                }
+                catch (Exception ex)
+                {
+                    var error = MessageBoxManager
+                        .GetMessageBoxStandard("Fehler",
+                            $"Ein Fehler ist aufgetreten:{Environment.NewLine}{Environment.NewLine}{ex.Message}",
+                            ButtonEnum.Ok,
+                            Icon.Error);
+
+                    await error.ShowAsync();
+                }
+
+                row = "Einkäufer_Telefonnummer";
+                textbox = textCustomersPurchaserPhone.Text;
+                updateQuery = $"UPDATE {table} SET {row} = '{textbox}' WHERE Kundennummer = '{textCustomerNumber.Text}'";
+
+                try
+                {
+                    using (MySql.Data.MySqlClient.MySqlConnection connection = new MySql.Data.MySqlClient.MySqlConnection(connectionString))
+                    {
+                        connection.Open();
+                        MySql.Data.MySqlClient.MySqlCommand command = new MySql.Data.MySqlClient.MySqlCommand(updateQuery, connection);
+
+                        command.ExecuteNonQuery();
+                    }
+                }
+                catch (Exception ex)
+                {
+                    var error = MessageBoxManager
+                        .GetMessageBoxStandard("Fehler",
+                            $"Ein Fehler ist aufgetreten:{Environment.NewLine}{Environment.NewLine}{ex.Message}",
+                            ButtonEnum.Ok,
+                            Icon.Error);
+
+                    await error.ShowAsync();
+                }
+
+                row = "Einkäufer_Email";
+                textbox = textCustomersPurchaserMail.Text;
+                updateQuery = $"UPDATE {table} SET {row} = '{textbox}' WHERE Kundennummer = '{textCustomerNumber.Text}'";
+
+                try
+                {
+                    using (MySql.Data.MySqlClient.MySqlConnection connection = new MySql.Data.MySqlClient.MySqlConnection(connectionString))
+                    {
+                        connection.Open();
+                        MySql.Data.MySqlClient.MySqlCommand command = new MySql.Data.MySqlClient.MySqlCommand(updateQuery, connection);
+
+                        command.ExecuteNonQuery();
+                    }
+                }
+                catch (Exception ex)
+                {
+                    var error = MessageBoxManager
+                        .GetMessageBoxStandard("Fehler",
+                            $"Ein Fehler ist aufgetreten:{Environment.NewLine}{Environment.NewLine}{ex.Message}",
+                            ButtonEnum.Ok,
+                            Icon.Error);
+
+                    await error.ShowAsync();
+                }
+
+                row = "Buchhaltung_Name";
+                textbox = textCustomersBookkeeperName.Text;
+                updateQuery = $"UPDATE {table} SET {row} = '{textbox}' WHERE Kundennummer = '{textCustomerNumber.Text}'";
+
+                try
+                {
+                    using (MySql.Data.MySqlClient.MySqlConnection connection = new MySql.Data.MySqlClient.MySqlConnection(connectionString))
+                    {
+                        connection.Open();
+                        MySql.Data.MySqlClient.MySqlCommand command = new MySql.Data.MySqlClient.MySqlCommand(updateQuery, connection);
+
+                        command.ExecuteNonQuery();
+                    }
+                }
+                catch (Exception ex)
+                {
+                    var error = MessageBoxManager
+                        .GetMessageBoxStandard("Fehler",
+                            $"Ein Fehler ist aufgetreten:{Environment.NewLine}{Environment.NewLine}{ex.Message}",
+                            ButtonEnum.Ok,
+                            Icon.Error);
+
+                    await error.ShowAsync();
+                }
+
+                row = "Buchhaltung_Telefonnummer";
+                textbox = textCustomersBookkeeperPhone.Text;
+                updateQuery = $"UPDATE {table} SET {row} = '{textbox}' WHERE Kundennummer = '{textCustomerNumber.Text}'";
+
+                try
+                {
+                    using (MySql.Data.MySqlClient.MySqlConnection connection = new MySql.Data.MySqlClient.MySqlConnection(connectionString))
+                    {
+                        connection.Open();
+                        MySql.Data.MySqlClient.MySqlCommand command = new MySql.Data.MySqlClient.MySqlCommand(updateQuery, connection);
+
+                        command.ExecuteNonQuery();
+                    }
+                }
+                catch (Exception ex)
+                {
+                    var error = MessageBoxManager
+                        .GetMessageBoxStandard("Fehler",
+                            $"Ein Fehler ist aufgetreten:{Environment.NewLine}{Environment.NewLine}{ex.Message}",
+                            ButtonEnum.Ok,
+                            Icon.Error);
+
+                    await error.ShowAsync();
+                }
+
+                row = "Buchhaltung_Email";
+                textbox = textCustomersBookkeeperMail.Text;
+                updateQuery = $"UPDATE {table} SET {row} = '{textbox}' WHERE Kundennummer = '{textCustomerNumber.Text}'";
+
+                try
+                {
+                    using (MySql.Data.MySqlClient.MySqlConnection connection = new MySql.Data.MySqlClient.MySqlConnection(connectionString))
+                    {
+                        connection.Open();
+                        MySql.Data.MySqlClient.MySqlCommand command = new MySql.Data.MySqlClient.MySqlCommand(updateQuery, connection);
+
+                        command.ExecuteNonQuery();
+                    }
+                }
+                catch (Exception ex)
+                {
+                    var error = MessageBoxManager
+                        .GetMessageBoxStandard("Fehler",
+                            $"Ein Fehler ist aufgetreten:{Environment.NewLine}{Environment.NewLine}{ex.Message}",
+                            ButtonEnum.Ok,
+                            Icon.Error);
+
+                    await error.ShowAsync();
+                }
+
+                row = "Werkszeugnis_Email";
+                textbox = textCustomersCertificateMail.Text;
+                updateQuery = $"UPDATE {table} SET {row} = '{textbox}' WHERE Kundennummer = '{textCustomerNumber.Text}'";
+
+                try
+                {
+                    using (MySql.Data.MySqlClient.MySqlConnection connection = new MySql.Data.MySqlClient.MySqlConnection(connectionString))
+                    {
+                        connection.Open();
+                        MySql.Data.MySqlClient.MySqlCommand command = new MySql.Data.MySqlClient.MySqlCommand(updateQuery, connection);
+
+                        command.ExecuteNonQuery();
+                    }
+                }
+                catch (Exception ex)
+                {
+                    var error = MessageBoxManager
+                        .GetMessageBoxStandard("Fehler",
+                            $"Ein Fehler ist aufgetreten:{Environment.NewLine}{Environment.NewLine}{ex.Message}",
+                            ButtonEnum.Ok,
+                            Icon.Error);
+
+                    await error.ShowAsync();
+                }
+
+                row = "Rechnung_Email";
+                textbox = textCustomersInvoiceMail.Text;
+                updateQuery = $"UPDATE {table} SET {row} = '{textbox}' WHERE Kundennummer = '{textCustomerNumber.Text}'";
+
+                try
+                {
+                    using (MySql.Data.MySqlClient.MySqlConnection connection = new MySql.Data.MySqlClient.MySqlConnection(connectionString))
+                    {
+                        connection.Open();
+                        MySql.Data.MySqlClient.MySqlCommand command = new MySql.Data.MySqlClient.MySqlCommand(updateQuery, connection);
+
+                        command.ExecuteNonQuery();
+                    }
+                }
+                catch (Exception ex)
+                {
+                    var error = MessageBoxManager
+                        .GetMessageBoxStandard("Fehler",
+                            $"Ein Fehler ist aufgetreten:{Environment.NewLine}{Environment.NewLine}{ex.Message}",
+                            ButtonEnum.Ok,
+                            Icon.Error);
+
+                    await error.ShowAsync();
+                }
+
+                row = "Skonto";
+                textbox = textCustomerSkonto.Text.Replace(',', '.');
+                updateQuery = $"UPDATE {table} SET {row} = '{textbox}' WHERE Kundennummer = '{textCustomerNumber.Text}'";
+
+                try
+                {
+                    using (MySql.Data.MySqlClient.MySqlConnection connection = new MySql.Data.MySqlClient.MySqlConnection(connectionString))
+                    {
+                        connection.Open();
+                        MySql.Data.MySqlClient.MySqlCommand command = new MySql.Data.MySqlClient.MySqlCommand(updateQuery, connection);
+
+                        command.ExecuteNonQuery();
+                    }
+                }
+                catch (Exception ex)
+                {
+                    var error = MessageBoxManager
+                        .GetMessageBoxStandard("Fehler",
+                            $"Ein Fehler ist aufgetreten:{Environment.NewLine}{Environment.NewLine}{ex.Message}",
+                            ButtonEnum.Ok,
+                            Icon.Error);
+
+                    await error.ShowAsync();
+                }
+
+                row = "Skontofrist";
+                textbox = textCustomerSkontoTerm.Text;
+                updateQuery = $"UPDATE {table} SET {row} = '{textbox}' WHERE Kundennummer = '{textCustomerNumber.Text}'";
+
+                try
+                {
+                    using (MySql.Data.MySqlClient.MySqlConnection connection = new MySql.Data.MySqlClient.MySqlConnection(connectionString))
+                    {
+                        connection.Open();
+                        MySql.Data.MySqlClient.MySqlCommand command = new MySql.Data.MySqlClient.MySqlCommand(updateQuery, connection);
+
+                        command.ExecuteNonQuery();
+                    }
+                }
+                catch (Exception ex)
+                {
+                    var error = MessageBoxManager
+                        .GetMessageBoxStandard("Fehler",
+                            $"Ein Fehler ist aufgetreten:{Environment.NewLine}{Environment.NewLine}{ex.Message}",
+                            ButtonEnum.Ok,
+                            Icon.Error);
+
+                    await error.ShowAsync();
+                }
+
+                row = "Nettofrist";
+                textbox = textCustomerNettoTerm.Text;
+                updateQuery = $"UPDATE {table} SET {row} = '{textbox}' WHERE Kundennummer = '{textCustomerNumber.Text}'";
+
+                try
+                {
+                    using (MySql.Data.MySqlClient.MySqlConnection connection = new MySql.Data.MySqlClient.MySqlConnection(connectionString))
+                    {
+                        connection.Open();
+                        MySql.Data.MySqlClient.MySqlCommand command = new MySql.Data.MySqlClient.MySqlCommand(updateQuery, connection);
+
+                        command.ExecuteNonQuery();
+                    }
+                }
+                catch (Exception ex)
+                {
+                    var error = MessageBoxManager
+                        .GetMessageBoxStandard("Fehler",
+                            $"Ein Fehler ist aufgetreten:{Environment.NewLine}{Environment.NewLine}{ex.Message}",
+                            ButtonEnum.Ok,
+                            Icon.Error);
+
+                    await error.ShowAsync();
+                }
+
+                CustomerCustomerInformationClear();
+                CustomerCustomerCreationSearchList();
+            }
+        }
+        else
+        {
+            var box = MessageBoxManager
+                .GetMessageBoxStandard("Bestätigung",
+                    $"Kundennummer: {textCustomerNumber.Text}{Environment.NewLine}" +
+                    $"Firmenname: {textCustomerName.Text}{Environment.NewLine}" +
+                    $"Kürzel: {textCustomerShortName.Text}{Environment.NewLine}" +
+                    $"Straße: {textCustomerStreet.Text}{Environment.NewLine}" +
+                    $"Hausnummer: {textCustomerHouseNo.Text}{Environment.NewLine}" +
+                    $"PLZ: {textCustomerPostCode.Text}{Environment.NewLine}" +
+                    $"Stadt: {textCustomerCity.Text}{Environment.NewLine}" +
+                    $"Land: {textCustomerCountry.Text}{Environment.NewLine}" +
+                    $"Einkäufer: {textCustomersPurchaserName.Text}{Environment.NewLine}" +
+                    $"Einkäufer Telefon: {textCustomersPurchaserPhone.Text}{Environment.NewLine}" +
+                    $"Einkäufer E-Mail: {textCustomersPurchaserMail.Text}{Environment.NewLine}" +
+                    $"Buchhaltung Name: {textCustomersBookkeeperName.Text}{Environment.NewLine}" +
+                    $"Buchhalung Telefon: {textCustomersBookkeeperPhone.Text}{Environment.NewLine}" +
+                    $"Buchhalung E-Mail: {textCustomersBookkeeperMail.Text}{Environment.NewLine}" +
+                    $"Werkszeugnis E-Mail: {textCustomersCertificateMail.Text}{Environment.NewLine}" +
+                    $"Rechung E-Mail: {textCustomersInvoiceMail.Text}{Environment.NewLine}" +
+                    $"Skonto: {textCustomerSkonto.Text}{Environment.NewLine}" +
+                    $"Skontofrist: {textCustomerSkontoTerm.Text}{Environment.NewLine}" +
+                    $"Nettofrist: {textCustomerNettoTerm.Text}",
+                ButtonEnum.YesNo);
+
+            var result = await box.ShowAsync();
+
+            if (result == ButtonResult.Yes)
+            {
+
+                // SQL query
+                string query = @"INSERT INTO kunden 
+                    (Kürzel, Firmenname, `Rechnung_Straße`, `Rechnung_Hausnummer`, `Rechnung_Stadt`, `Rechnung_PLZ`, `Rechnung_Land`, 
+                    `Einkäufer_Name`, `Einkäufer_Telefonnummer`, `Einkäufer_EMail`, `Buchhaltung_Name`, `Buchhaltung_Telefonnummer`, 
+                    `Buchhaltung_EMail`, `Werkszeugnis_EMail`, `Rechnung_EMail`, `Skonto`, `Skontofrist`, `Nettofrist`) 
+                    VALUES 
+                    (@Kürzel, @Firmenname, @Rechnung_Straße, @Rechnung_Hausnummer, @Rechnung_Stadt, @Rechnung_PLZ, @Rechnung_Land, 
+                    @Einkäufer_Name, @Einkäufer_Telefon, @Einkäufer_Email, @Buchhaltung_Name, @Buchhaltung_Telefon, 
+                    @Buchhaltung_Email, @Werkszeugnis_Email, @Rechnung_Email, @Skonto, @Skontofrist, @Nettofrist)";
+
+                // Create MySql.Data.MySqlClient.MySqlConnection object
+                using (MySql.Data.MySqlClient.MySqlConnection connection = new MySql.Data.MySqlClient.MySqlConnection(connectionString))
+                {
+                    // Open the connection
+                    connection.Open();
+
+                    // Create MySql.Data.MySqlClient.MySqlCommand object
+                    using (MySql.Data.MySqlClient.MySqlCommand command = new MySql.Data.MySqlClient.MySqlCommand(query, connection))
+                    {
+                        // Add parameters
+                        command.Parameters.AddWithValue("@Firmenname", textCustomerName.Text);
+                        command.Parameters.AddWithValue("@Kürzel", textCustomerShortName.Text);
+                        command.Parameters.AddWithValue("@Rechnung_Straße", textCustomerStreet.Text);
+                        command.Parameters.AddWithValue("@Rechnung_Hausnummer", textCustomerHouseNo.Text);
+                        command.Parameters.AddWithValue("@Rechnung_PLZ", textCustomerPostCode.Text);
+                        command.Parameters.AddWithValue("@Rechnung_Stadt", textCustomerCity.Text);
+                        command.Parameters.AddWithValue("@Rechnung_Land", textCustomerCountry.Text);
+                        command.Parameters.AddWithValue("@Einkäufer_Name", textCustomersPurchaserName.Text);
+                        command.Parameters.AddWithValue("@Einkäufer_Telefon", textCustomersPurchaserPhone.Text);
+                        command.Parameters.AddWithValue("@Einkäufer_Email", textCustomersPurchaserMail.Text);
+                        command.Parameters.AddWithValue("@Buchhaltung_Name", textCustomersBookkeeperName.Text);
+                        command.Parameters.AddWithValue("@Buchhaltung_Telefon", textCustomersBookkeeperPhone.Text);
+                        command.Parameters.AddWithValue("@Buchhaltung_Email", textCustomersBookkeeperMail.Text);
+                        command.Parameters.AddWithValue("@Werkszeugnis_Email", textCustomersCertificateMail.Text);
+                        command.Parameters.AddWithValue("@Rechnung_Email", textCustomersInvoiceMail.Text);
+                        command.Parameters.AddWithValue("@Skonto", textCustomerSkonto.Text);
+                        command.Parameters.AddWithValue("@Skontofrist", textCustomerSkontoTerm.Text);
+                        command.Parameters.AddWithValue("@Nettofrist", textCustomerNettoTerm.Text);
+
+
+                        // Execute the query
+                        command.ExecuteNonQuery();
+                    }
+                }
+                CustomerCustomerInformationClear();
+                CustomerCustomerCreationSearchList();
+            }
+        }
+    }
+
+    private void textCustomerNameSearch_TextChanged(object? sender, Avalonia.Interactivity.RoutedEventArgs e)
+    {
+        CustomerCustomerCreationSearchList();
+    }
+
+    private void ListCustomersCustomerList_SelectedIndexChanged(object? sender, Avalonia.Interactivity.RoutedEventArgs e)
+    {
+        if (ListCustomersCustomerList.SelectedItem != null)
+        {
+            string firmenname = ListCustomersCustomerList.SelectedItem.ToString();
+
+            textCustomerNumber.Text = GetFieldValue("Kundennummer", firmenname, "kunden", "Firmenname");
+            textCustomerStreet.Text = GetFieldValue("Rechnung_Straße", firmenname, "kunden", "Firmenname");
+            textCustomerHouseNo.Text = GetFieldValue("Rechnung_Hausnummer", firmenname, "kunden", "Firmenname");
+            textCustomerShortName.Text = GetFieldValue("Kürzel", firmenname, "kunden", "Firmenname");
+            textCustomerCity.Text = GetFieldValue("Rechnung_Stadt", firmenname, "kunden", "Firmenname");
+            textCustomerPostCode.Text = GetFieldValue("Rechnung_PLZ", firmenname, "kunden", "Firmenname");
+            textCustomerCountry.Text = GetFieldValue("Rechnung_Land", firmenname, "kunden", "Firmenname");
+            textCustomersPurchaserName.Text = GetFieldValue("Einkäufer_Name", firmenname, "kunden", "Firmenname");
+            textCustomersPurchaserPhone.Text = GetFieldValue("Einkäufer_Telefonnummer", firmenname, "kunden", "Firmenname");
+            textCustomersPurchaserMail.Text = GetFieldValue("Einkäufer_EMail", firmenname, "kunden", "Firmenname");
+            textCustomersBookkeeperName.Text = GetFieldValue("Buchhaltung_Name", firmenname, "kunden", "Firmenname");
+            textCustomersBookkeeperPhone.Text = GetFieldValue("Buchhaltung_Telefonnummer", firmenname, "kunden", "Firmenname");
+            textCustomersBookkeeperMail.Text = GetFieldValue("Buchhaltung_EMail", firmenname, "kunden", "Firmenname");
+            textCustomersCertificateMail.Text = GetFieldValue("Werkszeugnis_EMail", firmenname, "kunden", "Firmenname");
+            textCustomersInvoiceMail.Text = GetFieldValue("Rechnung_EMail", firmenname, "kunden", "Firmenname");
+            textCustomerName.Text = GetFieldValue("Firmenname", firmenname, "kunden", "Firmenname");
+            textCustomerNotes.Text = GetFieldValue("Notizen", firmenname, "kunden", "Firmenname");
+            textCustomerSkonto.Text = GetFieldValue("Skonto", firmenname, "kunden", "Firmenname");
+            textCustomerSkontoTerm.Text = GetFieldValue("Skontofrist", firmenname, "kunden", "Firmenname");
+            textCustomerNettoTerm.Text = GetFieldValue("Nettofrist", firmenname, "kunden", "Firmenname");
+        }
+    }
+
+    private async void textCustomerNotes_LostFocus(object? sender, Avalonia.Interactivity.RoutedEventArgs e)
+    {
+        if (ListCustomersCustomerList.SelectedItem != null)
+        {
+            // Customer Selected -> offer Change
+            string table = "kunden";
+
+            string row = "Notizen";
+            string textbox = textCustomerNotes.Text;
+            string updateQuery = $"UPDATE {table} SET {row} = '{textbox}' WHERE Firmenname = '{ListCustomersCustomerList.SelectedItem.ToString()}'";
+
+            try
+            {
+                using (MySql.Data.MySqlClient.MySqlConnection connection = new MySql.Data.MySqlClient.MySqlConnection(connectionString))
+                {
+                    connection.Open();
+                    MySql.Data.MySqlClient.MySqlCommand command = new MySql.Data.MySqlClient.MySqlCommand(updateQuery, connection);
+
+                    command.ExecuteNonQuery();
+                }
+            }
+            catch (Exception ex)
+            {
+                var error = MessageBoxManager
+                    .GetMessageBoxStandard("Fehler",
+                        $"Ein Fehler ist aufgetreten:{Environment.NewLine}{Environment.NewLine}{ex.Message}",
+                        ButtonEnum.Ok,
+                        Icon.Error);
+
+                await error.ShowAsync();
+            }
+        }
+        CustomerCustomerInformationClear();
+        CustomerCustomerCreationSearchList();
+    }
+
+    private void CustomerCustomerInformationClear()
+    {
+        textCustomerNumber.Text = "";
+        textCustomerStreet.Text = "";
+        textCustomerHouseNo.Text = "";
+        textCustomerShortName.Text = "";
+        textCustomerCity.Text = "";
+        textCustomerPostCode.Text = "";
+        textCustomerCountry.Text = "";
+        textCustomersPurchaserName.Text = "";
+        textCustomersPurchaserPhone.Text = "";
+        textCustomersPurchaserMail.Text = "";
+        textCustomersBookkeeperName.Text = "";
+        textCustomersBookkeeperPhone.Text = "";
+        textCustomersBookkeeperMail.Text = "";
+        textCustomersCertificateMail.Text = "";
+        textCustomersInvoiceMail.Text = "";
+        textCustomerName.Text = "";
+        textCustomerNotes.Text = "";
+        textCustomerSkonto.Text = "";
+        textCustomerSkontoTerm.Text = "";
+        textCustomerNettoTerm.Text = "";
+    }
+
+    private async void CustomerCustomerCreationSearchList()
+    {
+        if (textCustomerNameSearch.Text != null)
+        {
+            ListCustomersCustomerList.Items.Clear();
+
+            try
+            {
+                string query = $"SELECT * FROM prostahl.kunden WHERE CONCAT_WS(' ', Kürzel, Firmenname, Rechnung_Straße, Rechnung_Hausnummer, Rechnung_Stadt, Rechnung_PLZ, Rechnung_Land, Einkäufer_Name, Einkäufer_Telefonnummer, Einkäufer_EMail, Buchhaltung_Name, Buchhaltung_Telefonnummer, Buchhaltung_EMail, Werkszeugnis_EMail, Rechnung_EMail, Skonto, Skontofrist, Nettofrist) LIKE @SearchTerm ORDER BY Firmenname ASC LIMIT 1000";
+
+                using (MySql.Data.MySqlClient.MySqlConnection connection = new MySql.Data.MySqlClient.MySqlConnection(connectionString))
+                {
+                    using (MySql.Data.MySqlClient.MySqlCommand command = new MySql.Data.MySqlClient.MySqlCommand(query, connection))
+                    {
+                        command.Parameters.AddWithValue("@SearchTerm", $"%{textCustomerNameSearch.Text}%");
+
+                        try
+                        {
+                            connection.Open();
+                            using (MySql.Data.MySqlClient.MySqlDataReader reader = command.ExecuteReader())
+                            {
+                                while (reader.Read())
+                                {
+                                    // Read values from columns
+                                    string firmenname = reader.GetString(2); // Assuming `Firmenname` is at index 2
+
+                                    // Do something with the values...
+                                    ListCustomersCustomerList.Items.Add(firmenname);
+                                }
+                            }
+                        }
+                        catch (Exception ex)
+                        {
+                            var error = MessageBoxManager
+                            .GetMessageBoxStandard("Fehler",
+                                $"Ein Fehler ist aufgetreten:{Environment.NewLine}{Environment.NewLine}{ex.Message}",
+                                ButtonEnum.Ok,
+                                Icon.Error);
+
+                            await error.ShowAsync();
+                        }
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                var error = MessageBoxManager
+                .GetMessageBoxStandard("Fehler",
+                    $"Ein Fehler ist aufgetreten:{Environment.NewLine}{Environment.NewLine}{ex.Message}",
+                    ButtonEnum.Ok,
+                    Icon.Error);
+
+                await error.ShowAsync();
+            }
+        }
+    }
+
+    private void btnCustomerInfoClear_Click(object? sender, Avalonia.Interactivity.RoutedEventArgs e)
+    {
+        CustomerCustomerInformationClear();
+        textCustomerNameSearch.Text = "";
+        ListCustomersCustomerList.Items.Clear();
+    }
 }

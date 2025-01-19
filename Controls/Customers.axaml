@@ -30,54 +30,56 @@
 			<TextBox  Watermark="Avis. E-Mail" Name="textCustomersDeliveryAdressContactMail" Grid.Row="17" Grid.Column="1" Margin="0 0 0 10"/>
 			<TextBlock Text="Avis. E-Mail:" TextAlignment="End" Grid.Row="17" Grid.Column="0" Margin="0 0 10 5" VerticalAlignment="Center"/>
 			<Button Content="Lieferanschrift Speichern" Click="btnCustomersSaveDeliveryAdress_Click" Grid.Row="18" Grid.Column="1" Grid.RowSpan="0" Grid.ColumnSpan="1" />
+			<Button Content="Lieferanschriftdaten Leeren" Click="btnDeliveryInfoClear_Click" Grid.Row="19" Grid.Column="1" Grid.RowSpan="0" Grid.ColumnSpan="1" />
 
-			<TextBox  Watermark="Kunde" Grid.Row="0" Grid.ColumnSpan="2" Grid.Column="2" Margin="0 30 0 10"/>
-			<ListBox x:Name="ListCustomersCustomerList" Height="200" Width="400" HorizontalAlignment="Right" Grid.Row="1" Grid.RowSpan="5" Grid.Column="2" Grid.ColumnSpan="2" Margin="0 0 0 10"/>
+
+			<TextBox  Watermark="Kunde" Grid.Row="0" Name="textCustomerNameSearch" TextChanged="textCustomerNameSearch_TextChanged" Grid.ColumnSpan="2" Grid.Column="2" Margin="0 30 0 10"/>
+			<ListBox x:Name="ListCustomersCustomerList" SelectionChanged="ListCustomersCustomerList_SelectedIndexChanged" Height="200" Width="400" HorizontalAlignment="Right" Grid.Row="1" Grid.RowSpan="5" Grid.Column="2" Grid.ColumnSpan="2" Margin="0 0 0 10"/>
 			<TextBlock Text="Kunden Details:" TextAlignment="Center" Grid.Row="6" Grid.Column="2" Grid.ColumnSpan="4" Margin="0 0 0 10"/>
 			<TextBlock Text="Einkäufer Name:" TextAlignment="End" Grid.Row="8" Grid.Column="2" Margin="0 0 10 5" VerticalAlignment="Center"/>
-			<TextBox  Watermark="Einkäufer Name" Grid.Row="8" Grid.Column="3" Margin="0 0 0 10"/>
-			<TextBox  Watermark="Einkäufer Tel.Nr." Grid.Row="9" Grid.Column="3" Margin="0 0 0 10"/>
+			<TextBox  Watermark="Einkäufer Name" Name="textCustomersPurchaserName" Grid.Row="8" Grid.Column="3" Margin="0 0 0 10"/>
+			<TextBox  Watermark="Einkäufer Tel.Nr." Name="textCustomersPurchaserPhone" Grid.Row="9" Grid.Column="3" Margin="0 0 0 10"/>
 			<TextBlock Text="Einkäufer Tel.Nr." TextAlignment="End" Grid.Row="9" Grid.Column="2" Margin="0 0 10 5" VerticalAlignment="Center"/>
-			<TextBox  Watermark="Einkäufer E-Mail" Grid.Row="10" Grid.Column="3" Margin="0 0 0 10"/>
+			<TextBox  Watermark="Einkäufer E-Mail" Name="textCustomersPurchaserMail" Grid.Row="10" Grid.Column="3" Margin="0 0 0 10"/>
 			<TextBlock Text="Einkäufer E-Mail" TextAlignment="End" Grid.Row="10" Grid.Column="2" Margin="0 0 10 5" VerticalAlignment="Center"/>
-			<TextBox  Watermark="Buchhaltung Name" Grid.Row="11" Grid.Column="3" Margin="0 0 0 10"/>
+			<TextBox  Watermark="Buchhaltung Name" Name="textCustomersBookkeeperName" Grid.Row="11" Grid.Column="3" Margin="0 0 0 10"/>
 			<TextBlock Text="Buchhaltung Name:" TextAlignment="End" Grid.Row="11" Grid.Column="2" Margin="0 0 10 5" VerticalAlignment="Center"/>
-			<TextBox  Watermark="Buchhaltung Tel.Nr." Grid.Row="12" Grid.Column="3" Margin="0 0 0 10"/>
+			<TextBox  Watermark="Buchhaltung Tel.Nr." Name="textCustomersBookkeeperPhone" Grid.Row="12" Grid.Column="3" Margin="0 0 0 10"/>
 			<TextBlock Text="Buchhaltung Tel.Nr.:" TextAlignment="End" Grid.Row="12" Grid.Column="2" Margin="0 0 10 5" VerticalAlignment="Center"/>
 			<TextBlock Text="Buchhaltung E-Mail:" Grid.Row="13" TextAlignment="End" Grid.Column="2" Margin="0 0 10 5" VerticalAlignment="Center"/>
-			<TextBox  Watermark="Buchhaltung E-Mail" Grid.Row="13" Grid.Column="3" Margin="0 0 0 10"/>
-			<TextBox  Watermark="Werkszeugnis E-Mail" Grid.Row="14" Grid.Column="3" Margin="0 0 0 10"/>
+			<TextBox  Watermark="Buchhaltung E-Mail" Name="textCustomersBookkeeperMail" Grid.Row="13" Grid.Column="3" Margin="0 0 0 10"/>
+			<TextBox  Watermark="Werkszeugnis E-Mail" Name="textCustomersCertificateMail" Grid.Row="14" Grid.Column="3" Margin="0 0 0 10"/>
 			<TextBlock Text="Werkszeugnis E-Mail" Grid.Row="14" TextAlignment="End" Grid.Column="2" Margin="0 0 10 5" VerticalAlignment="Center"/>
-			<TextBox  Watermark="Rechnung E-Mail" Grid.Row="15" Grid.Column="3" Margin="0 0 0 10"/>
+			<TextBox  Watermark="Rechnung E-Mail" Name="textCustomersInvoiceMail" Grid.Row="15" Grid.Column="3" Margin="0 0 0 10"/>
 			<TextBlock Text="Rechnung E-Mail" TextAlignment="End" Grid.Row="15" Grid.Column="2" Margin="0 0 10 5" VerticalAlignment="Center"/>
 			<TextBlock Text="Kd.Nr.:" TextAlignment="End" Grid.Row="8" Grid.Column="4" Margin="0 0 10 5" VerticalAlignment="Center"/>
-			<TextBox  Watermark="Kundennummer" Grid.Row="8" Grid.Column="5" Margin="0 0 0 10"/>
-			<TextBox  Watermark="Firmenname" Grid.Row="9" Grid.Column="5" Margin="0 0 0 10"/>
+			<TextBox  Watermark="Kundennummer" Name="textCustomerNumber" Grid.Row="8" Grid.Column="5" Margin="0 0 0 10"/>
+			<TextBox  Watermark="Firmenname" Name="textCustomerName" Grid.Row="9" Grid.Column="5" Margin="0 0 0 10"/>
 			<TextBlock Text="Firmenname" TextAlignment="End" Grid.Row="9" Grid.Column="4" Margin="0 0 10 5" VerticalAlignment="Center"/>
-			<TextBox  Watermark="Kürzel" Grid.Row="10" Grid.Column="5" Margin="0 0 0 10"/>
+			<TextBox  Watermark="Kürzel" Name="textCustomerShortName" Grid.Row="10" Grid.Column="5" Margin="0 0 0 10"/>
 			<TextBlock Text="Kürzel" TextAlignment="End" Grid.Row="10" Grid.Column="4" Margin="0 0 10 5" VerticalAlignment="Center"/>
-			<TextBox  Watermark="Straße" Grid.Row="11" Grid.Column="5" Margin="0 0 0 10"/>
+			<TextBox  Watermark="Straße" Name="textCustomerStreet" Grid.Row="11" Grid.Column="5" Margin="0 0 0 10"/>
 			<TextBlock Text="Straße:" TextAlignment="End" Grid.Row="11" Grid.Column="4" Margin="0 0 10 5" VerticalAlignment="Center"/>
-			<TextBox  Watermark="Hausnummer" Grid.Row="12" Grid.Column="5" Margin="0 0 0 10"/>
+			<TextBox  Watermark="Hausnummer" Name="textCustomerHouseNo" Grid.Row="12" Grid.Column="5" Margin="0 0 0 10"/>
 			<TextBlock Text="Hausnr.:" TextAlignment="End" Grid.Row="12" Grid.Column="4" Margin="0 0 10 5" VerticalAlignment="Center"/>
 			<TextBlock Text="Stadt:" Grid.Row="13" TextAlignment="End" Grid.Column="4" Margin="0 0 10 5" VerticalAlignment="Center"/>
-			<TextBox  Watermark="Stadt" Grid.Row="13" Grid.Column="5" Margin="0 0 0 10"/>
-			<TextBox  Watermark="PLZ" Grid.Row="14" Grid.Column="5" Margin="0 0 0 10"/>
+			<TextBox  Watermark="Stadt" Name="textCustomerCity" Grid.Row="13" Grid.Column="5" Margin="0 0 0 10"/>
+			<TextBox  Watermark="PLZ" Name="textCustomerPostCode" Grid.Row="14" Grid.Column="5" Margin="0 0 0 10"/>
 			<TextBlock Text="PLZ" Grid.Row="14" TextAlignment="End" Grid.Column="4" Margin="0 0 10 5" VerticalAlignment="Center"/>
-			<TextBox  Watermark="Land" Grid.Row="15" Grid.Column="5" Margin="0 0 0 10"/>
+			<TextBox  Watermark="Land" Name="textCustomerCountry" Grid.Row="15" Grid.Column="5" Margin="0 0 0 10"/>
 			<TextBlock Text="Land" TextAlignment="End" Grid.Row="15" Grid.Column="4" Margin="0 0 10 5" VerticalAlignment="Center"/>
 			<TextBlock Text="Zahlungsbedingungen" TextAlignment="End" Grid.Row="16" Grid.ColumnSpan="2" Grid.Column="4" Margin="0 0 10 5" VerticalAlignment="Center"/>
-			<TextBox  Watermark="Skonto %" Grid.Row="17" Grid.Column="5" Margin="0 0 0 10"/>
+			<TextBox  Watermark="Skonto %" Name="textCustomerSkonto" Grid.Row="17" Grid.Column="5" Margin="0 0 0 10"/>
 			<TextBlock Text="Skonto %" TextAlignment="End" Grid.Row="17" Grid.Column="4" Margin="0 0 10 5" VerticalAlignment="Center"/>
-			<TextBox  Watermark="Skontofrist" Grid.Row="18" Grid.Column="5" Margin="0 0 0 10"/>
+			<TextBox  Watermark="Skontofrist" Name="textCustomerSkontoTerm" Grid.Row="18" Grid.Column="5" Margin="0 0 0 10"/>
 			<TextBlock Text="Skontofrist:" TextAlignment="End" Grid.Row="18" Grid.Column="4" Margin="0 0 10 5" VerticalAlignment="Center"/>
-			<TextBox  Watermark="Nettofrist" Grid.Row="19" Grid.Column="5" Margin="0 0 0 10"/>
+			<TextBox  Watermark="Nettofrist" Name="textCustomerNettoTerm" Grid.Row="19" Grid.Column="5" Margin="0 0 0 10"/>
 			<TextBlock Text="Nettofrist:" TextAlignment="End" Grid.Row="19" Grid.Column="4" Margin="0 0 10 5" VerticalAlignment="Center"/>
 			<TextBlock Margin="20 30 0 10" Grid.Row="0" Grid.Column="6" >Notizen:</TextBlock>
-			<TextBox Margin="20 -10 0 -50" AcceptsReturn="True" Grid.RowSpan="19" Grid.Row="1" Grid.Column="7" TextWrapping="Wrap" HorizontalAlignment="Stretch" VerticalAlignment="Stretch"/>
-			<Button Content="Kundendaten Speichern" Grid.Row="18" Grid.Column="3" Grid.RowSpan="0" Grid.ColumnSpan="2" />
+			<TextBox Margin="20 -10 0 -50" Name="textCustomerNotes" LostFocus="textCustomerNotes_LostFocus" AcceptsReturn="True" Grid.RowSpan="19" Grid.Row="1" Grid.Column="7" TextWrapping="Wrap" HorizontalAlignment="Stretch" VerticalAlignment="Stretch"/>
+			<Button Content="Kundendaten Speichern" Click="btnNewCustomer_Click" Grid.Row="18" Grid.Column="3" Grid.RowSpan="0" Grid.ColumnSpan="2" />
+			<Button Content="Kundendaten Leeren" Click="btnCustomerInfoClear_Click" Grid.Row="19" Grid.Column="3" Grid.RowSpan="0" Grid.ColumnSpan="2" />
 
-			<Button Content="SpansCol1-2Row1-2" Name="MyButton" Grid.Row="18" Grid.Column="0" Grid.RowSpan="2" Grid.ColumnSpan="2" />
 		</Grid>
 	</ScrollViewer>
 </UserControl>

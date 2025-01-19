@@ -37,7 +37,7 @@ public partial class Customers : UserControl
         }
         catch (Exception ex)
         {
-            //Add Serilog here at some point? 
+            //Log
             return "";
         }
     }
@@ -93,7 +93,9 @@ public partial class Customers : UserControl
                     await error.ShowAsync();
                 }
 
-                updateQuery = $"UPDATE lieferanschrift SET Straﬂe = '{textCustomersDeliveryAdressStreet.Text}' WHERE Lieferanschrift_Nummer = '{textCustomersDeliveryAdressNumber.Text}'";
+                tablerow = "Straﬂe";
+                txtfield = textCustomersDeliveryAdressStreet.Text;
+                updateQuery = $"UPDATE lieferanschrift SET {tablerow} = '{txtfield}' WHERE Lieferanschrift_Nummer = '{textCustomersDeliveryAdressNumber.Text}'";
 
                 try
                 {
@@ -114,7 +116,6 @@ public partial class Customers : UserControl
                             Icon.Error);
 
                     await error.ShowAsync();                }
-
 
                 tablerow = "Hausnummer";
                 txtfield = textCustomersDeliveryAdressHouseNo.Text;
@@ -191,7 +192,6 @@ public partial class Customers : UserControl
                     await error.ShowAsync();
                 }
 
-
                 tablerow = "Land";
                 txtfield = textCustomersDeliveryAdressCountry.Text;
                 updateQuery = $"UPDATE lieferanschrift SET {tablerow} = '{txtfield}' WHERE Lieferanschrift_Nummer = '{textCustomersDeliveryAdressNumber.Text}'";
@@ -244,100 +244,110 @@ public partial class Customers : UserControl
 
                 tablerow = "Ansprechpartner_Telefon";
                 txtfield = textCustomersDeliveryAdressContactPhone.Text;
+                updateQuery = $"UPDATE lieferanschrift SET {tablerow} = '{txtfield}' WHERE Lieferanschrift_Nummer = '{textCustomersDeliveryAdressNumber.Text}'";
 
-                // Ensure the connection is disposed of properly
-                using (MySql.Data.MySqlClient.MySqlConnection connection = new MySql.Data.MySqlClient.MySqlConnection(connectionString))
+                try
                 {
-                    // Open the connection
-                    connection.Open();
-
-                    // Create the SQL command with parameters
-                    updateQuery = $"UPDATE lieferanschrift SET `{tablerow}` = @TxtField WHERE Lieferanschrift_Nummer = '{textCustomersDeliveryAdressNumber.Text}'";
-
-                    // Create and configure the MySql.Data.MySqlClient.MySqlCommand
-                    using (MySql.Data.MySqlClient.MySqlCommand command = new MySql.Data.MySqlClient.MySqlCommand(updateQuery, connection))
+                    using (MySql.Data.MySqlClient.MySqlConnection connection = new MySql.Data.MySqlClient.MySqlConnection(connectionString))
                     {
-                        // Add parameters to the command
-                        command.Parameters.AddWithValue("@TxtField", txtfield);
+                        connection.Open();
+                        MySql.Data.MySqlClient.MySqlCommand command = new MySql.Data.MySqlClient.MySqlCommand(updateQuery, connection);
 
-                        try
-                        {
-                            command.ExecuteNonQuery();
-                        }
-                        catch (Exception ex)
-                        {
-                            var error = MessageBoxManager
-                                .GetMessageBoxStandard("Fehler",
-                                    $"Ein Fehler ist aufgetreten:{Environment.NewLine}{Environment.NewLine}{ex.Message}",
-                                    ButtonEnum.Ok,
-                                    Icon.Error);
-
-                            await error.ShowAsync();
-                        }
+                        command.ExecuteNonQuery();
                     }
+                }
+                catch (Exception ex)
+                {
+                    var error = MessageBoxManager
+                        .GetMessageBoxStandard("Fehler",
+                            $"Ein Fehler ist aufgetreten:{Environment.NewLine}{Environment.NewLine}{ex.Message}",
+                            ButtonEnum.Ok,
+                            Icon.Error);
+
+                    await error.ShowAsync();
                 }
 
                 tablerow = "Ansprechpartner_Mail";
                 txtfield = textCustomersDeliveryAdressContactMail.Text;
+                updateQuery = $"UPDATE lieferanschrift SET {tablerow} = '{txtfield}' WHERE Lieferanschrift_Nummer = '{textCustomersDeliveryAdressNumber.Text}'";
 
-                // Ensure the connection is disposed of properly
-                using (MySql.Data.MySqlClient.MySqlConnection connection = new MySql.Data.MySqlClient.MySqlConnection(connectionString))
+                try
                 {
-                    // Open the connection
-                    connection.Open();
-
-                    // Create the SQL command with parameters
-                    updateQuery = $"UPDATE lieferanschrift SET {tablerow} = '{txtfield}' WHERE Lieferanschrift_Nummer = '{textCustomersDeliveryAdressNumber.Text}'";
-
-                    // Create and configure the MySql.Data.MySqlClient.MySqlCommand
-                    using (MySql.Data.MySqlClient.MySqlCommand command = new MySql.Data.MySqlClient.MySqlCommand(updateQuery, connection))
+                    using (MySql.Data.MySqlClient.MySqlConnection connection = new MySql.Data.MySqlClient.MySqlConnection(connectionString))
                     {
-                        // Add parameters to the command
-                        command.Parameters.AddWithValue("@TxtField", txtfield);
+                        connection.Open();
+                        MySql.Data.MySqlClient.MySqlCommand command = new MySql.Data.MySqlClient.MySqlCommand(updateQuery, connection);
 
-                        try
-                        {
-                            // Execute the query
-                            int rowsAffected = command.ExecuteNonQuery();
-
-                            // Check if any rows were affected
-                            if (rowsAffected > 0)
-                            {
-                                var error = MessageBoxManager
-                                    .GetMessageBoxStandard("Erfolg! ",
-                                        $"Eintrag erfolgreich aktualisiert!",
-                                        ButtonEnum.Ok,
-                                        Icon.Success);
-
-                                await error.ShowAsync();
-                            }
-                            else
-                            {
-                                var error = MessageBoxManager
-                                    .GetMessageBoxStandard("Fehler",
-                                        $"No Matching Record found",
-                                        ButtonEnum.Ok,
-                                        Icon.Error);
-
-                                await error.ShowAsync();
-                            }
-                        }
-                        catch (Exception ex)
-                        {
-                            var error = MessageBoxManager
-                                .GetMessageBoxStandard("Fehler",
-                                    $"Ein Fehler ist aufgetreten:{Environment.NewLine}{Environment.NewLine}{ex.Message}",
-                                    ButtonEnum.Ok,
-                                    Icon.Error);
-
-                            await error.ShowAsync();
-                        }
+                        command.ExecuteNonQuery();
                     }
                 }
+                catch (Exception ex)
+                {
+                    var error = MessageBoxManager
+                        .GetMessageBoxStandard("Fehler",
+                            $"Ein Fehler ist aufgetreten:{Environment.NewLine}{Environment.NewLine}{ex.Message}",
+                            ButtonEnum.Ok,
+                            Icon.Error);
+
+                    await error.ShowAsync();
+                }
+
                 CustomerDeliveryAdressInformationClear();
                 CustomerDeliveryAdressSearchList();
             }
         }
+        else
+        {
+            var box = MessageBoxManager
+                .GetMessageBoxStandard("Best‰tigung",
+                $"Lieferanschrift Nr.: {textCustomersDeliveryAdressNumber.Text}{Environment.NewLine}" +
+                $"Firmenname: {textCustomersDeliveryAdressCompany.Text}{Environment.NewLine}" +
+                $"Straﬂe: {textCustomersDeliveryAdressStreet.Text}{Environment.NewLine}" +
+                $"Hausnummer: {textCustomersDeliveryAdressHouseNo.Text}{Environment.NewLine}" +
+                $"PLZ: {textCustomersDeliveryAdressPostCode.Text}{Environment.NewLine}" +
+                $"Stadt: {textCustomersDeliveryAdressCity.Text}{Environment.NewLine}" +
+                $"Land: {textCustomersDeliveryAdressCountry.Text}{Environment.NewLine}" +
+                $"Ansprechpartner: {textCustomersDeliveryAdressContactName.Text}{Environment.NewLine}" +
+                $"Ansprechpartner Telefon: {textCustomersDeliveryAdressContactPhone.Text}{Environment.NewLine}" +
+                $"Ansprechpartner Mail: {textCustomersDeliveryAdressContactMail.Text}",
+                ButtonEnum.YesNo);
+
+            var result = await box.ShowAsync();
+
+            if (result == ButtonResult.Yes)
+            {
+                string query = @"INSERT INTO lieferanschrift 
+                (`Firmenname`, `Straﬂe`, `Hausnummer`, `PLZ`, `Stadt`, `Land`, `Ansprechpartner`, `Ansprechpartner_Telefon`, `Ansprechpartner_Mail`) 
+                VALUES 
+                (@Firmenname, @Straﬂe, @Hausnummer, @PLZ, @Stadt, @Land, @Ansprechpartner, @Ansprechpartner_Telefon, @Ansprechpartner_Mail)";
+
+                // Create MySqlConnection object
+                using (MySqlConnection connection = new MySqlConnection(connectionString))
+                {
+                    // Open the connection
+                    connection.Open();
+
+                    // Create MySqlCommand object
+                    using (MySqlCommand command = new MySqlCommand(query, connection))
+                    {
+                        // Add parameters
+                        command.Parameters.AddWithValue("@Firmenname", textCustomersDeliveryAdressCompany.Text);
+                        command.Parameters.AddWithValue("@Straﬂe", textCustomersDeliveryAdressStreet.Text);
+                        command.Parameters.AddWithValue("@Hausnummer", textCustomersDeliveryAdressHouseNo.Text);
+                        command.Parameters.AddWithValue("@PLZ", textCustomersDeliveryAdressPostCode.Text);
+                        command.Parameters.AddWithValue("@Stadt", textCustomersDeliveryAdressCity.Text);
+                        command.Parameters.AddWithValue("@Land", textCustomersDeliveryAdressCountry.Text);
+                        command.Parameters.AddWithValue("@Ansprechpartner", textCustomersDeliveryAdressContactName.Text);
+                        command.Parameters.AddWithValue("@Ansprechpartner_Telefon", textCustomersDeliveryAdressContactPhone.Text);
+                        command.Parameters.AddWithValue("@Ansprechpartner_Mail", textCustomersDeliveryAdressContactMail.Text);
+
+                        // Execute the query
+                        command.ExecuteNonQuery();
+                    }
+                }
+            }
+
+         }
     }
 
     private void DeliveryAdressSearchBox_TextChanged(object? sender, Avalonia.Interactivity.RoutedEventArgs e)

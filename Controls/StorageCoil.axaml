@@ -1,0 +1,164 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             mc:Ignorable="d" d:DesignWidth="1920" d:DesignHeight="1080"
+             x:Class="PS3000.StorageCoil">
+	
+	<Grid ColumnDefinitions="Auto,Auto" RowDefinitions="Auto">
+		
+		<Grid ColumnDefinitions="Auto,Auto,Auto,Auto,Auto" RowDefinitions="Auto,Auto,Auto" Grid.Row="0" Grid.Column="0">
+			<TextBlock Text="Lieferant:" Grid.Row="0" Grid.Column="0"/>
+			<TextBlock Text="Werkstoff:" Grid.Row="0" Grid.Column="1"/>
+			<TextBlock Text="Wandstärke:" Grid.Row="0" Grid.Column="2"/>
+			<TextBlock Text="Status:" Grid.Row="0" Grid.Column="3"/>
+
+			<ComboBox SelectedIndex="0" MaxDropDownHeight="100" Grid.Row="1" Grid.Column="0" Name="SearchComboSupplier">
+				<ComboBoxItem>Text Item 1</ComboBoxItem>
+				<ComboBoxItem>Text Item 2</ComboBoxItem>
+				<ComboBoxItem>Text Item 3</ComboBoxItem>
+				<ComboBoxItem>Text Item 4</ComboBoxItem>
+				<ComboBoxItem>Text Item 5</ComboBoxItem>
+				<ComboBoxItem>Text Item 6</ComboBoxItem>
+				<ComboBoxItem>Text Item 7</ComboBoxItem>
+				<ComboBoxItem>Text Item 8</ComboBoxItem>
+				<ComboBoxItem>Text Item 9</ComboBoxItem>
+			</ComboBox>
+
+			<ComboBox SelectedIndex="0" MaxDropDownHeight="100" Grid.Row="1" Grid.Column="1" Name="SearchComboGrade">
+				<ComboBoxItem>Text Item 1</ComboBoxItem>
+				<ComboBoxItem>Text Item 2</ComboBoxItem>
+				<ComboBoxItem>Text Item 3</ComboBoxItem>
+				<ComboBoxItem>Text Item 4</ComboBoxItem>
+				<ComboBoxItem>Text Item 5</ComboBoxItem>
+				<ComboBoxItem>Text Item 6</ComboBoxItem>
+				<ComboBoxItem>Text Item 7</ComboBoxItem>
+				<ComboBoxItem>Text Item 8</ComboBoxItem>
+				<ComboBoxItem>Text Item 9</ComboBoxItem>
+			</ComboBox>
+
+			<ComboBox SelectedIndex="0" MaxDropDownHeight="100" Grid.Row="1" Grid.Column="2" Name="SearchComboWT">
+				<ComboBoxItem>Text Item 1</ComboBoxItem>
+				<ComboBoxItem>Text Item 2</ComboBoxItem>
+				<ComboBoxItem>Text Item 3</ComboBoxItem>
+				<ComboBoxItem>Text Item 4</ComboBoxItem>
+				<ComboBoxItem>Text Item 5</ComboBoxItem>
+				<ComboBoxItem>Text Item 6</ComboBoxItem>
+				<ComboBoxItem>Text Item 7</ComboBoxItem>
+				<ComboBoxItem>Text Item 8</ComboBoxItem>
+				<ComboBoxItem>Text Item 9</ComboBoxItem>
+			</ComboBox>
+
+			<ComboBox SelectedIndex="0" MaxDropDownHeight="100" Grid.Row="1" Grid.Column="3" Name="SearchComboStatus">
+				<ComboBoxItem>Text Item 1</ComboBoxItem>
+				<ComboBoxItem>Text Item 2</ComboBoxItem>
+				<ComboBoxItem>Text Item 3</ComboBoxItem>
+				<ComboBoxItem>Text Item 4</ComboBoxItem>
+				<ComboBoxItem>Text Item 5</ComboBoxItem>
+				<ComboBoxItem>Text Item 6</ComboBoxItem>
+				<ComboBoxItem>Text Item 7</ComboBoxItem>
+				<ComboBoxItem>Text Item 8</ComboBoxItem>
+				<ComboBoxItem>Text Item 9</ComboBoxItem>
+			</ComboBox>
+
+			<Button Grid.Row="0" Grid.Column="4" Grid.RowSpan="2">Suchen</Button>
+
+			<DataGrid Name="DataGridCoils" AutoGenerateColumns="True" IsReadOnly="True"
+				GridLinesVisibility="All"
+				BorderThickness="1" BorderBrush="Gray" Grid.Row="3" Grid.Column="0" Grid.ColumnSpan="5">
+			</DataGrid>
+		</Grid>
+
+		<Grid ColumnDefinitions="Auto,Auto,Auto" RowDefinitions="Auto,Auto,Auto,Auto,Auto,Auto,Auto,Auto,Auto,Auto,Auto,Auto,Auto,Auto" Grid.Row="0" Grid.Column="1">
+			<TextBlock Text="WS Gruppe:" Grid.Row="0" Grid.Column="0"/>
+			<ComboBox SelectedIndex="0" MaxDropDownHeight="100" Grid.Row="0" Grid.Column="1" Name="CoilcmbWTGroup">
+				<ComboBoxItem>Text Item 1</ComboBoxItem>
+				<ComboBoxItem>Text Item 2</ComboBoxItem>
+				<ComboBoxItem>Text Item 3</ComboBoxItem>
+				<ComboBoxItem>Text Item 4</ComboBoxItem>
+				<ComboBoxItem>Text Item 5</ComboBoxItem>
+				<ComboBoxItem>Text Item 6</ComboBoxItem>
+				<ComboBoxItem>Text Item 7</ComboBoxItem>
+				<ComboBoxItem>Text Item 8</ComboBoxItem>
+				<ComboBoxItem>Text Item 9</ComboBoxItem>
+			</ComboBox>
+			
+			<TextBlock Text="Soll WS:" Grid.Row="1" Grid.Column="0"/>
+			<TextBox Grid.Row="1" Grid.Column="1" Watermark="Soll WS"/>
+			
+			<TextBlock Text="Ist WS:" Grid.Row="2" Grid.Column="0"/>
+			<TextBox Grid.Row="2" Grid.Column="1" Watermark="Ist WS"/>
+			
+			<TextBlock Text="Werkstoff:" Grid.Row="3" Grid.Column="0"/>
+			<ComboBox SelectedIndex="0" MaxDropDownHeight="100" Grid.Row="3" Grid.Column="1" Name="CoilcmbGrade">
+				<ComboBoxItem>Text Item 1</ComboBoxItem>
+				<ComboBoxItem>Text Item 2</ComboBoxItem>
+				<ComboBoxItem>Text Item 3</ComboBoxItem>
+				<ComboBoxItem>Text Item 4</ComboBoxItem>
+				<ComboBoxItem>Text Item 5</ComboBoxItem>
+				<ComboBoxItem>Text Item 6</ComboBoxItem>
+				<ComboBoxItem>Text Item 7</ComboBoxItem>
+				<ComboBoxItem>Text Item 8</ComboBoxItem>
+				<ComboBoxItem>Text Item 9</ComboBoxItem>
+			</ComboBox>
+			
+			<TextBlock Text="Kaufdatum:" Grid.Row="4" Grid.Column="0"/>
+			<CalendarDatePicker Grid.Row="4" Grid.Column="1"/>
+
+				<TextBlock Text="Charge:" Grid.Row="5" Grid.Column="0"/>
+			<TextBox Grid.Row="5" Grid.Column="1" Watermark="Charge"/>
+			
+			<TextBlock Text="Lieferant:" Grid.Row="6" Grid.Column="0"/>
+			<ComboBox SelectedIndex="0" MaxDropDownHeight="100" Grid.Row="6" Grid.Column="1" Name="CoilcmbSupplier">
+				<ComboBoxItem>Text Item 1</ComboBoxItem>
+				<ComboBoxItem>Text Item 2</ComboBoxItem>
+				<ComboBoxItem>Text Item 3</ComboBoxItem>
+				<ComboBoxItem>Text Item 4</ComboBoxItem>
+				<ComboBoxItem>Text Item 5</ComboBoxItem>
+				<ComboBoxItem>Text Item 6</ComboBoxItem>
+				<ComboBoxItem>Text Item 7</ComboBoxItem>
+				<ComboBoxItem>Text Item 8</ComboBoxItem>
+				<ComboBoxItem>Text Item 9</ComboBoxItem>
+			</ComboBox>
+			
+			<TextBlock Text="Ausführung:" Grid.Row="7" Grid.Column="0"/>
+			<ComboBox SelectedIndex="0" MaxDropDownHeight="100" Grid.Row="7" Grid.Column="1" Name="CoilcmbExecution">
+				<ComboBoxItem>1C</ComboBoxItem>
+				<ComboBoxItem>1E</ComboBoxItem>
+				<ComboBoxItem>1D</ComboBoxItem>
+				<ComboBoxItem>2C</ComboBoxItem>
+				<ComboBoxItem>2E</ComboBoxItem>
+				<ComboBoxItem>2D</ComboBoxItem>
+				<ComboBoxItem>2B</ComboBoxItem>
+				<ComboBoxItem>2R</ComboBoxItem>
+			</ComboBox>
+			
+			<TextBlock Text="Status:" Grid.Row="8" Grid.Column="0"/>
+			<ComboBox SelectedIndex="0" MaxDropDownHeight="100" Grid.Row="8" Grid.Column="1" Name="CoilcmbStatus">
+				<ComboBoxItem>Unbekannt</ComboBoxItem>
+				<ComboBoxItem>Zu Lieferant Unterwegs</ComboBoxItem>
+				<ComboBoxItem>Lager Lieferant</ComboBoxItem>
+				<ComboBoxItem>Unterwegs zu EHG</ComboBoxItem>
+				<ComboBoxItem>Lager</ComboBoxItem>
+				<ComboBoxItem>Spaltplan</ComboBoxItem>
+				<ComboBoxItem>Gespalten</ComboBoxItem>
+				<ComboBoxItem>Verarbeitet</ComboBoxItem>
+				<ComboBoxItem>Band</ComboBoxItem>
+				<ComboBoxItem>Restband</ComboBoxItem>
+			</ComboBox>
+			
+			<TextBlock Text="Breite:" Grid.Row="9" Grid.Column="0"/>
+			<TextBox Grid.Row="9" Grid.Column="1" Watermark="Breite"/>
+			
+			<TextBlock Text="Gewicht:" Grid.Row="10" Grid.Column="0"/>
+			<TextBox Grid.Row="10" Grid.Column="1" Watermark="Gewicht"/>
+			
+			<TextBlock Text="Länge:" Grid.Row="11" Grid.Column="0"/>
+			<TextBox Grid.Row="11" Grid.Column="1" Watermark="Länge"/>
+			
+			<TextBlock Text="Preis €/kg:" Grid.Row="12" Grid.Column="0"/>
+			<TextBox Grid.Row="12" Grid.Column="1" Watermark="Preis €/kg"/>
+			
+			<Button Grid.Row="13" Grid.Column="1" >Speichern</Button>
+		</Grid>	</Grid>
+</UserControl>

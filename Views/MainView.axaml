@@ -30,7 +30,6 @@
 						<controls:Invoices/>
 					</TabItem>					
 					<TabItem Header="Status">
-						
 					</TabItem>
 				</TabControl>
 			</ScrollViewer>
@@ -47,14 +46,13 @@
 		</TabItem>
 		<TabItem Header="Lager Coils">
 			<ScrollViewer HorizontalScrollBarVisibility="Visible" VerticalScrollBarVisibility="Visible">
-
-				<TextBlock Margin="5">This is tab 3 content</TextBlock>
+				<controls:StorageCoil/>
 			</ScrollViewer>
 
 		</TabItem>
 		<TabItem Header="Produktion">
 			<ScrollViewer HorizontalScrollBarVisibility="Visible" VerticalScrollBarVisibility="Visible">
-
+				
 				<TextBlock Margin="5">This is tab 3 content</TextBlock>
 			</ScrollViewer>
 
@@ -66,10 +64,9 @@
 			</ScrollViewer>
 
 		</TabItem>
-		<TabItem Header="Planung">
+		<TabItem Header="Allgemein">
 			<ScrollViewer HorizontalScrollBarVisibility="Visible" VerticalScrollBarVisibility="Visible">
-
-				<TextBlock Margin="5">This is tab 3 content</TextBlock>
+				<controls:MasterData/>
 			</ScrollViewer>
 
 		</TabItem>

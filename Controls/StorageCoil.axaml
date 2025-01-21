@@ -61,7 +61,7 @@
 				<ComboBoxItem>Text Item 9</ComboBoxItem>
 			</ComboBox>
 
-			<Button Grid.Row="0" Grid.Column="4" Grid.RowSpan="2">Suchen</Button>
+			<Button Grid.Row="0" Grid.Column="4" Grid.RowSpan="2" Click="btnCoilsSearch_Click" >Suchen</Button>
 
 			<DataGrid Name="DataGridCoils" AutoGenerateColumns="True" IsReadOnly="True"
 				GridLinesVisibility="All"
@@ -71,7 +71,7 @@
 
 		<Grid ColumnDefinitions="Auto,Auto,Auto" RowDefinitions="Auto,Auto,Auto,Auto,Auto,Auto,Auto,Auto,Auto,Auto,Auto,Auto,Auto,Auto" Grid.Row="0" Grid.Column="1">
 			<TextBlock Text="WS Gruppe:" Grid.Row="0" Grid.Column="0"/>
-			<ComboBox SelectedIndex="0" MaxDropDownHeight="100" Grid.Row="0" Grid.Column="1" Name="CoilcmbWTGroup">
+			<ComboBox SelectedIndex="0" MaxDropDownHeight="100" HorizontalAlignment="Stretch" Grid.Row="0" Grid.Column="1" Name="CoilcmbWTGroup">
 				<ComboBoxItem>Text Item 1</ComboBoxItem>
 				<ComboBoxItem>Text Item 2</ComboBoxItem>
 				<ComboBoxItem>Text Item 3</ComboBoxItem>
@@ -90,7 +90,7 @@
 			<TextBox Grid.Row="2" Grid.Column="1" Watermark="Ist WS"/>
 			
 			<TextBlock Text="Werkstoff:" Grid.Row="3" Grid.Column="0"/>
-			<ComboBox SelectedIndex="0" MaxDropDownHeight="100" Grid.Row="3" Grid.Column="1" Name="CoilcmbGrade">
+			<ComboBox SelectedIndex="0" MaxDropDownHeight="100" HorizontalAlignment="Stretch" Grid.Row="3" Grid.Column="1" Name="CoilcmbGrade">
 				<ComboBoxItem>Text Item 1</ComboBoxItem>
 				<ComboBoxItem>Text Item 2</ComboBoxItem>
 				<ComboBoxItem>Text Item 3</ComboBoxItem>
@@ -105,11 +105,11 @@
 			<TextBlock Text="Kaufdatum:" Grid.Row="4" Grid.Column="0"/>
 			<CalendarDatePicker Grid.Row="4" Grid.Column="1"/>
 
-				<TextBlock Text="Charge:" Grid.Row="5" Grid.Column="0"/>
+			<TextBlock Text="Charge:" Grid.Row="5" Grid.Column="0"/>
 			<TextBox Grid.Row="5" Grid.Column="1" Watermark="Charge"/>
 			
 			<TextBlock Text="Lieferant:" Grid.Row="6" Grid.Column="0"/>
-			<ComboBox SelectedIndex="0" MaxDropDownHeight="100" Grid.Row="6" Grid.Column="1" Name="CoilcmbSupplier">
+			<ComboBox SelectedIndex="0" MaxDropDownHeight="100" Grid.Row="6" HorizontalAlignment="Stretch" Grid.Column="1" Name="CoilcmbSupplier">
 				<ComboBoxItem>Text Item 1</ComboBoxItem>
 				<ComboBoxItem>Text Item 2</ComboBoxItem>
 				<ComboBoxItem>Text Item 3</ComboBoxItem>
@@ -122,7 +122,7 @@
 			</ComboBox>
 			
 			<TextBlock Text="Ausführung:" Grid.Row="7" Grid.Column="0"/>
-			<ComboBox SelectedIndex="0" MaxDropDownHeight="100" Grid.Row="7" Grid.Column="1" Name="CoilcmbExecution">
+			<ComboBox SelectedIndex="0" MaxDropDownHeight="100" Grid.Row="7" HorizontalAlignment="Stretch" Grid.Column="1" Name="CoilcmbExecution">
 				<ComboBoxItem>1C</ComboBoxItem>
 				<ComboBoxItem>1E</ComboBoxItem>
 				<ComboBoxItem>1D</ComboBoxItem>
@@ -134,7 +134,7 @@
 			</ComboBox>
 			
 			<TextBlock Text="Status:" Grid.Row="8" Grid.Column="0"/>
-			<ComboBox SelectedIndex="0" MaxDropDownHeight="100" Grid.Row="8" Grid.Column="1" Name="CoilcmbStatus">
+			<ComboBox SelectedIndex="0" MaxDropDownHeight="100" HorizontalAlignment="Stretch" Grid.Row="8" Grid.Column="1" Name="CoilcmbStatus">
 				<ComboBoxItem>Unbekannt</ComboBoxItem>
 				<ComboBoxItem>Zu Lieferant Unterwegs</ComboBoxItem>
 				<ComboBoxItem>Lager Lieferant</ComboBoxItem>
@@ -159,6 +159,6 @@
 			<TextBlock Text="Preis €/kg:" Grid.Row="12" Grid.Column="0"/>
 			<TextBox Grid.Row="12" Grid.Column="1" Watermark="Preis €/kg"/>
 			
-			<Button Grid.Row="13" Grid.Column="1" >Speichern</Button>
+			<Button Grid.Row="13" Grid.Column="1" HorizontalContentAlignment="Center" HorizontalAlignment="Stretch" >Speichern</Button>
 		</Grid>	</Grid>
 </UserControl>

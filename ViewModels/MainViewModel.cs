@@ -9,6 +9,7 @@ public class MainViewModel : ViewModelBase
     public ObservableCollection<Positions> InquiryPositions { get; set; }
 
 
+
     public MainViewModel()
     {
         // Example data
@@ -52,5 +53,7 @@ public class MainViewModel : ViewModelBase
     {
         public int PosNumber { get; set; }
     }
+
+
 }
 

@@ -14,58 +14,47 @@
 			<TextBlock Text="Status:" Grid.Row="0" Grid.Column="3"/>
 
 			<ComboBox SelectedIndex="0" MaxDropDownHeight="100" Grid.Row="1" Grid.Column="0" Name="SearchComboSupplier">
-				<ComboBoxItem>Text Item 1</ComboBoxItem>
-				<ComboBoxItem>Text Item 2</ComboBoxItem>
-				<ComboBoxItem>Text Item 3</ComboBoxItem>
-				<ComboBoxItem>Text Item 4</ComboBoxItem>
-				<ComboBoxItem>Text Item 5</ComboBoxItem>
-				<ComboBoxItem>Text Item 6</ComboBoxItem>
-				<ComboBoxItem>Text Item 7</ComboBoxItem>
-				<ComboBoxItem>Text Item 8</ComboBoxItem>
-				<ComboBoxItem>Text Item 9</ComboBoxItem>
 			</ComboBox>
 
 			<ComboBox SelectedIndex="0" MaxDropDownHeight="100" Grid.Row="1" Grid.Column="1" Name="SearchComboGrade">
-				<ComboBoxItem>Text Item 1</ComboBoxItem>
-				<ComboBoxItem>Text Item 2</ComboBoxItem>
-				<ComboBoxItem>Text Item 3</ComboBoxItem>
-				<ComboBoxItem>Text Item 4</ComboBoxItem>
-				<ComboBoxItem>Text Item 5</ComboBoxItem>
-				<ComboBoxItem>Text Item 6</ComboBoxItem>
-				<ComboBoxItem>Text Item 7</ComboBoxItem>
-				<ComboBoxItem>Text Item 8</ComboBoxItem>
-				<ComboBoxItem>Text Item 9</ComboBoxItem>
 			</ComboBox>
 
 			<ComboBox SelectedIndex="0" MaxDropDownHeight="100" Grid.Row="1" Grid.Column="2" Name="SearchComboWT">
-				<ComboBoxItem>Text Item 1</ComboBoxItem>
-				<ComboBoxItem>Text Item 2</ComboBoxItem>
-				<ComboBoxItem>Text Item 3</ComboBoxItem>
-				<ComboBoxItem>Text Item 4</ComboBoxItem>
-				<ComboBoxItem>Text Item 5</ComboBoxItem>
-				<ComboBoxItem>Text Item 6</ComboBoxItem>
-				<ComboBoxItem>Text Item 7</ComboBoxItem>
-				<ComboBoxItem>Text Item 8</ComboBoxItem>
-				<ComboBoxItem>Text Item 9</ComboBoxItem>
+				<ComboBoxItem>0,8</ComboBoxItem>
+				<ComboBoxItem>1</ComboBoxItem>
+				<ComboBoxItem>1,2</ComboBoxItem>
+				<ComboBoxItem>1,5</ComboBoxItem>
+				<ComboBoxItem>2</ComboBoxItem>
+				<ComboBoxItem>2,5</ComboBoxItem>
+				<ComboBoxItem>3</ComboBoxItem>
+				<ComboBoxItem>3,5</ComboBoxItem>
+				<ComboBoxItem>4</ComboBoxItem>
+				<ComboBoxItem>4,5</ComboBoxItem>
+				<ComboBoxItem>5</ComboBoxItem>
+				<ComboBoxItem>6</ComboBoxItem>
+				<ComboBoxItem>6,3</ComboBoxItem>
+				<ComboBoxItem>7,11</ComboBoxItem>
+
 			</ComboBox>
 
 			<ComboBox SelectedIndex="0" MaxDropDownHeight="100" Grid.Row="1" Grid.Column="3" Name="SearchComboStatus">
-				<ComboBoxItem>Text Item 1</ComboBoxItem>
-				<ComboBoxItem>Text Item 2</ComboBoxItem>
-				<ComboBoxItem>Text Item 3</ComboBoxItem>
-				<ComboBoxItem>Text Item 4</ComboBoxItem>
-				<ComboBoxItem>Text Item 5</ComboBoxItem>
-				<ComboBoxItem>Text Item 6</ComboBoxItem>
-				<ComboBoxItem>Text Item 7</ComboBoxItem>
-				<ComboBoxItem>Text Item 8</ComboBoxItem>
-				<ComboBoxItem>Text Item 9</ComboBoxItem>
+				<ComboBoxItem>Unbekannt</ComboBoxItem>
+				<ComboBoxItem>Zu Lieferant Unterwegs</ComboBoxItem>
+				<ComboBoxItem>Lager Lieferant</ComboBoxItem>
+				<ComboBoxItem>UNterwegs zu EHG</ComboBoxItem>
+				<ComboBoxItem>Lager</ComboBoxItem>
+				<ComboBoxItem>Spaltplan</ComboBoxItem>
+				<ComboBoxItem>Gespalten</ComboBoxItem>
+				<ComboBoxItem>Verarbeitet</ComboBoxItem>
+				<ComboBoxItem>Band</ComboBoxItem>
+				<ComboBoxItem>Restband</ComboBoxItem>
 			</ComboBox>
 
 			<Button Grid.Row="0" Grid.Column="4" Grid.RowSpan="2" Click="btnCoilsSearch_Click" >Suchen</Button>
 
-			<DataGrid Name="DataGridCoils" AutoGenerateColumns="True" IsReadOnly="True"
+			<DataGrid Name="DataGridCoils" ItemsSource="{Binding CoilSearchAttribute}" AutoGenerateColumns="True" IsReadOnly="True"
 				GridLinesVisibility="All"
-				BorderThickness="1" BorderBrush="Gray" Grid.Row="3" Grid.Column="0" Grid.ColumnSpan="5">
+				BorderThickness="1" BorderBrush="Gray" Grid.Row="3" Grid.Column="0" Grid.ColumnSpan="5" >
 			</DataGrid>
 		</Grid>
 

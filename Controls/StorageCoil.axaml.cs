@@ -5,6 +5,13 @@ using Avalonia.Markup.Xaml;
 using MySql.Data.MySqlClient;
 using System.Collections.Generic;
 using System;
+using System.Collections.ObjectModel;
+using static PS3000.ViewModels.MainViewModel;
+using DynamicData;
+using static PS3000.StorageCoil;
+using Avalonia.Styling;
+using MsBox.Avalonia.Enums;
+using MsBox.Avalonia;
 
 namespace PS3000;
 
@@ -15,593 +22,702 @@ public partial class StorageCoil : UserControl
     public StorageCoil()
     {
         InitializeComponent();
+
+        PopulateLists();
     }
 
-
-    private void txtCoilsNewCoilWidth_TextChanged(object sender, EventArgs e)
+    private void PopulateLists()
     {
-        SetCoilLength();
-    }
+        
 
-    private void txtCoilsNewCoilWeight_TextChanged(object sender, EventArgs e)
-    {
-        SetCoilLength();
-    }
+        string query = "SELECT * FROM lieferanten";
 
-    private void txtCoilsNewCoilSetWT_TextChanged(object sender, EventArgs e)
-    {
-        SetCoilLength();
-    }
-
-    private void SetCoilLength()
-    {
-        float.TryParse(txtCoilsNewCoilWeight.Text, out float weight);
-        float.TryParse(txtCoilsNewCoilWidth.Text, out float width);
-        float.TryParse(txtCoilsNewCoilSetWT.Text, out float WT);
-        float formula = (weight / width / WT / 7.97f * 1000);
-
-        // Round the Length to 2 decimal places
-
-        txtCoilsNewCoilLength.Text = Math.Round(formula, 0).ToString();
-    }
-
-    private void btnCoilsNewCoilSave_Click(object sender, EventArgs e)
-    {
-        if (ListCoils.SelectedItems.Count > 0)
+        try
         {
-            //Update existing Coil
-            string laufendeCoilnummer = ListCoils.SelectedItems[0].SubItems[0].Text;
-
-            string tablerow = "Status";
-            string txtfield = cmbCoilsNewCoilStatus.SelectedIndex.ToString();
-
-            if (txtfield == "-1")
+            using (var connection = new MySqlConnection(connectionString))
             {
-                txtfield = "0";
-            }
+                connection.Open();
 
-            string updateQuery = $"UPDATE lagercoils SET {tablerow} = '{txtfield}' WHERE LaufendeCoilnummer = '{laufendeCoilnummer}'";
-
-            try
-            {
-                using (MySqlConnection connection = new MySqlConnection(connectionString))
-                {
-                    connection.Open();
-                    MySqlCommand command = new MySqlCommand(updateQuery, connection);
-
-                    command.ExecuteNonQuery();
-                }
-            }
-            catch (Exception ex)
-            {
-                MessageBox.Show("Error: " + ex.Message);
-            }
-
-            tablerow = "WSGruppe";
-            txtfield = cmbCoilsNewCoilWTGroup.SelectedItem.ToString();
-            updateQuery = $"UPDATE lagercoils SET {tablerow} = '{txtfield}' WHERE LaufendeCoilnummer = '{laufendeCoilnummer}'";
-
-            try
-            {
-                using (MySqlConnection connection = new MySqlConnection(connectionString))
-                {
-                    connection.Open();
-                    MySqlCommand command = new MySqlCommand(updateQuery, connection);
-
-                    command.ExecuteNonQuery();
-                }
-            }
-            catch (Exception ex)
-            {
-                MessageBox.Show("Error: " + ex.Message);
-            }
-
-            tablerow = "Wandstarke";
-            txtfield = txtCoilsNewCoilSetWT.Text.Replace(',', '.');
-            updateQuery = $"UPDATE lagercoils SET {tablerow} = '{txtfield}' WHERE LaufendeCoilnummer = '{laufendeCoilnummer}'";
-
-            try
-            {
-                using (MySqlConnection connection = new MySqlConnection(connectionString))
-                {
-                    connection.Open();
-                    MySqlCommand command = new MySqlCommand(updateQuery, connection);
-
-                    command.ExecuteNonQuery();
-                }
-            }
-            catch (Exception ex)
-            {
-                MessageBox.Show("Error: " + ex.Message);
-            }
-
-            tablerow = "Besaumt";
-            if (chkCoilsNewCoilCut.Checked)
-            {
-                txtfield = "1";
-            }
-            else
-            {
-                txtfield = "0";
-            }
-            updateQuery = $"UPDATE lagercoils SET {tablerow} = '{txtfield}' WHERE LaufendeCoilnummer = '{laufendeCoilnummer}'";
-
-            try
-            {
-                using (MySqlConnection connection = new MySqlConnection(connectionString))
-                {
-                    connection.Open();
-                    MySqlCommand command = new MySqlCommand(updateQuery, connection);
-
-                    command.ExecuteNonQuery();
-                }
-            }
-            catch (Exception ex)
-            {
-                MessageBox.Show("Error: " + ex.Message);
-            }
-
-            tablerow = "Werkstoff";
-            txtfield = cmbCoilsNewCoilMaterial.SelectedIndex.ToString();
-            updateQuery = $"UPDATE lagercoils SET {tablerow} = '{txtfield}' WHERE LaufendeCoilnummer = '{laufendeCoilnummer}'";
-
-            try
-            {
-                using (MySqlConnection connection = new MySqlConnection(connectionString))
-                {
-                    connection.Open();
-                    MySqlCommand command = new MySqlCommand(updateQuery, connection);
-
-                    command.ExecuteNonQuery();
-                }
-            }
-            catch (Exception ex)
-            {
-                MessageBox.Show("Error: " + ex.Message);
-            }
-
-            tablerow = "Kaufdatum";
-            txtfield = dateCoilsNewCoilPurchase.Value.ToString("yyyy-MM-dd");
-            updateQuery = $"UPDATE lagercoils SET {tablerow} = '{txtfield}' WHERE LaufendeCoilnummer = '{laufendeCoilnummer}'";
-
-            try
-            {
-                using (MySqlConnection connection = new MySqlConnection(connectionString))
-                {
-                    connection.Open();
-                    MySqlCommand command = new MySqlCommand(updateQuery, connection);
-
-                    command.ExecuteNonQuery();
-                }
-            }
-            catch (Exception ex)
-            {
-                MessageBox.Show("Error: " + ex.Message);
-            }
-
-            tablerow = "Lieferant";
-            txtfield = cmbCoilsNewCoilSupplier.SelectedIndex.ToString();
-            updateQuery = $"UPDATE lagercoils SET {tablerow} = '{txtfield}' WHERE LaufendeCoilnummer = '{laufendeCoilnummer}'";
-
-            try
-            {
-                using (MySqlConnection connection = new MySqlConnection(connectionString))
-                {
-                    connection.Open();
-                    MySqlCommand command = new MySqlCommand(updateQuery, connection);
-
-                    command.ExecuteNonQuery();
-                }
-            }
-            catch (Exception ex)
-            {
-                MessageBox.Show("Error: " + ex.Message);
-            }
-
-            tablerow = "Ausfuhrung";
-            txtfield = cmbCoilsNewCoilVariant.SelectedIndex.ToString();
-            updateQuery = $"UPDATE lagercoils SET {tablerow} = '{txtfield}' WHERE LaufendeCoilnummer = '{laufendeCoilnummer}'";
-
-            try
-            {
-                using (MySqlConnection connection = new MySqlConnection(connectionString))
-                {
-                    connection.Open();
-                    MySqlCommand command = new MySqlCommand(updateQuery, connection);
-
-                    command.ExecuteNonQuery();
-                }
-            }
-            catch (Exception ex)
-            {
-                MessageBox.Show("Error: " + ex.Message);
-            }
-
-            tablerow = "Breite";
-            txtfield = txtCoilsNewCoilWidth.Text;
-            updateQuery = $"UPDATE lagercoils SET {tablerow} = '{txtfield}' WHERE LaufendeCoilnummer = '{laufendeCoilnummer}'";
-
-            try
-            {
-                using (MySqlConnection connection = new MySqlConnection(connectionString))
-                {
-                    connection.Open();
-                    MySqlCommand command = new MySqlCommand(updateQuery, connection);
-
-                    command.ExecuteNonQuery();
-                }
-            }
-            catch (Exception ex)
-            {
-                MessageBox.Show("Error: " + ex.Message);
-            }
-
-            tablerow = "Gewicht";
-            txtfield = txtCoilsNewCoilWeight.Text;
-            updateQuery = $"UPDATE lagercoils SET {tablerow} = '{txtfield}' WHERE LaufendeCoilnummer = '{laufendeCoilnummer}'";
-
-            try
-            {
-                using (MySqlConnection connection = new MySqlConnection(connectionString))
-                {
-                    connection.Open();
-                    MySqlCommand command = new MySqlCommand(updateQuery, connection);
-
-                    command.ExecuteNonQuery();
-                }
-            }
-            catch (Exception ex)
-            {
-                MessageBox.Show("Error: " + ex.Message);
-            }
-
-            tablerow = "Lange";
-            txtfield = txtCoilsNewCoilLength.Text;
-            updateQuery = $"UPDATE lagercoils SET {tablerow} = '{txtfield}' WHERE LaufendeCoilnummer = '{laufendeCoilnummer}'";
-
-            try
-            {
-                using (MySqlConnection connection = new MySqlConnection(connectionString))
-                {
-                    connection.Open();
-                    MySqlCommand command = new MySqlCommand(updateQuery, connection);
-
-                    command.ExecuteNonQuery();
-                }
-            }
-            catch (Exception ex)
-            {
-                MessageBox.Show("Error: " + ex.Message);
-            }
-
-            tablerow = "Preis";
-            txtfield = txtCoilsNewCoilPrice.Text.Replace(',', '.');
-            updateQuery = $"UPDATE lagercoils SET {tablerow} = '{txtfield}' WHERE LaufendeCoilnummer = '{laufendeCoilnummer}'";
-
-            try
-            {
-                using (MySqlConnection connection = new MySqlConnection(connectionString))
-                {
-                    connection.Open();
-                    MySqlCommand command = new MySqlCommand(updateQuery, connection);
-
-                    command.ExecuteNonQuery();
-                }
-            }
-            catch (Exception ex)
-            {
-                MessageBox.Show("Error: " + ex.Message);
-            }
-
-            tablerow = "Notizen";
-            txtfield = txtCoilsNewCoilText.Text;
-            updateQuery = $"UPDATE lagercoils SET {tablerow} = '{txtfield}' WHERE LaufendeCoilnummer = '{laufendeCoilnummer}'";
-
-            try
-            {
-                using (MySqlConnection connection = new MySqlConnection(connectionString))
-                {
-                    connection.Open();
-                    MySqlCommand command = new MySqlCommand(updateQuery, connection);
-
-                    command.ExecuteNonQuery();
-                }
-            }
-            catch (Exception ex)
-            {
-                MessageBox.Show("Error: " + ex.Message);
-            }
-
-            tablerow = "Charge";
-            txtfield = txtCoilsNewCoilHeat.Text;
-            updateQuery = $"UPDATE lagercoils SET {tablerow} = '{txtfield}' WHERE LaufendeCoilnummer = '{laufendeCoilnummer}'";
-
-            try
-            {
-                using (MySqlConnection connection = new MySqlConnection(connectionString))
-                {
-                    connection.Open();
-                    MySqlCommand command = new MySqlCommand(updateQuery, connection);
-
-                    command.ExecuteNonQuery();
-                }
-            }
-            catch (Exception ex)
-            {
-                MessageBox.Show("Error: " + ex.Message);
-            }
-
-        }
-        else //Create a new Coil
-        {
-            string Besäumt;
-            string BesäumtValue;
-            if (chkCoilsNewCoilCut.Checked)
-            {
-                Besäumt = "Ja";
-                BesäumtValue = "1";
-            }
-            else
-            {
-                Besäumt = "Nein";
-                BesäumtValue = "0";
-            }
-
-            // Display a MessageBox with two buttons
-            DialogResult result = MessageBox.Show(
-                $"WS Gruppe: {cmbCoilsNewCoilWTGroup.SelectedItem.ToString()} {Environment.NewLine}" +
-                $"Wandstärke: {txtCoilsNewCoilSetWT.Text ?? ""} {Environment.NewLine}" +
-                $"Besäumt?: {Besäumt} {Environment.NewLine}" +
-                $"Werkstoff: {cmbCoilsNewCoilMaterial.SelectedItem.ToString()} {Environment.NewLine}" +
-                $"Kaufdatum: {dateCoilsNewCoilPurchase.Value.ToString("yyyy-MM-dd")} {Environment.NewLine}" +
-                $"Lieferant: {cmbCoilsNewCoilSupplier.SelectedItem.ToString()} {Environment.NewLine}" +
-                $"Ausführung: {cmbCoilsNewCoilVariant.SelectedItem.ToString()} {Environment.NewLine}" +
-                $"Breite: {txtCoilsNewCoilWidth.Text} {Environment.NewLine}" +
-                $"Gewicht: {txtCoilsNewCoilWeight.Text ?? ""} {Environment.NewLine}" +
-                $"Länge: {txtCoilsNewCoilLength.Text ?? ""} {Environment.NewLine}" +
-                $"Status: {cmbCoilsNewCoilStatus.SelectedItem.ToString()} {Environment.NewLine}" +
-                $"Preis €/kg: {txtCoilsNewCoilPrice.Text ?? ""} {Environment.NewLine}" +
-                $"Notizen: {txtCoilsNewCoilText.Text ?? ""}",
-                $"Charge: {txtCoilsNewCoilHeat.Text ?? ""} {Environment.NewLine}" +
-                "Confirm Details", // Title of the message box
-                MessageBoxButtons.YesNo // Buttons for the message box
-            );
-
-            if (result == DialogResult.Yes)
-            {
-                try
-                {
-                    using (MySqlConnection connection = new MySqlConnection(connectionString))
-                    {
-                        connection.Open();
-
-                        string query = @"INSERT INTO `lagercoils` 
-                                (`WSGruppe`, `Wandstarke`,`Besaumt`,`Werkstoff`,`Kaufdatum`,`Lieferant`,`Ausfuhrung`,`Breite`,`Gewicht`,`Lange`,`Preis`,`Notizen`,`Status`,`Charge`)
-                                VALUES
-                                (@WSGruppe, @Wandstärke, @Besäumt, @Werkstoff, @Kaufdatum, @Lieferant, @Ausführung, @Breite, @Gewicht, @Länge, @Preis, @Notizen, @Status, @Charge);";
-
-                        MySqlCommand command = new MySqlCommand(query, connection);
-
-                        // Add parameters
-                        command.Parameters.AddWithValue("@WSGruppe", cmbCoilsNewCoilWTGroup.SelectedItem.ToString().Replace(',', '.'));
-                        command.Parameters.AddWithValue("@Wandstärke", txtCoilsNewCoilSetWT.Text.Replace(',', '.'));
-                        command.Parameters.AddWithValue("@Besäumt", BesäumtValue);
-                        command.Parameters.AddWithValue("@Werkstoff", cmbCoilsNewCoilMaterial.SelectedIndex);
-                        command.Parameters.AddWithValue("@Kaufdatum", dateCoilsNewCoilPurchase.Value.ToString("yyyy-MM-dd"));
-                        command.Parameters.AddWithValue("@Lieferant", cmbCoilsNewCoilSupplier.SelectedIndex);
-                        command.Parameters.AddWithValue("@Ausführung", cmbCoilsNewCoilVariant.SelectedIndex);
-                        command.Parameters.AddWithValue("@Status", cmbCoilsNewCoilStatus.SelectedIndex);
-                        command.Parameters.AddWithValue("@Breite", txtCoilsNewCoilWidth.Text);
-                        command.Parameters.AddWithValue("@Gewicht", txtCoilsNewCoilWeight.Text);
-                        command.Parameters.AddWithValue("@Länge", txtCoilsNewCoilLength.Text);
-                        command.Parameters.AddWithValue("@Preis", txtCoilsNewCoilPrice.Text.Replace(',', '.'));
-                        command.Parameters.AddWithValue("@Notizen", txtCoilsNewCoilText.Text);
-                        command.Parameters.AddWithValue("@Charge", txtCoilsNewCoilHeat.Text);
-
-                        // Execute the query
-                        int rowsAffected = command.ExecuteNonQuery();
-
-                        // Check if the insertion was successful
-                        if (rowsAffected > 0)
-                        {
-                            MessageBox.Show("Data inserted successfully.", "Success", MessageBoxButtons.OK, MessageBoxIcon.Information);
-                        }
-                        else
-                        {
-                            MessageBox.Show("Failed to insert data.", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
-                        }
-                    }
-                }
-                catch (Exception ex)
-                {
-                    MessageBox.Show("Error: " + ex.Message, "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
-                }
-            }
-        }
-    }
-
-    private async void LoadCoilsInStorage(string Selectors)
-    {
-        ListCoils.Items.Clear();
-        ListCoils.Columns.Clear();
-
-        // Add columns to the ListView
-        ListCoils.Columns.Add("Coilnummer", -2);
-        ListCoils.Columns.Add("Status", -2);
-        ListCoils.Columns.Add("WSGruppe", -2);
-        ListCoils.Columns.Add("Wandstärke", -2);
-        ListCoils.Columns.Add("Besäumt", -2);
-        ListCoils.Columns.Add("Werkstoff", -2);
-        ListCoils.Columns.Add("Kaufdatum", -2);
-        ListCoils.Columns.Add("Lieferant", -2);
-        ListCoils.Columns.Add("Ausführung", -2);
-        ListCoils.Columns.Add("Breite", -2);
-        ListCoils.Columns.Add("Gewicht", -2);
-        ListCoils.Columns.Add("Länge", -2);
-        ListCoils.Columns.Add("Preis", -2);
-        ListCoils.Columns.Add("Notizen", -2);
-
-        // Fetch total number of rows
-        int totalRows = GetTotalRowCount(Selectors);
-        const int pageSize = 1000; // Number of rows to fetch at a time
-        int totalPages = (int)Math.Ceiling((double)totalRows / pageSize);
-
-        // Fetch rows in batches
-        for (int currentPage = 0; currentPage < totalPages; currentPage++)
-        {
-            List<string[]> rows = CoilsGetRows(currentPage, pageSize, Selectors);
-
-            foreach (ColumnHeader column in ListCoils.Columns)
-            {
-                column.AutoResize(ColumnHeaderAutoResizeStyle.HeaderSize); // Resize based on header size
-            }
-
-            //await Task.Delay(250);
-
-            // Add each row to the ListView with a delay
-            foreach (var row in rows)
-            {
-                ListViewItem item = new ListViewItem(row[0]);
-
-                for (int i = 1; i < row.Length; i++)
-                {
-                    item.SubItems.Add(row[i]);
-                }
-
-                ListCoils.Items.Add(item);
-            }
-        }
-
-        foreach (ColumnHeader column in ListCoils.Columns)
-        {
-            column.AutoResize(ColumnHeaderAutoResizeStyle.HeaderSize); // Resize based on header size
-        }
-    }
-
-    private int GetTotalRowCount(string Selectors)
-    {
-        using (MySqlConnection conn = new MySqlConnection(connectionString))
-        {
-            conn.Open();
-            string countQuery = $"SELECT COUNT(*) FROM lagercoils {Selectors}";
-
-            using (MySqlCommand cmd = new MySqlCommand(countQuery, conn))
-            {
-                return Convert.ToInt32(cmd.ExecuteScalar());
-            }
-        }
-    }
-
-    private List<string[]> CoilsGetRows(int pageNumber, int pageSize, string Selectors)
-    {
-        var results = new List<string[]>();
-        int offset = pageNumber * pageSize;
-
-        using (MySqlConnection conn = new MySqlConnection(connectionString))
-        {
-            conn.Open();
-            string query = $"SELECT LaufendeCoilnummer, Status, WSGruppe, Wandstarke, Besaumt, Werkstoff, Kaufdatum, Lieferant, Ausfuhrung, Breite, Gewicht, Lange, Preis, Notizen FROM lagercoils {Selectors} LIMIT {pageSize} OFFSET {offset}";
-
-            using (MySqlCommand cmd = new MySqlCommand(query, conn))
-            {
-                using (MySqlDataReader reader = cmd.ExecuteReader())
+                using (var command = new MySqlCommand(query, connection))
+                using (var reader = command.ExecuteReader())
                 {
                     while (reader.Read())
                     {
-                        string WSGruppe = reader["WSGruppe"].ToString();
-                        string Wandstarke = reader["Wandstarke"].ToString();
-
-                        string Besaumt = reader["Besaumt"].ToString() == "1" ? "Ja" : "Nein";
-                        string Werkstoff = GetFieldValue("Werkstoff", reader["Werkstoff"].ToString(), "werkstoffe", "LaufendeWerkstoffnummer");
-
-                        DateTime kaufdatum = Convert.ToDateTime(reader["Kaufdatum"]);
-                        string Kaufdatum = kaufdatum.ToString("yyyy-MM-dd");
-                        string Lieferant = GetFieldValue("Name", reader["Lieferant"].ToString(), "lieferanten", "LaufendeLieferantennummer");
-                        string Ausfuhrung = reader["Ausfuhrung"].ToString();
-                        string Breite = reader["Breite"].ToString();
-                        string Gewicht = reader["Gewicht"].ToString();
-                        string Lange = reader["Lange"].ToString();
-                        string Preis = reader["Preis"].ToString();
-                        string Notizen = reader["Notizen"].ToString();
-                        string Status = reader["Status"].ToString();
-
-                        switch (int.Parse(Ausfuhrung))
-                        {
-                            case 0:
-                                Ausfuhrung = "1C";
-                                break;
-                            case 1:
-                                Ausfuhrung = "1E";
-                                break;
-                            case 2:
-                                Ausfuhrung = "1D";
-                                break;
-                            case 3:
-                                Ausfuhrung = "2C";
-                                break;
-                            case 4:
-                                Ausfuhrung = "2E";
-                                break;
-                            case 5:
-                                Ausfuhrung = "2D";
-                                break;
-                            case 6:
-                                Ausfuhrung = "2B";
-                                break;
-                            case 7:
-                                Ausfuhrung = "2R";
-                                break;
-                        }
-
-
-                        if (String.IsNullOrEmpty(Status)) { Status = "0"; };
-                        switch (int.Parse(Status))
-                        {
-                            case 0:
-                                Status = "Unbekannt";
-                                break;
-                            case 1:
-                                Status = "Zu Lieferant Unterwegs";
-                                break;
-                            case 2:
-                                Status = "Lager Lieferant";
-                                break;
-                            case 3:
-                                Status = "Unterwegs zu EHG";
-                                break;
-                            case 4:
-                                Status = "Lager";
-                                break;
-                            case 5:
-                                Status = "Spaltplan";
-                                break;
-                            case 6:
-                                Status = "Gespalten";
-                                break;
-                            case 7:
-                                Status = "Verarbeitet";
-                                break;
-                            case 8:
-                                Status = "Band";
-                                break;
-                            case 9:
-                                Status = "Restband";
-                                break;
-
-                        }
-
-                        string LaufendeCoilnummer = reader["LaufendeCoilnummer"].ToString();
-
-                        results.Add(new string[] { LaufendeCoilnummer, Status, WSGruppe, Wandstarke, Besaumt, Werkstoff, Kaufdatum, Lieferant, Ausfuhrung, Breite, Gewicht, Lange, Preis, Notizen });
+                        SearchComboSupplier.Items.Add(reader["Name"].ToString());
                     }
                 }
             }
         }
-        return results;
+        catch (Exception ex)
+        {
+            // Handle errors (e.g., log them)
+            Console.WriteLine($"Error loading surcharges: {ex.Message}");
+        }
+
+        query = "SELECT * FROM werkstoffe";
+
+        try
+        {
+            using (var connection = new MySqlConnection(connectionString))
+            {
+                connection.Open();
+
+                using (var command = new MySqlCommand(query, connection))
+                using (var reader = command.ExecuteReader())
+                {
+                    while (reader.Read())
+                    {
+                        SearchComboGrade.Items.Add(reader["Werkstoff"].ToString());
+                    }
+                }
+            }
+        }
+        catch (Exception ex)
+        {
+            // Handle errors (e.g., log them)
+            Console.WriteLine($"Error loading surcharges: {ex.Message}");
+        }
+
+
+        SearchComboSupplier.SelectedIndex = -1;
+        SearchComboGrade.SelectedIndex = -1;
+        SearchComboWT.SelectedIndex = -1;
+        SearchComboStatus.SelectedIndex = -1;
+    }
+
+    //private void txtCoilsNewCoilWidth_TextChanged(object sender, EventArgs e)
+    //{
+    //    SetCoilLength();
+    //}
+
+    //private void txtCoilsNewCoilWeight_TextChanged(object sender, EventArgs e)
+    //{
+    //    SetCoilLength();
+    //}
+
+    //private void txtCoilsNewCoilSetWT_TextChanged(object sender, EventArgs e)
+    //{
+    //    SetCoilLength();
+    //}
+
+    //private void SetCoilLength()
+    //{
+    //    float.TryParse(txtCoilsNewCoilWeight.Text, out float weight);
+    //    float.TryParse(txtCoilsNewCoilWidth.Text, out float width);
+    //    float.TryParse(txtCoilsNewCoilSetWT.Text, out float WT);
+    //    float formula = (weight / width / WT / 7.97f * 1000);
+
+    //    // Round the Length to 2 decimal places
+
+    //    txtCoilsNewCoilLength.Text = Math.Round(formula, 0).ToString();
+    //}
+
+    //private void btnCoilsNewCoilSave_Click(object sender, EventArgs e)
+    //{
+    //    if (ListCoils.SelectedItems.Count > 0)
+    //    {
+    //        //Update existing Coil
+    //        string laufendeCoilnummer = ListCoils.SelectedItems[0].SubItems[0].Text;
+
+    //        string tablerow = "Status";
+    //        string txtfield = cmbCoilsNewCoilStatus.SelectedIndex.ToString();
+
+    //        if (txtfield == "-1")
+    //        {
+    //            txtfield = "0";
+    //        }
+
+    //        string updateQuery = $"UPDATE lagercoils SET {tablerow} = '{txtfield}' WHERE LaufendeCoilnummer = '{laufendeCoilnummer}'";
+
+    //        try
+    //        {
+    //            using (MySqlConnection connection = new MySqlConnection(connectionString))
+    //            {
+    //                connection.Open();
+    //                MySqlCommand command = new MySqlCommand(updateQuery, connection);
+
+    //                command.ExecuteNonQuery();
+    //            }
+    //        }
+    //        catch (Exception ex)
+    //        {
+    //            MessageBox.Show("Error: " + ex.Message);
+    //        }
+
+    //        tablerow = "WSGruppe";
+    //        txtfield = cmbCoilsNewCoilWTGroup.SelectedItem.ToString();
+    //        updateQuery = $"UPDATE lagercoils SET {tablerow} = '{txtfield}' WHERE LaufendeCoilnummer = '{laufendeCoilnummer}'";
+
+    //        try
+    //        {
+    //            using (MySqlConnection connection = new MySqlConnection(connectionString))
+    //            {
+    //                connection.Open();
+    //                MySqlCommand command = new MySqlCommand(updateQuery, connection);
+
+    //                command.ExecuteNonQuery();
+    //            }
+    //        }
+    //        catch (Exception ex)
+    //        {
+    //            MessageBox.Show("Error: " + ex.Message);
+    //        }
+
+    //        tablerow = "Wandstarke";
+    //        txtfield = txtCoilsNewCoilSetWT.Text.Replace(',', '.');
+    //        updateQuery = $"UPDATE lagercoils SET {tablerow} = '{txtfield}' WHERE LaufendeCoilnummer = '{laufendeCoilnummer}'";
+
+    //        try
+    //        {
+    //            using (MySqlConnection connection = new MySqlConnection(connectionString))
+    //            {
+    //                connection.Open();
+    //                MySqlCommand command = new MySqlCommand(updateQuery, connection);
+
+    //                command.ExecuteNonQuery();
+    //            }
+    //        }
+    //        catch (Exception ex)
+    //        {
+    //            MessageBox.Show("Error: " + ex.Message);
+    //        }
+
+    //        tablerow = "Besaumt";
+    //        if (chkCoilsNewCoilCut.Checked)
+    //        {
+    //            txtfield = "1";
+    //        }
+    //        else
+    //        {
+    //            txtfield = "0";
+    //        }
+    //        updateQuery = $"UPDATE lagercoils SET {tablerow} = '{txtfield}' WHERE LaufendeCoilnummer = '{laufendeCoilnummer}'";
+
+    //        try
+    //        {
+    //            using (MySqlConnection connection = new MySqlConnection(connectionString))
+    //            {
+    //                connection.Open();
+    //                MySqlCommand command = new MySqlCommand(updateQuery, connection);
+
+    //                command.ExecuteNonQuery();
+    //            }
+    //        }
+    //        catch (Exception ex)
+    //        {
+    //            MessageBox.Show("Error: " + ex.Message);
+    //        }
+
+    //        tablerow = "Werkstoff";
+    //        txtfield = cmbCoilsNewCoilMaterial.SelectedIndex.ToString();
+    //        updateQuery = $"UPDATE lagercoils SET {tablerow} = '{txtfield}' WHERE LaufendeCoilnummer = '{laufendeCoilnummer}'";
+
+    //        try
+    //        {
+    //            using (MySqlConnection connection = new MySqlConnection(connectionString))
+    //            {
+    //                connection.Open();
+    //                MySqlCommand command = new MySqlCommand(updateQuery, connection);
+
+    //                command.ExecuteNonQuery();
+    //            }
+    //        }
+    //        catch (Exception ex)
+    //        {
+    //            MessageBox.Show("Error: " + ex.Message);
+    //        }
+
+    //        tablerow = "Kaufdatum";
+    //        txtfield = dateCoilsNewCoilPurchase.Value.ToString("yyyy-MM-dd");
+    //        updateQuery = $"UPDATE lagercoils SET {tablerow} = '{txtfield}' WHERE LaufendeCoilnummer = '{laufendeCoilnummer}'";
+
+    //        try
+    //        {
+    //            using (MySqlConnection connection = new MySqlConnection(connectionString))
+    //            {
+    //                connection.Open();
+    //                MySqlCommand command = new MySqlCommand(updateQuery, connection);
+
+    //                command.ExecuteNonQuery();
+    //            }
+    //        }
+    //        catch (Exception ex)
+    //        {
+    //            MessageBox.Show("Error: " + ex.Message);
+    //        }
+
+    //        tablerow = "Lieferant";
+    //        txtfield = cmbCoilsNewCoilSupplier.SelectedIndex.ToString();
+    //        updateQuery = $"UPDATE lagercoils SET {tablerow} = '{txtfield}' WHERE LaufendeCoilnummer = '{laufendeCoilnummer}'";
+
+    //        try
+    //        {
+    //            using (MySqlConnection connection = new MySqlConnection(connectionString))
+    //            {
+    //                connection.Open();
+    //                MySqlCommand command = new MySqlCommand(updateQuery, connection);
+
+    //                command.ExecuteNonQuery();
+    //            }
+    //        }
+    //        catch (Exception ex)
+    //        {
+    //            MessageBox.Show("Error: " + ex.Message);
+    //        }
+
+    //        tablerow = "Ausfuhrung";
+    //        txtfield = cmbCoilsNewCoilVariant.SelectedIndex.ToString();
+    //        updateQuery = $"UPDATE lagercoils SET {tablerow} = '{txtfield}' WHERE LaufendeCoilnummer = '{laufendeCoilnummer}'";
+
+    //        try
+    //        {
+    //            using (MySqlConnection connection = new MySqlConnection(connectionString))
+    //            {
+    //                connection.Open();
+    //                MySqlCommand command = new MySqlCommand(updateQuery, connection);
+
+    //                command.ExecuteNonQuery();
+    //            }
+    //        }
+    //        catch (Exception ex)
+    //        {
+    //            MessageBox.Show("Error: " + ex.Message);
+    //        }
+
+    //        tablerow = "Breite";
+    //        txtfield = txtCoilsNewCoilWidth.Text;
+    //        updateQuery = $"UPDATE lagercoils SET {tablerow} = '{txtfield}' WHERE LaufendeCoilnummer = '{laufendeCoilnummer}'";
+
+    //        try
+    //        {
+    //            using (MySqlConnection connection = new MySqlConnection(connectionString))
+    //            {
+    //                connection.Open();
+    //                MySqlCommand command = new MySqlCommand(updateQuery, connection);
+
+    //                command.ExecuteNonQuery();
+    //            }
+    //        }
+    //        catch (Exception ex)
+    //        {
+    //            MessageBox.Show("Error: " + ex.Message);
+    //        }
+
+    //        tablerow = "Gewicht";
+    //        txtfield = txtCoilsNewCoilWeight.Text;
+    //        updateQuery = $"UPDATE lagercoils SET {tablerow} = '{txtfield}' WHERE LaufendeCoilnummer = '{laufendeCoilnummer}'";
+
+    //        try
+    //        {
+    //            using (MySqlConnection connection = new MySqlConnection(connectionString))
+    //            {
+    //                connection.Open();
+    //                MySqlCommand command = new MySqlCommand(updateQuery, connection);
+
+    //                command.ExecuteNonQuery();
+    //            }
+    //        }
+    //        catch (Exception ex)
+    //        {
+    //            MessageBox.Show("Error: " + ex.Message);
+    //        }
+
+    //        tablerow = "Lange";
+    //        txtfield = txtCoilsNewCoilLength.Text;
+    //        updateQuery = $"UPDATE lagercoils SET {tablerow} = '{txtfield}' WHERE LaufendeCoilnummer = '{laufendeCoilnummer}'";
+
+    //        try
+    //        {
+    //            using (MySqlConnection connection = new MySqlConnection(connectionString))
+    //            {
+    //                connection.Open();
+    //                MySqlCommand command = new MySqlCommand(updateQuery, connection);
+
+    //                command.ExecuteNonQuery();
+    //            }
+    //        }
+    //        catch (Exception ex)
+    //        {
+    //            MessageBox.Show("Error: " + ex.Message);
+    //        }
+
+    //        tablerow = "Preis";
+    //        txtfield = txtCoilsNewCoilPrice.Text.Replace(',', '.');
+    //        updateQuery = $"UPDATE lagercoils SET {tablerow} = '{txtfield}' WHERE LaufendeCoilnummer = '{laufendeCoilnummer}'";
+
+    //        try
+    //        {
+    //            using (MySqlConnection connection = new MySqlConnection(connectionString))
+    //            {
+    //                connection.Open();
+    //                MySqlCommand command = new MySqlCommand(updateQuery, connection);
+
+    //                command.ExecuteNonQuery();
+    //            }
+    //        }
+    //        catch (Exception ex)
+    //        {
+    //            MessageBox.Show("Error: " + ex.Message);
+    //        }
+
+    //        tablerow = "Notizen";
+    //        txtfield = txtCoilsNewCoilText.Text;
+    //        updateQuery = $"UPDATE lagercoils SET {tablerow} = '{txtfield}' WHERE LaufendeCoilnummer = '{laufendeCoilnummer}'";
+
+    //        try
+    //        {
+    //            using (MySqlConnection connection = new MySqlConnection(connectionString))
+    //            {
+    //                connection.Open();
+    //                MySqlCommand command = new MySqlCommand(updateQuery, connection);
+
+    //                command.ExecuteNonQuery();
+    //            }
+    //        }
+    //        catch (Exception ex)
+    //        {
+    //            MessageBox.Show("Error: " + ex.Message);
+    //        }
+
+    //        tablerow = "Charge";
+    //        txtfield = txtCoilsNewCoilHeat.Text;
+    //        updateQuery = $"UPDATE lagercoils SET {tablerow} = '{txtfield}' WHERE LaufendeCoilnummer = '{laufendeCoilnummer}'";
+
+    //        try
+    //        {
+    //            using (MySqlConnection connection = new MySqlConnection(connectionString))
+    //            {
+    //                connection.Open();
+    //                MySqlCommand command = new MySqlCommand(updateQuery, connection);
+
+    //                command.ExecuteNonQuery();
+    //            }
+    //        }
+    //        catch (Exception ex)
+    //        {
+    //            MessageBox.Show("Error: " + ex.Message);
+    //        }
+
+    //    }
+    //    else //Create a new Coil
+    //    {
+    //        string Besäumt;
+    //        string BesäumtValue;
+    //        if (chkCoilsNewCoilCut.Checked)
+    //        {
+    //            Besäumt = "Ja";
+    //            BesäumtValue = "1";
+    //        }
+    //        else
+    //        {
+    //            Besäumt = "Nein";
+    //            BesäumtValue = "0";
+    //        }
+
+    //        // Display a MessageBox with two buttons
+    //        DialogResult result = MessageBox.Show(
+    //            $"WS Gruppe: {cmbCoilsNewCoilWTGroup.SelectedItem.ToString()} {Environment.NewLine}" +
+    //            $"Wandstärke: {txtCoilsNewCoilSetWT.Text ?? ""} {Environment.NewLine}" +
+    //            $"Besäumt?: {Besäumt} {Environment.NewLine}" +
+    //            $"Werkstoff: {cmbCoilsNewCoilMaterial.SelectedItem.ToString()} {Environment.NewLine}" +
+    //            $"Kaufdatum: {dateCoilsNewCoilPurchase.Value.ToString("yyyy-MM-dd")} {Environment.NewLine}" +
+    //            $"Lieferant: {cmbCoilsNewCoilSupplier.SelectedItem.ToString()} {Environment.NewLine}" +
+    //            $"Ausführung: {cmbCoilsNewCoilVariant.SelectedItem.ToString()} {Environment.NewLine}" +
+    //            $"Breite: {txtCoilsNewCoilWidth.Text} {Environment.NewLine}" +
+    //            $"Gewicht: {txtCoilsNewCoilWeight.Text ?? ""} {Environment.NewLine}" +
+    //            $"Länge: {txtCoilsNewCoilLength.Text ?? ""} {Environment.NewLine}" +
+    //            $"Status: {cmbCoilsNewCoilStatus.SelectedItem.ToString()} {Environment.NewLine}" +
+    //            $"Preis €/kg: {txtCoilsNewCoilPrice.Text ?? ""} {Environment.NewLine}" +
+    //            $"Notizen: {txtCoilsNewCoilText.Text ?? ""}",
+    //            $"Charge: {txtCoilsNewCoilHeat.Text ?? ""} {Environment.NewLine}" +
+    //            "Confirm Details", // Title of the message box
+    //            MessageBoxButtons.YesNo // Buttons for the message box
+    //        );
+
+    //        if (result == DialogResult.Yes)
+    //        {
+    //            try
+    //            {
+    //                using (MySqlConnection connection = new MySqlConnection(connectionString))
+    //                {
+    //                    connection.Open();
+
+    //                    string query = @"INSERT INTO `lagercoils` 
+    //                            (`WSGruppe`, `Wandstarke`,`Besaumt`,`Werkstoff`,`Kaufdatum`,`Lieferant`,`Ausfuhrung`,`Breite`,`Gewicht`,`Lange`,`Preis`,`Notizen`,`Status`,`Charge`)
+    //                            VALUES
+    //                            (@WSGruppe, @Wandstärke, @Besäumt, @Werkstoff, @Kaufdatum, @Lieferant, @Ausführung, @Breite, @Gewicht, @Länge, @Preis, @Notizen, @Status, @Charge);";
+
+    //                    MySqlCommand command = new MySqlCommand(query, connection);
+
+    //                    // Add parameters
+    //                    command.Parameters.AddWithValue("@WSGruppe", cmbCoilsNewCoilWTGroup.SelectedItem.ToString().Replace(',', '.'));
+    //                    command.Parameters.AddWithValue("@Wandstärke", txtCoilsNewCoilSetWT.Text.Replace(',', '.'));
+    //                    command.Parameters.AddWithValue("@Besäumt", BesäumtValue);
+    //                    command.Parameters.AddWithValue("@Werkstoff", cmbCoilsNewCoilMaterial.SelectedIndex);
+    //                    command.Parameters.AddWithValue("@Kaufdatum", dateCoilsNewCoilPurchase.Value.ToString("yyyy-MM-dd"));
+    //                    command.Parameters.AddWithValue("@Lieferant", cmbCoilsNewCoilSupplier.SelectedIndex);
+    //                    command.Parameters.AddWithValue("@Ausführung", cmbCoilsNewCoilVariant.SelectedIndex);
+    //                    command.Parameters.AddWithValue("@Status", cmbCoilsNewCoilStatus.SelectedIndex);
+    //                    command.Parameters.AddWithValue("@Breite", txtCoilsNewCoilWidth.Text);
+    //                    command.Parameters.AddWithValue("@Gewicht", txtCoilsNewCoilWeight.Text);
+    //                    command.Parameters.AddWithValue("@Länge", txtCoilsNewCoilLength.Text);
+    //                    command.Parameters.AddWithValue("@Preis", txtCoilsNewCoilPrice.Text.Replace(',', '.'));
+    //                    command.Parameters.AddWithValue("@Notizen", txtCoilsNewCoilText.Text);
+    //                    command.Parameters.AddWithValue("@Charge", txtCoilsNewCoilHeat.Text);
+
+    //                    // Execute the query
+    //                    int rowsAffected = command.ExecuteNonQuery();
+
+    //                    // Check if the insertion was successful
+    //                    if (rowsAffected > 0)
+    //                    {
+    //                        MessageBox.Show("Data inserted successfully.", "Success", MessageBoxButtons.OK, MessageBoxIcon.Information);
+    //                    }
+    //                    else
+    //                    {
+    //                        MessageBox.Show("Failed to insert data.", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+    //                    }
+    //                }
+    //            }
+    //            catch (Exception ex)
+    //            {
+    //                MessageBox.Show("Error: " + ex.Message, "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+    //            }
+    //        }
+    //    }
+    //}
+
+
+    public ObservableCollection<CoilSearchAttributes> CoilSearchAttribute { get; set; }
+
+    private async void LoadCoilsInStorage(string Selectors)
+    {
+        CoilSearchAttribute = new ObservableCollection<CoilSearchAttributes>();
+
+        string query = $"SELECT * FROM lagercoils";
+
+        try
+        {
+            using (var connection = new MySqlConnection(connectionString))
+            {
+                connection.Open();
+
+                using (var command = new MySqlCommand(query, connection))
+                using (var reader = command.ExecuteReader())
+                {
+                    while (reader.Read())
+                    {
+                        var Attribute = new CoilSearchAttributes
+                        {
+                            LaufendeCoilnummer = reader[0].ToString(),
+                            Status = reader[1].ToString(),
+                            WSGruppe = reader[2].ToString(),
+                            Charge = reader[3].ToString(),
+                            Wandstärke = reader[4].ToString(),
+                            Besäumt = reader[5].ToString(),
+                            Werkstoff = reader[6].ToString(),
+                            Kaufdatum = reader[7].ToString(),
+                            Lieferant = reader[8].ToString(),
+                            Ausführung = reader[9].ToString(),
+                            Breite = reader[10].ToString(),
+                            Gewicht = reader[11].ToString(),
+                            Länge = reader[12].ToString(),
+                            Preis = reader[13].ToString(),
+                            Notizen = reader[14].ToString(),
+                        };
+
+                        CoilSearchAttribute.Add(Attribute);
+                    }
+                }
+            }
+        }
+        catch (Exception ex)
+        {
+            // Handle errors (e.g., log them)
+            Console.WriteLine($"Error loading surcharges: {ex.Message}");
+        }
+
+
+        //    ListCoils.Items.Clear();
+        //    ListCoils.Columns.Clear();
+
+        //    // Add columns to the ListView
+        //    ListCoils.Columns.Add("Coilnummer", -2);
+        //    ListCoils.Columns.Add("Status", -2);
+        //    ListCoils.Columns.Add("WSGruppe", -2);
+        //    ListCoils.Columns.Add("Wandstärke", -2);
+        //    ListCoils.Columns.Add("Besäumt", -2);
+        //    ListCoils.Columns.Add("Werkstoff", -2);
+        //    ListCoils.Columns.Add("Kaufdatum", -2);
+        //    ListCoils.Columns.Add("Lieferant", -2);
+        //    ListCoils.Columns.Add("Ausführung", -2);
+        //    ListCoils.Columns.Add("Breite", -2);
+        //    ListCoils.Columns.Add("Gewicht", -2);
+        //    ListCoils.Columns.Add("Länge", -2);
+        //    ListCoils.Columns.Add("Preis", -2);
+        //    ListCoils.Columns.Add("Notizen", -2);
+
+        //    // Fetch total number of rows
+        //    int totalRows = GetTotalRowCount(Selectors);
+        //    const int pageSize = 1000; // Number of rows to fetch at a time
+        //    int totalPages = (int)Math.Ceiling((double)totalRows / pageSize);
+
+        //    // Fetch rows in batches
+        //    for (int currentPage = 0; currentPage < totalPages; currentPage++)
+        //    {
+        //        List<string[]> rows = CoilsGetRows(currentPage, pageSize, Selectors);
+
+        //        foreach (ColumnHeader column in ListCoils.Columns)
+        //        {
+        //            column.AutoResize(ColumnHeaderAutoResizeStyle.HeaderSize); // Resize based on header size
+        //        }
+
+        //        //await Task.Delay(250);
+
+        //        // Add each row to the ListView with a delay
+        //        foreach (var row in rows)
+        //        {
+        //            ListViewItem item = new ListViewItem(row[0]);
+
+        //            for (int i = 1; i < row.Length; i++)
+        //            {
+        //                item.SubItems.Add(row[i]);
+        //            }
+
+        //            ListCoils.Items.Add(item);
+        //        }
+        //    }
+
+        //    foreach (ColumnHeader column in ListCoils.Columns)
+        //    {
+        //        column.AutoResize(ColumnHeaderAutoResizeStyle.HeaderSize); // Resize based on header size
+        //    }
+        //}
+
+        //private int GetTotalRowCount(string Selectors)
+        //{
+        //    using (MySqlConnection conn = new MySqlConnection(connectionString))
+        //    {
+        //        conn.Open();
+        //        string countQuery = $"SELECT COUNT(*) FROM lagercoils {Selectors}";
+
+        //        using (MySqlCommand cmd = new MySqlCommand(countQuery, conn))
+        //        {
+        //            return Convert.ToInt32(cmd.ExecuteScalar());
+        //        }
+        //    }
+        //}
+
+        //private List<string[]> CoilsGetRows(int pageNumber, int pageSize, string Selectors)
+        //{
+        //    var results = new List<string[]>();
+        //    int offset = pageNumber * pageSize;
+
+        //    using (MySqlConnection conn = new MySqlConnection(connectionString))
+        //    {
+        //        conn.Open();
+        //        string query = $"SELECT LaufendeCoilnummer, Status, WSGruppe, Wandstarke, Besaumt, Werkstoff, Kaufdatum, Lieferant, Ausfuhrung, Breite, Gewicht, Lange, Preis, Notizen FROM lagercoils {Selectors} LIMIT {pageSize} OFFSET {offset}";
+
+        //        using (MySqlCommand cmd = new MySqlCommand(query, conn))
+        //        {
+        //            using (MySqlDataReader reader = cmd.ExecuteReader())
+        //            {
+        //                while (reader.Read())
+        //                {
+        //                    string WSGruppe = reader["WSGruppe"].ToString();
+        //                    string Wandstarke = reader["Wandstarke"].ToString();
+
+        //                    string Besaumt = reader["Besaumt"].ToString() == "1" ? "Ja" : "Nein";
+        //                    string Werkstoff = GetFieldValue("Werkstoff", reader["Werkstoff"].ToString(), "werkstoffe", "LaufendeWerkstoffnummer");
+
+        //                    DateTime kaufdatum = Convert.ToDateTime(reader["Kaufdatum"]);
+        //                    string Kaufdatum = kaufdatum.ToString("yyyy-MM-dd");
+        //                    string Lieferant = GetFieldValue("Name", reader["Lieferant"].ToString(), "lieferanten", "LaufendeLieferantennummer");
+        //                    string Ausfuhrung = reader["Ausfuhrung"].ToString();
+        //                    string Breite = reader["Breite"].ToString();
+        //                    string Gewicht = reader["Gewicht"].ToString();
+        //                    string Lange = reader["Lange"].ToString();
+        //                    string Preis = reader["Preis"].ToString();
+        //                    string Notizen = reader["Notizen"].ToString();
+        //                    string Status = reader["Status"].ToString();
+
+        //                    switch (int.Parse(Ausfuhrung))
+        //                    {
+        //                        case 0:
+        //                            Ausfuhrung = "1C";
+        //                            break;
+        //                        case 1:
+        //                            Ausfuhrung = "1E";
+        //                            break;
+        //                        case 2:
+        //                            Ausfuhrung = "1D";
+        //                            break;
+        //                        case 3:
+        //                            Ausfuhrung = "2C";
+        //                            break;
+        //                        case 4:
+        //                            Ausfuhrung = "2E";
+        //                            break;
+        //                        case 5:
+        //                            Ausfuhrung = "2D";
+        //                            break;
+        //                        case 6:
+        //                            Ausfuhrung = "2B";
+        //                            break;
+        //                        case 7:
+        //                            Ausfuhrung = "2R";
+        //                            break;
+        //                    }
+
+
+        //                    if (String.IsNullOrEmpty(Status)) { Status = "0"; };
+        //                    switch (int.Parse(Status))
+        //                    {
+        //                        case 0:
+        //                            Status = "Unbekannt";
+        //                            break;
+        //                        case 1:
+        //                            Status = "Zu Lieferant Unterwegs";
+        //                            break;
+        //                        case 2:
+        //                            Status = "Lager Lieferant";
+        //                            break;
+        //                        case 3:
+        //                            Status = "Unterwegs zu EHG";
+        //                            break;
+        //                        case 4:
+        //                            Status = "Lager";
+        //                            break;
+        //                        case 5:
+        //                            Status = "Spaltplan";
+        //                            break;
+        //                        case 6:
+        //                            Status = "Gespalten";
+        //                            break;
+        //                        case 7:
+        //                            Status = "Verarbeitet";
+        //                            break;
+        //                        case 8:
+        //                            Status = "Band";
+        //                            break;
+        //                        case 9:
+        //                            Status = "Restband";
+        //                            break;
+
+        //                    }
+
+        //                    string LaufendeCoilnummer = reader["LaufendeCoilnummer"].ToString();
+
+        //                    results.Add(new string[] { LaufendeCoilnummer, Status, WSGruppe, Wandstarke, Besaumt, Werkstoff, Kaufdatum, Lieferant, Ausfuhrung, Breite, Gewicht, Lange, Preis, Notizen });
+        //                }
+        //            }
+        //        }
+        //    }
+        //    return results;
     }
 
     private void btnCoilsSearch_Click(object? sender, Avalonia.Interactivity.RoutedEventArgs e)
-    {
+        {
         string GradeQuery = "";
         string SupplierQuery = "";
         string WTQuery = "";
@@ -1200,4 +1316,23 @@ public partial class StorageCoil : UserControl
     //        MessageBoxButtons.YesNo,
     //        MessageBoxIcon.Question);
     //}
+
+    public class CoilSearchAttributes
+    {
+        public string LaufendeCoilnummer { get; set; }
+        public string Status { get; set; }
+        public string WSGruppe { get; set; }
+        public string Charge { get; set; }
+        public string Wandstärke { get; set; }
+        public string Besäumt { get; set; }
+        public string Werkstoff { get; set; }
+        public string Kaufdatum { get; set; }
+        public string Lieferant { get; set; }
+        public string Ausführung { get; set; }
+        public string Breite { get; set; }
+        public string Gewicht { get; set; }
+        public string Länge { get; set; }
+        public string Preis { get; set; }
+        public string Notizen { get; set; }
+    }
 }

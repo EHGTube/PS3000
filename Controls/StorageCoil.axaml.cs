@@ -606,115 +606,114 @@ public partial class StorageCoil : UserControl
         //            return Convert.ToInt32(cmd.ExecuteScalar());
         //        }
         //    }
-        //}
-
-        //private List<string[]> CoilsGetRows(int pageNumber, int pageSize, string Selectors)
-        //{
-        //    var results = new List<string[]>();
-        //    int offset = pageNumber * pageSize;
-
-        //    using (MySqlConnection conn = new MySqlConnection(connectionString))
-        //    {
-        //        conn.Open();
-        //        string query = $"SELECT LaufendeCoilnummer, Status, WSGruppe, Wandstarke, Besaumt, Werkstoff, Kaufdatum, Lieferant, Ausfuhrung, Breite, Gewicht, Lange, Preis, Notizen FROM lagercoils {Selectors} LIMIT {pageSize} OFFSET {offset}";
-
-        //        using (MySqlCommand cmd = new MySqlCommand(query, conn))
-        //        {
-        //            using (MySqlDataReader reader = cmd.ExecuteReader())
-        //            {
-        //                while (reader.Read())
-        //                {
-        //                    string WSGruppe = reader["WSGruppe"].ToString();
-        //                    string Wandstarke = reader["Wandstarke"].ToString();
-
-        //                    string Besaumt = reader["Besaumt"].ToString() == "1" ? "Ja" : "Nein";
-        //                    string Werkstoff = GetFieldValue("Werkstoff", reader["Werkstoff"].ToString(), "werkstoffe", "LaufendeWerkstoffnummer");
-
-        //                    DateTime kaufdatum = Convert.ToDateTime(reader["Kaufdatum"]);
-        //                    string Kaufdatum = kaufdatum.ToString("yyyy-MM-dd");
-        //                    string Lieferant = GetFieldValue("Name", reader["Lieferant"].ToString(), "lieferanten", "LaufendeLieferantennummer");
-        //                    string Ausfuhrung = reader["Ausfuhrung"].ToString();
-        //                    string Breite = reader["Breite"].ToString();
-        //                    string Gewicht = reader["Gewicht"].ToString();
-        //                    string Lange = reader["Lange"].ToString();
-        //                    string Preis = reader["Preis"].ToString();
-        //                    string Notizen = reader["Notizen"].ToString();
-        //                    string Status = reader["Status"].ToString();
-
-        //                    switch (int.Parse(Ausfuhrung))
-        //                    {
-        //                        case 0:
-        //                            Ausfuhrung = "1C";
-        //                            break;
-        //                        case 1:
-        //                            Ausfuhrung = "1E";
-        //                            break;
-        //                        case 2:
-        //                            Ausfuhrung = "1D";
-        //                            break;
-        //                        case 3:
-        //                            Ausfuhrung = "2C";
-        //                            break;
-        //                        case 4:
-        //                            Ausfuhrung = "2E";
-        //                            break;
-        //                        case 5:
-        //                            Ausfuhrung = "2D";
-        //                            break;
-        //                        case 6:
-        //                            Ausfuhrung = "2B";
-        //                            break;
-        //                        case 7:
-        //                            Ausfuhrung = "2R";
-        //                            break;
-        //                    }
-
-
-        //                    if (String.IsNullOrEmpty(Status)) { Status = "0"; };
-        //                    switch (int.Parse(Status))
-        //                    {
-        //                        case 0:
-        //                            Status = "Unbekannt";
-        //                            break;
-        //                        case 1:
-        //                            Status = "Zu Lieferant Unterwegs";
-        //                            break;
-        //                        case 2:
-        //                            Status = "Lager Lieferant";
-        //                            break;
-        //                        case 3:
-        //                            Status = "Unterwegs zu EHG";
-        //                            break;
-        //                        case 4:
-        //                            Status = "Lager";
-        //                            break;
-        //                        case 5:
-        //                            Status = "Spaltplan";
-        //                            break;
-        //                        case 6:
-        //                            Status = "Gespalten";
-        //                            break;
-        //                        case 7:
-        //                            Status = "Verarbeitet";
-        //                            break;
-        //                        case 8:
-        //                            Status = "Band";
-        //                            break;
-        //                        case 9:
-        //                            Status = "Restband";
-        //                            break;
-
-        //                    }
-
-        //                    string LaufendeCoilnummer = reader["LaufendeCoilnummer"].ToString();
-
-        //                    results.Add(new string[] { LaufendeCoilnummer, Status, WSGruppe, Wandstarke, Besaumt, Werkstoff, Kaufdatum, Lieferant, Ausfuhrung, Breite, Gewicht, Lange, Preis, Notizen });
-        //                }
-        //            }
-        //        }
-        //    }
-        //    return results;
     }
+
+    //private List<string[]> CoilsGetRows(int pageNumber, int pageSize, string Selectors)
+    //{
+    //    var results = new List<string[]>();
+    //    int offset = pageNumber * pageSize;
+
+    //    using (MySqlConnection conn = new MySqlConnection(connectionString))
+    //    {
+    //        conn.Open();
+    //        string query = $"SELECT LaufendeCoilnummer, Status, WSGruppe, Wandstarke, Besaumt, Werkstoff, Kaufdatum, Lieferant, Ausfuhrung, Breite, Gewicht, Lange, Preis, Notizen FROM lagercoils {Selectors} LIMIT {pageSize} OFFSET {offset}";
+
+    //        using (MySqlCommand cmd = new MySqlCommand(query, conn))
+    //        {
+    //            using (MySqlDataReader reader = cmd.ExecuteReader())
+    //            {
+    //                while (reader.Read())
+    //                {
+    //                    string WSGruppe = reader["WSGruppe"].ToString();
+    //                    string Wandstarke = reader["Wandstarke"].ToString();
+
+    //                    string Besaumt = reader["Besaumt"].ToString() == "1" ? "Ja" : "Nein";
+    //                    string Werkstoff = GetFieldValue("Werkstoff", reader["Werkstoff"].ToString(), "werkstoffe", "LaufendeWerkstoffnummer");
+
+    //                    DateTime kaufdatum = Convert.ToDateTime(reader["Kaufdatum"]);
+    //                    string Kaufdatum = kaufdatum.ToString("yyyy-MM-dd");
+    //                    string Lieferant = GetFieldValue("Name", reader["Lieferant"].ToString(), "lieferanten", "LaufendeLieferantennummer");
+    //                    string Ausfuhrung = reader["Ausfuhrung"].ToString();
+    //                    string Breite = reader["Breite"].ToString();
+    //                    string Gewicht = reader["Gewicht"].ToString();
+    //                    string Lange = reader["Lange"].ToString();
+    //                    string Preis = reader["Preis"].ToString();
+    //                    string Notizen = reader["Notizen"].ToString();
+    //                    string Status = reader["Status"].ToString();
+
+    //                    switch (int.Parse(Ausfuhrung))
+    //                    {
+    //                        case 0:
+    //                            Ausfuhrung = "1C";
+    //                            break;
+    //                        case 1:
+    //                            Ausfuhrung = "1E";
+    //                            break;
+    //                        case 2:
+    //                            Ausfuhrung = "1D";
+    //                            break;
+    //                        case 3:
+    //                            Ausfuhrung = "2C";
+    //                            break;
+    //                        case 4:
+    //                            Ausfuhrung = "2E";
+    //                            break;
+    //                        case 5:
+    //                            Ausfuhrung = "2D";
+    //                            break;
+    //                        case 6:
+    //                            Ausfuhrung = "2B";
+    //                            break;
+    //                        case 7:
+    //                            Ausfuhrung = "2R";
+    //                            break;
+    //                    }
+
+
+    //                    if (String.IsNullOrEmpty(Status)) { Status = "0"; };
+    //                    switch (int.Parse(Status))
+    //                    {
+    //                        case 0:
+    //                            Status = "Unbekannt";
+    //                            break;
+    //                        case 1:
+    //                            Status = "Zu Lieferant Unterwegs";
+    //                            break;
+    //                        case 2:
+    //                            Status = "Lager Lieferant";
+    //                            break;
+    //                        case 3:
+    //                            Status = "Unterwegs zu EHG";
+    //                            break;
+    //                        case 4:
+    //                            Status = "Lager";
+    //                            break;
+    //                        case 5:
+    //                            Status = "Spaltplan";
+    //                            break;
+    //                        case 6:
+    //                            Status = "Gespalten";
+    //                            break;
+    //                        case 7:
+    //                            Status = "Verarbeitet";
+    //                            break;
+    //                        case 8:
+    //                            Status = "Band";
+    //                            break;
+    //                        case 9:
+    //                            Status = "Restband";
+    //                            break;
+
+    //                    }
+
+    //                    string LaufendeCoilnummer = reader["LaufendeCoilnummer"].ToString();
+
+    //                    results.Add(new string[] { LaufendeCoilnummer, Status, WSGruppe, Wandstarke, Besaumt, Werkstoff, Kaufdatum, Lieferant, Ausfuhrung, Breite, Gewicht, Lange, Preis, Notizen });
+    //                }
+    //            }
+    //        }
+    //    }
+    //    return results;
 
     private void btnCoilsSearch_Click(object? sender, Avalonia.Interactivity.RoutedEventArgs e)
         {

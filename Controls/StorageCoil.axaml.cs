@@ -490,6 +490,47 @@ public partial class StorageCoil : UserControl
 
     public ObservableCollection<CoilSearchAttributes> CoilSearchAttribute { get; set; }
 
+    public class CoilSearchAttributes
+    {
+        public string LaufendeCoilnummer { get; set; }
+        public string Status { get; set; }
+        public string WSGruppe { get; set; }
+        public string Charge { get; set; }
+        public string Wandstärke { get; set; }
+        public string Besäumt { get; set; }
+        public string Werkstoff { get; set; }
+        public string Kaufdatum { get; set; }
+        public string Lieferant { get; set; }
+        public string Ausführung { get; set; }
+        public string Breite { get; set; }
+        public string Gewicht { get; set; }
+        public string Länge { get; set; }
+        public string Preis { get; set; }
+        public string Notizen { get; set; }
+
+
+        //Not sure if following is necessary? 
+        //Also definetely breaks the code. 
+        public CoilAttribute(string laufendeCoilNummer, string status, string wSGruppe, string charge, string wandstärke, string besäumt, string werkstoff, string kaufdatum, string lieferant, string ausführung, string breite, string gewicht, string länge, string preis, string notizen)
+        {
+            LaufendeCoilnummer = laufendeCoilNummer;
+            Status = status;
+            WSGruppe = wSGruppe;
+            Charge = charge;
+            Wandstärke = wandstärke;
+            Besäumt = besäumt;
+            Werkstoff = werkstoff;
+            Kaufdatum = kaufdatum;
+            Lieferant = lieferant;
+            Ausführung = ausführung;
+            Breite = breite;
+            Gewicht = gewicht;
+            Länge = länge;
+            Preis = preis;
+            Notizen = notizen;
+        }
+    }
+
     private async void LoadCoilsInStorage(string Selectors)
     {
         CoilSearchAttribute = new ObservableCollection<CoilSearchAttributes>();
@@ -1315,23 +1356,4 @@ public partial class StorageCoil : UserControl
     //        MessageBoxButtons.YesNo,
     //        MessageBoxIcon.Question);
     //}
-
-    public class CoilSearchAttributes
-    {
-        public string LaufendeCoilnummer { get; set; }
-        public string Status { get; set; }
-        public string WSGruppe { get; set; }
-        public string Charge { get; set; }
-        public string Wandstärke { get; set; }
-        public string Besäumt { get; set; }
-        public string Werkstoff { get; set; }
-        public string Kaufdatum { get; set; }
-        public string Lieferant { get; set; }
-        public string Ausführung { get; set; }
-        public string Breite { get; set; }
-        public string Gewicht { get; set; }
-        public string Länge { get; set; }
-        public string Preis { get; set; }
-        public string Notizen { get; set; }
-    }
 }

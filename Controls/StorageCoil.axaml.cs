@@ -488,7 +488,9 @@ public partial class StorageCoil : UserControl
     //}
 
 
-    public ObservableCollection<CoilSearchAttributes> CoilSearchAttribute { get; set; }
+    public ObservableCollection<CoilSearchAttributes> CoilSearchAttribute { get; set; } = new();
+
+
 
     public class CoilSearchAttributes
     {
@@ -507,33 +509,11 @@ public partial class StorageCoil : UserControl
         public string Länge { get; set; }
         public string Preis { get; set; }
         public string Notizen { get; set; }
-
-
-        //Not sure if following is necessary? 
-        //Also definetely breaks the code. 
-        public CoilAttribute(string laufendeCoilNummer, string status, string wSGruppe, string charge, string wandstärke, string besäumt, string werkstoff, string kaufdatum, string lieferant, string ausführung, string breite, string gewicht, string länge, string preis, string notizen)
-        {
-            LaufendeCoilnummer = laufendeCoilNummer;
-            Status = status;
-            WSGruppe = wSGruppe;
-            Charge = charge;
-            Wandstärke = wandstärke;
-            Besäumt = besäumt;
-            Werkstoff = werkstoff;
-            Kaufdatum = kaufdatum;
-            Lieferant = lieferant;
-            Ausführung = ausführung;
-            Breite = breite;
-            Gewicht = gewicht;
-            Länge = länge;
-            Preis = preis;
-            Notizen = notizen;
-        }
     }
 
     private async void LoadCoilsInStorage(string Selectors)
     {
-        CoilSearchAttribute = new ObservableCollection<CoilSearchAttributes>();
+        CoilSearchAttribute.Clear();
 
         string query = $"SELECT * FROM lagercoils";
 

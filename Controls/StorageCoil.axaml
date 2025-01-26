@@ -4,7 +4,7 @@
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
              mc:Ignorable="d" d:DesignWidth="1920" d:DesignHeight="1080"
              x:Class="PS3000.StorageCoil">
-	
+
 	<Grid ColumnDefinitions="Auto,Auto" RowDefinitions="Auto">
 		
 		<Grid ColumnDefinitions="Auto,Auto,Auto,Auto,Auto" RowDefinitions="Auto,Auto,Auto" Grid.Row="0" Grid.Column="0">
@@ -50,9 +50,9 @@
 				<ComboBoxItem>Restband</ComboBoxItem>
 			</ComboBox>
 
-			<Button Grid.Row="0" Grid.Column="4" Grid.RowSpan="2" Click="btnCoilsSearch_Click" >Suchen</Button>
+			<Button Grid.Row="0" Grid.Column="4" Grid.RowSpan="2" >Suchen</Button>
 
-			<DataGrid Name="DataGridCoils" ItemsSource="{Binding CoilSearchAttribute}" AutoGenerateColumns="True" IsReadOnly="True"
+			<DataGrid Name="DataGridCoils" DataContext="StorageCoilCoilSearchAttribute" ItemsSource="{Binding CoilSearchAttribute}" AutoGenerateColumns="True" IsReadOnly="True"
 				GridLinesVisibility="All"
 				BorderThickness="1" BorderBrush="Gray" Grid.Row="3" Grid.Column="0" Grid.ColumnSpan="5" >
 			</DataGrid>
@@ -61,34 +61,30 @@
 		<Grid ColumnDefinitions="Auto,Auto,Auto" RowDefinitions="Auto,Auto,Auto,Auto,Auto,Auto,Auto,Auto,Auto,Auto,Auto,Auto,Auto,Auto" Grid.Row="0" Grid.Column="1">
 			<TextBlock Text="WS Gruppe:" Grid.Row="0" Grid.Column="0"/>
 			<ComboBox SelectedIndex="0" MaxDropDownHeight="100" HorizontalAlignment="Stretch" Grid.Row="0" Grid.Column="1" Name="CoilcmbWTGroup">
-				<ComboBoxItem>Text Item 1</ComboBoxItem>
-				<ComboBoxItem>Text Item 2</ComboBoxItem>
-				<ComboBoxItem>Text Item 3</ComboBoxItem>
-				<ComboBoxItem>Text Item 4</ComboBoxItem>
-				<ComboBoxItem>Text Item 5</ComboBoxItem>
-				<ComboBoxItem>Text Item 6</ComboBoxItem>
-				<ComboBoxItem>Text Item 7</ComboBoxItem>
-				<ComboBoxItem>Text Item 8</ComboBoxItem>
-				<ComboBoxItem>Text Item 9</ComboBoxItem>
+				<ComboBoxItem>0,8</ComboBoxItem>
+				<ComboBoxItem>1</ComboBoxItem>
+				<ComboBoxItem>1,2</ComboBoxItem>
+				<ComboBoxItem>1,5</ComboBoxItem>
+				<ComboBoxItem>2</ComboBoxItem>
+				<ComboBoxItem>2,5</ComboBoxItem>
+				<ComboBoxItem>3</ComboBoxItem>
+				<ComboBoxItem>3,5</ComboBoxItem>
+				<ComboBoxItem>4</ComboBoxItem>
+				<ComboBoxItem>4,5</ComboBoxItem>
+				<ComboBoxItem>5</ComboBoxItem>
+				<ComboBoxItem>6</ComboBoxItem>
+				<ComboBoxItem>6,3</ComboBoxItem>
+				<ComboBoxItem>7,11</ComboBoxItem>
 			</ComboBox>
 			
 			<TextBlock Text="Soll WS:" Grid.Row="1" Grid.Column="0"/>
 			<TextBox Grid.Row="1" Grid.Column="1" Watermark="Soll WS"/>
 			
 			<TextBlock Text="Ist WS:" Grid.Row="2" Grid.Column="0"/>
-			<TextBox Grid.Row="2" Grid.Column="1" Watermark="Ist WS"/>
+			<TextBox Grid.Row="2" Grid.Column="1" Text="{Binding coilWT}" Watermark="Ist WS"/>
 			
 			<TextBlock Text="Werkstoff:" Grid.Row="3" Grid.Column="0"/>
 			<ComboBox SelectedIndex="0" MaxDropDownHeight="100" HorizontalAlignment="Stretch" Grid.Row="3" Grid.Column="1" Name="CoilcmbGrade">
-				<ComboBoxItem>Text Item 1</ComboBoxItem>
-				<ComboBoxItem>Text Item 2</ComboBoxItem>
-				<ComboBoxItem>Text Item 3</ComboBoxItem>
-				<ComboBoxItem>Text Item 4</ComboBoxItem>
-				<ComboBoxItem>Text Item 5</ComboBoxItem>
-				<ComboBoxItem>Text Item 6</ComboBoxItem>
-				<ComboBoxItem>Text Item 7</ComboBoxItem>
-				<ComboBoxItem>Text Item 8</ComboBoxItem>
-				<ComboBoxItem>Text Item 9</ComboBoxItem>
 			</ComboBox>
 			
 			<TextBlock Text="Kaufdatum:" Grid.Row="4" Grid.Column="0"/>
@@ -99,15 +95,6 @@
 			
 			<TextBlock Text="Lieferant:" Grid.Row="6" Grid.Column="0"/>
 			<ComboBox SelectedIndex="0" MaxDropDownHeight="100" Grid.Row="6" HorizontalAlignment="Stretch" Grid.Column="1" Name="CoilcmbSupplier">
-				<ComboBoxItem>Text Item 1</ComboBoxItem>
-				<ComboBoxItem>Text Item 2</ComboBoxItem>
-				<ComboBoxItem>Text Item 3</ComboBoxItem>
-				<ComboBoxItem>Text Item 4</ComboBoxItem>
-				<ComboBoxItem>Text Item 5</ComboBoxItem>
-				<ComboBoxItem>Text Item 6</ComboBoxItem>
-				<ComboBoxItem>Text Item 7</ComboBoxItem>
-				<ComboBoxItem>Text Item 8</ComboBoxItem>
-				<ComboBoxItem>Text Item 9</ComboBoxItem>
 			</ComboBox>
 			
 			<TextBlock Text="Ausführung:" Grid.Row="7" Grid.Column="0"/>
@@ -137,13 +124,13 @@
 			</ComboBox>
 			
 			<TextBlock Text="Breite:" Grid.Row="9" Grid.Column="0"/>
-			<TextBox Grid.Row="9" Grid.Column="1" Watermark="Breite"/>
+			<TextBox Grid.Row="9" Grid.Column="1" Text="{Binding coilWidth}" Watermark="Breite"/>
 			
 			<TextBlock Text="Gewicht:" Grid.Row="10" Grid.Column="0"/>
-			<TextBox Grid.Row="10" Grid.Column="1" Watermark="Gewicht"/>
+			<TextBox Grid.Row="10" Grid.Column="1" Text="{Binding coilWeight}" Watermark="Gewicht"/>
 			
 			<TextBlock Text="Länge:" Grid.Row="11" Grid.Column="0"/>
-			<TextBox Grid.Row="11" Grid.Column="1" Watermark="Länge"/>
+			<TextBox Grid.Row="11" Grid.Column="1" Text="{Binding CoilLength}" Name="CoiltxtLength" Watermark="Länge"/>
 			
 			<TextBlock Text="Preis €/kg:" Grid.Row="12" Grid.Column="0"/>
 			<TextBox Grid.Row="12" Grid.Column="1" Watermark="Preis €/kg"/>

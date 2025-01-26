@@ -1,4 +1,5 @@
-﻿using System.Collections.ObjectModel;
+﻿using PS3000.Controls;
+using System.Collections.ObjectModel;
 using static PS3000.Views.MainView;
 
 namespace PS3000.ViewModels;
@@ -8,7 +9,7 @@ public class MainViewModel : ViewModelBase
     public ObservableCollection<Surcharges> SurchargeData { get; set; }
     public ObservableCollection<Positions> InquiryPositions { get; set; }
 
-
+    public StorageCoilCode StorageCoil { get; } = new();
 
     public MainViewModel()
     {

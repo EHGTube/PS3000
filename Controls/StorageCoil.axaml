@@ -3,7 +3,9 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
              mc:Ignorable="d" d:DesignWidth="1920" d:DesignHeight="1080"
-             x:Class="PS3000.StorageCoil">
+             x:Class="PS3000.StorageCoil"
+			 x:DataType="controls:StorageCoil"
+			 x:CompileBindings="True">
 
 	<Grid ColumnDefinitions="Auto,Auto" RowDefinitions="Auto">
 		
@@ -52,7 +54,7 @@
 
 			<Button Grid.Row="0" Grid.Column="4" Grid.RowSpan="2" >Suchen</Button>
 
-			<DataGrid Name="DataGridCoils" DataContext="StorageCoilCoilSearchAttribute" ItemsSource="{Binding CoilSearchAttribute}" AutoGenerateColumns="True" IsReadOnly="True"
+			<DataGrid Name="DataGridCoils" AutoGenerateColumns="True" IsReadOnly="True"
 				GridLinesVisibility="All"
 				BorderThickness="1" BorderBrush="Gray" Grid.Row="3" Grid.Column="0" Grid.ColumnSpan="5" >
 			</DataGrid>

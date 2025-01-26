@@ -7,9 +7,22 @@ using System.Threading.Tasks;
 
 namespace PS3000.Controls
 {
-    internal partial class StorageCoilCode : ObservableObject
+    public partial class StorageCoilCode : ObservableObject
     {
-        string connectionString = PS3000.Properties.Resources.ConnectionString;
+
+        [ObservableProperty]
+        [NotifyPropertyChangedFor(nameof(CoilLength))]
+        public float coilWeight;
+        [ObservableProperty]
+        [NotifyPropertyChangedFor(nameof(CoilLength))]
+        public float coilWidth;
+        [ObservableProperty]
+        [NotifyPropertyChangedFor(nameof(CoilLength))]
+        public float coilWT;
+
+        public int CoilLength => (int)Math.Round(coilWeight / coilWidth / coilWT / 7.97f * 1000, 0);
+
+        //string connectionString = PS3000.Properties.Resources.ConnectionString;
 
         //private void PopulateLists()
         //{
@@ -98,19 +111,6 @@ namespace PS3000.Controls
 
         //    CoiltxtLength.Text = Math.Round(formula, 0).ToString();
         //}
-
-        [ObservableProperty]
-        [NotifyPropertyChangedFor(nameof(CoilLength))]
-        private float coilWeight;
-        [ObservableProperty]
-        [NotifyPropertyChangedFor(nameof(CoilLength))]
-        private float coilWidth;
-        [ObservableProperty]
-        [NotifyPropertyChangedFor(nameof(CoilLength))]
-        private float coilWT;
-
-        public int CoilLength => (int)Math.Round(coilWeight / coilWidth / coilWT / 7.97f * 1000, 0);
-
 
         //private void btnCoilsNewCoilSave_Click(object sender, EventArgs e)
         //{

@@ -4,12 +4,61 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using CommunityToolkit.Mvvm.Input;
+using MsBox.Avalonia;
+using MsBox.Avalonia.Enums;
 
 namespace PS3000.Controls
 {
-    public partial class StorageCoilCode : ObservableObject
+    public partial class StorageCoilViewModel : ObservableObject
     {
-
+        [ObservableProperty] 
+        private string message = "Click a button!";
+        
+        [ObservableProperty]
+        [NotifyPropertyChangedFor(nameof(Toggle2))]
+        [NotifyCanExecuteChangedFor(nameof(MethodTwoCommand))]
+        [NotifyCanExecuteChangedFor(nameof(MethodFourCommand))]
+        private bool toggle;
+        
+        public bool Toggle2 => !Toggle;
+        
+        [RelayCommand]
+        
+        private void MethodOne()
+        {
+            this.Message = "MethodOne Called";
+            this.Toggle = !this.Toggle;
+        }
+        
+        [RelayCommand(CanExecute = nameof(Toggle))]
+        
+        private void MethodTwo(string parameter)
+        {
+            this.Message = $"MethodTwo Called: {parameter}";
+            this.toggle = !this.toggle;
+        }
+        
+        [RelayCommand]
+        
+        private async Task MethodThree()
+        {
+            this.Message = "MethodThree Called";
+            this.toggle = !this.toggle;
+            await Task.Delay(TimeSpan.FromSeconds(1));
+        }
+        
+        [RelayCommand(CanExecute = nameof(Toggle2))]
+        
+        private async Task MethodFour(string parameter)
+        {
+            this.Message = $"MethodFour Called: {parameter}";
+            this.toggle = !this.toggle;
+            await Task.Delay(TimeSpan.FromSeconds(1));
+        }
+        
+        
+                
         [ObservableProperty]
         [NotifyPropertyChangedFor(nameof(CoilLength))]
         public float coilWeight;
@@ -21,6 +70,18 @@ namespace PS3000.Controls
         public float coilWT;
 
         public int CoilLength => (int)Math.Round(coilWeight / coilWidth / coilWT / 7.97f * 1000, 0);
+
+        // public async Task ShowConfirmationAsync()
+        // {
+        //     var box = MessageBoxManager
+        //         .GetMessageBoxStandard("Bestätigung",
+        //             "Ansprechpartner Mail:",
+        //             ButtonEnum.YesNo);
+        //
+        //     var result = await box.ShowAsync();
+        //
+        //     // Handle the result as needed
+        // }
 
         //string connectionString = PS3000.Properties.Resources.ConnectionString;
 
@@ -83,33 +144,6 @@ namespace PS3000.Controls
         //    SearchComboStatus.SelectedIndex = -1;
         //    CoilcmbGrade.SelectedIndex = -1;
         //    CoilcmbSupplier.SelectedIndex = -1;
-        //}
-
-        //private void txtCoilsNewCoilWidth_TextChanged(object? sender, Avalonia.Interactivity.RoutedEventArgs e)
-        //{
-        //    SetCoilLength();
-        //}
-
-        //private void txtCoilsNewCoilWeight_TextChanged(object? sender, Avalonia.Interactivity.RoutedEventArgs e)
-        //{
-        //    SetCoilLength();
-        //}
-
-        //private void txtCoilsNewCoilSetWT_TextChanged(object? sender, Avalonia.Interactivity.RoutedEventArgs e)
-        //{
-        //    SetCoilLength();
-        //}
-
-        //private void SetCoilLength()
-        //{
-        //    float.TryParse(StorageCoilCode.CoiltxtWeight.Text, out float weight);
-        //    float.TryParse(CoiltxtWidth.Text, out float width);
-        //    float.TryParse(CoiltxtWT.Text, out float WT);
-        //    float formula = (weight / width / WT / 7.97f * 1000);
-
-        //    // Round the Length to 2 decimal places
-
-        //    CoiltxtLength.Text = Math.Round(formula, 0).ToString();
         //}
 
         //private void btnCoilsNewCoilSave_Click(object sender, EventArgs e)
@@ -487,144 +521,144 @@ namespace PS3000.Controls
         //    }
         //}
 
-        //public ObservableCollection<CoilSearchAttributes> CoilSearchAttribute { get; set; } = new();
-
-        //public class CoilSearchAttributes
-        //{
-        //    public string LaufendeCoilnummer { get; set; }
-        //    public string Status { get; set; }
-        //    public string WSGruppe { get; set; }
-        //    public string Charge { get; set; }
-        //    public string Wandstärke { get; set; }
-        //    public string Besäumt { get; set; }
-        //    public string Werkstoff { get; set; }
-        //    public string Kaufdatum { get; set; }
-        //    public string Lieferant { get; set; }
-        //    public string Ausführung { get; set; }
-        //    public string Breite { get; set; }
-        //    public string Gewicht { get; set; }
-        //    public string Länge { get; set; }
-        //    public string Preis { get; set; }
-        //    public string Notizen { get; set; }
-        //}
-
-        //private async void LoadCoilsInStorage(string Selectors)
-        //{
-        //    CoilSearchAttribute.Clear();
-
-        //    string query = $"SELECT * FROM lagercoils";
-
-        //    try
-        //    {
-        //        using (var connection = new MySqlConnection(connectionString))
-        //        {
-        //            connection.Open();
-
-        //            using (var command = new MySqlCommand(query, connection))
-        //            using (var reader = command.ExecuteReader())
-        //            {
-        //                while (reader.Read())
-        //                {
-        //                    var Attribute = new CoilSearchAttributes
-        //                    {
-        //                        LaufendeCoilnummer = reader[0].ToString(),
-        //                        Status = reader[1].ToString(),
-        //                        WSGruppe = reader[2].ToString(),
-        //                        Charge = reader[3].ToString(),
-        //                        Wandstärke = reader[4].ToString(),
-        //                        Besäumt = reader[5].ToString(),
-        //                        Werkstoff = reader[6].ToString(),
-        //                        Kaufdatum = reader[7].ToString(),
-        //                        Lieferant = reader[8].ToString(),
-        //                        Ausführung = reader[9].ToString(),
-        //                        Breite = reader[10].ToString(),
-        //                        Gewicht = reader[11].ToString(),
-        //                        Länge = reader[12].ToString(),
-        //                        Preis = reader[13].ToString(),
-        //                        Notizen = reader[14].ToString(),
-        //                    };
-
-        //                    CoilSearchAttribute.Add(Attribute);
-        //                }
-        //            }
-        //        }
-        //    }
-        //    catch (Exception ex)
-        //    {
-        //        // Handle errors (e.g., log them)
-        //        Console.WriteLine($"Error loading surcharges: {ex.Message}");
-        //    }
-
-
-        //    //    ListCoils.Items.Clear();
-        //    //    ListCoils.Columns.Clear();
-
-        //    //    // Add columns to the ListView
-        //    //    ListCoils.Columns.Add("Coilnummer", -2);
-        //    //    ListCoils.Columns.Add("Status", -2);
-        //    //    ListCoils.Columns.Add("WSGruppe", -2);
-        //    //    ListCoils.Columns.Add("Wandstärke", -2);
-        //    //    ListCoils.Columns.Add("Besäumt", -2);
-        //    //    ListCoils.Columns.Add("Werkstoff", -2);
-        //    //    ListCoils.Columns.Add("Kaufdatum", -2);
-        //    //    ListCoils.Columns.Add("Lieferant", -2);
-        //    //    ListCoils.Columns.Add("Ausführung", -2);
-        //    //    ListCoils.Columns.Add("Breite", -2);
-        //    //    ListCoils.Columns.Add("Gewicht", -2);
-        //    //    ListCoils.Columns.Add("Länge", -2);
-        //    //    ListCoils.Columns.Add("Preis", -2);
-        //    //    ListCoils.Columns.Add("Notizen", -2);
-
-        //    //    // Fetch total number of rows
-        //    //    int totalRows = GetTotalRowCount(Selectors);
-        //    //    const int pageSize = 1000; // Number of rows to fetch at a time
-        //    //    int totalPages = (int)Math.Ceiling((double)totalRows / pageSize);
-
-        //    //    // Fetch rows in batches
-        //    //    for (int currentPage = 0; currentPage < totalPages; currentPage++)
-        //    //    {
-        //    //        List<string[]> rows = CoilsGetRows(currentPage, pageSize, Selectors);
-
-        //    //        foreach (ColumnHeader column in ListCoils.Columns)
-        //    //        {
-        //    //            column.AutoResize(ColumnHeaderAutoResizeStyle.HeaderSize); // Resize based on header size
-        //    //        }
-
-        //    //        //await Task.Delay(250);
-
-        //    //        // Add each row to the ListView with a delay
-        //    //        foreach (var row in rows)
-        //    //        {
-        //    //            ListViewItem item = new ListViewItem(row[0]);
-
-        //    //            for (int i = 1; i < row.Length; i++)
-        //    //            {
-        //    //                item.SubItems.Add(row[i]);
-        //    //            }
-
-        //    //            ListCoils.Items.Add(item);
-        //    //        }
-        //    //    }
-
-        //    //    foreach (ColumnHeader column in ListCoils.Columns)
-        //    //    {
-        //    //        column.AutoResize(ColumnHeaderAutoResizeStyle.HeaderSize); // Resize based on header size
-        //    //    }
-        //    //}
-
-        //    //private int GetTotalRowCount(string Selectors)
-        //    //{
-        //    //    using (MySqlConnection conn = new MySqlConnection(connectionString))
-        //    //    {
-        //    //        conn.Open();
-        //    //        string countQuery = $"SELECT COUNT(*) FROM lagercoils {Selectors}";
-
-        //    //        using (MySqlCommand cmd = new MySqlCommand(countQuery, conn))
-        //    //        {
-        //    //            return Convert.ToInt32(cmd.ExecuteScalar());
-        //    //        }
-        //    //    }
-        //}
+        // public ObservableCollection<CoilSearchAttributes> CoilSearchAttribute { get; set; } = new();
+        //
+        // public class CoilSearchAttributes
+        // {
+        //     public string LaufendeCoilnummer { get; set; }
+        //     public string Status { get; set; }
+        //     public string WSGruppe { get; set; }
+        //     public string Charge { get; set; }
+        //     public string Wandstärke { get; set; }
+        //     public string Besäumt { get; set; }
+        //     public string Werkstoff { get; set; }
+        //     public string Kaufdatum { get; set; }
+        //     public string Lieferant { get; set; }
+        //     public string Ausführung { get; set; }
+        //     public string Breite { get; set; }
+        //     public string Gewicht { get; set; }
+        //     public string Länge { get; set; }
+        //     public string Preis { get; set; }
+        //     public string Notizen { get; set; }
+        // }
+        //
+        // private async void LoadCoilsInStorage(string Selectors)
+        // {
+        //     CoilSearchAttribute.Clear();
+        //
+        //     string query = $"SELECT * FROM lagercoils";
+        //
+        //     try
+        //     {
+        //         using (var connection = new MySqlConnection(connectionString))
+        //         {
+        //             connection.Open();
+        //
+        //             using (var command = new MySqlCommand(query, connection))
+        //             using (var reader = command.ExecuteReader())
+        //             {
+        //                 while (reader.Read())
+        //                 {
+        //                     var Attribute = new CoilSearchAttributes
+        //                     {
+        //                         LaufendeCoilnummer = reader[0].ToString(),
+        //                         Status = reader[1].ToString(),
+        //                         WSGruppe = reader[2].ToString(),
+        //                         Charge = reader[3].ToString(),
+        //                         Wandstärke = reader[4].ToString(),
+        //                         Besäumt = reader[5].ToString(),
+        //                         Werkstoff = reader[6].ToString(),
+        //                         Kaufdatum = reader[7].ToString(),
+        //                         Lieferant = reader[8].ToString(),
+        //                         Ausführung = reader[9].ToString(),
+        //                         Breite = reader[10].ToString(),
+        //                         Gewicht = reader[11].ToString(),
+        //                         Länge = reader[12].ToString(),
+        //                         Preis = reader[13].ToString(),
+        //                         Notizen = reader[14].ToString(),
+        //                     };
+        //
+        //                     CoilSearchAttribute.Add(Attribute);
+        //                 }
+        //             }
+        //         }
+        //     }
+        //     catch (Exception ex)
+        //     {
+        //         // Handle errors (e.g., log them)
+        //         Console.WriteLine($"Error loading surcharges: {ex.Message}");
+        //     }
+        //
+        //
+        //     //    ListCoils.Items.Clear();
+        //     //    ListCoils.Columns.Clear();
+        //
+        //     //    // Add columns to the ListView
+        //     //    ListCoils.Columns.Add("Coilnummer", -2);
+        //     //    ListCoils.Columns.Add("Status", -2);
+        //     //    ListCoils.Columns.Add("WSGruppe", -2);
+        //     //    ListCoils.Columns.Add("Wandstärke", -2);
+        //     //    ListCoils.Columns.Add("Besäumt", -2);
+        //     //    ListCoils.Columns.Add("Werkstoff", -2);
+        //     //    ListCoils.Columns.Add("Kaufdatum", -2);
+        //     //    ListCoils.Columns.Add("Lieferant", -2);
+        //     //    ListCoils.Columns.Add("Ausführung", -2);
+        //     //    ListCoils.Columns.Add("Breite", -2);
+        //     //    ListCoils.Columns.Add("Gewicht", -2);
+        //     //    ListCoils.Columns.Add("Länge", -2);
+        //     //    ListCoils.Columns.Add("Preis", -2);
+        //     //    ListCoils.Columns.Add("Notizen", -2);
+        //
+        //     //    // Fetch total number of rows
+        //     //    int totalRows = GetTotalRowCount(Selectors);
+        //     //    const int pageSize = 1000; // Number of rows to fetch at a time
+        //     //    int totalPages = (int)Math.Ceiling((double)totalRows / pageSize);
+        //
+        //     //    // Fetch rows in batches
+        //     //    for (int currentPage = 0; currentPage < totalPages; currentPage++)
+        //     //    {
+        //     //        List<string[]> rows = CoilsGetRows(currentPage, pageSize, Selectors);
+        //
+        //     //        foreach (ColumnHeader column in ListCoils.Columns)
+        //     //        {
+        //     //            column.AutoResize(ColumnHeaderAutoResizeStyle.HeaderSize); // Resize based on header size
+        //     //        }
+        //
+        //     //        //await Task.Delay(250);
+        //
+        //     //        // Add each row to the ListView with a delay
+        //     //        foreach (var row in rows)
+        //     //        {
+        //     //            ListViewItem item = new ListViewItem(row[0]);
+        //
+        //     //            for (int i = 1; i < row.Length; i++)
+        //     //            {
+        //     //                item.SubItems.Add(row[i]);
+        //     //            }
+        //
+        //     //            ListCoils.Items.Add(item);
+        //     //        }
+        //     //    }
+        //
+        //     //    foreach (ColumnHeader column in ListCoils.Columns)
+        //     //    {
+        //     //        column.AutoResize(ColumnHeaderAutoResizeStyle.HeaderSize); // Resize based on header size
+        //     //    }
+        //     //}
+        //
+        //     //private int GetTotalRowCount(string Selectors)
+        //     //{
+        //     //    using (MySqlConnection conn = new MySqlConnection(connectionString))
+        //     //    {
+        //     //        conn.Open();
+        //     //        string countQuery = $"SELECT COUNT(*) FROM lagercoils {Selectors}";
+        //
+        //     //        using (MySqlCommand cmd = new MySqlCommand(countQuery, conn))
+        //     //        {
+        //     //            return Convert.ToInt32(cmd.ExecuteScalar());
+        //     //        }
+        //     //    }
+        // }
 
         //private List<string[]> CoilsGetRows(int pageNumber, int pageSize, string Selectors)
         //{

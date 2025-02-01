@@ -9,7 +9,7 @@ public class MainViewModel : ViewModelBase
     public ObservableCollection<Surcharges> SurchargeData { get; set; }
     public ObservableCollection<Positions> InquiryPositions { get; set; }
 
-    public StorageCoilCode StorageCoil { get; } = new();
+    public StorageCoilViewModel StorageCoil { get; } = new();
 
     public MainViewModel()
     {

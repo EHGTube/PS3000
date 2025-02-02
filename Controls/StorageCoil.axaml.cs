@@ -6,6 +6,7 @@ using MySql.Data.MySqlClient;
 using System.Collections.Generic;
 using System;
 using System.Collections.ObjectModel;
+using Avalonia.Interactivity;
 using static PS3000.ViewModels.MainViewModel;
 using DynamicData;
 using static PS3000.StorageCoil;

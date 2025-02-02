@@ -16,10 +16,10 @@
 			<TextBlock Text="Wandstärke:" Grid.Row="0" Grid.Column="2"/>
 			<TextBlock Text="Status:" Grid.Row="0" Grid.Column="3"/>
 
-			<ComboBox SelectedIndex="0" MaxDropDownHeight="100" Grid.Row="1" Grid.Column="0" Name="SearchComboSupplier">
+			<ComboBox SelectedIndex="0" MaxDropDownHeight="100" Grid.Row="1" Grid.Column="0" ItemsSource="{Binding CoilSuppliers}">
 			</ComboBox>
 
-			<ComboBox SelectedIndex="0" MaxDropDownHeight="100" Grid.Row="1" Grid.Column="1" Name="SearchComboGrade">
+			<ComboBox SelectedIndex="0" MaxDropDownHeight="100" Grid.Row="1" Grid.Column="1" ItemsSource="{Binding CoilGrades}">
 			</ComboBox>
 
 			<ComboBox SelectedIndex="0" MaxDropDownHeight="100" Grid.Row="1" Grid.Column="2" Name="SearchComboWT">
@@ -87,7 +87,7 @@
 			<TextBox Grid.Row="2" Grid.Column="1" Text="{Binding Path=CoilWT}" Watermark="Ist WS"/>
 			
 			<TextBlock Text="Werkstoff:" Grid.Row="3" Grid.Column="0"/>
-			<ComboBox SelectedIndex="0" MaxDropDownHeight="100" HorizontalAlignment="Stretch" Grid.Row="3" Grid.Column="1" Name="CoilcmbGrade">
+			<ComboBox SelectedIndex="0" MaxDropDownHeight="100" HorizontalAlignment="Stretch" Grid.Row="3" Grid.Column="1" ItemsSource="{Binding CoilGrades}">
 			</ComboBox>
 			
 			<TextBlock Text="Kaufdatum:" Grid.Row="4" Grid.Column="0"/>
@@ -97,7 +97,7 @@
 			<TextBox Grid.Row="5" Grid.Column="1" Watermark="Charge"/>
 			
 			<TextBlock Text="Lieferant:" Grid.Row="6" Grid.Column="0"/>
-			<ComboBox SelectedIndex="0" MaxDropDownHeight="100" Grid.Row="6" HorizontalAlignment="Stretch" Grid.Column="1" Name="CoilcmbSupplier">
+			<ComboBox SelectedIndex="0" MaxDropDownHeight="100" Grid.Row="6" HorizontalAlignment="Stretch" Grid.Column="1" ItemsSource="{Binding CoilSuppliers}" >
 			</ComboBox>
 			
 			<TextBlock Text="Ausführung:" Grid.Row="7" Grid.Column="0"/>
@@ -138,12 +138,15 @@
 			<TextBlock Text="Preis €/kg:" Grid.Row="12" Grid.Column="0"/>
 			<TextBox Grid.Row="12" Grid.Column="1" Watermark="Preis €/kg"/>
 			
-			<Button Grid.Row="13" Grid.Column="1" Content="MethodOne" Command="{Binding MethodOneCommand}" HorizontalContentAlignment="Center" HorizontalAlignment="Stretch" ></Button>
-			<Button Grid.Row="14" Grid.Column="1" Content="MethodTwo" Command="{Binding MethodTwoCommand}" CommandParameter="5" HorizontalContentAlignment="Center" HorizontalAlignment="Stretch" ></Button>
-			<Button Grid.Row="15" Grid.Column="1" Content="MethodThree" Command="{Binding MethodThreeCommand}" HorizontalContentAlignment="Center" HorizontalAlignment="Stretch" ></Button>
-			<Button Grid.Row="16" Grid.Column="1" Content="MethodFour" Command="{Binding MethodFourCommand}" CommandParameter="3" HorizontalContentAlignment="Center" HorizontalAlignment="Stretch" ></Button>
-			<TextBlock Grid.Row="17" Grid.Column="1" Text="{Binding Message}"  ></TextBlock>
-			<CheckBox Grid.Row="18" Grid.Column="1" IsChecked="{Binding Toggle}" ></CheckBox>
+			<Button Grid.Row="13" Grid.Column="1" Content="Coil Speichern" Command="{Binding MethodOneCommand}" HorizontalContentAlignment="Center" HorizontalAlignment="Stretch" ></Button>
+			<Button Grid.Row="14" Grid.Column="1" Content="Alles Laden" Command="{Binding GridLoadedCommand}" HorizontalContentAlignment="Center" HorizontalAlignment="Stretch" ></Button>
+
+			<Button Grid.Row="15" Grid.Column="1" Content="MethodOne" Command="{Binding MethodOneCommand}" HorizontalContentAlignment="Center" HorizontalAlignment="Stretch" ></Button>
+			<Button Grid.Row="16" Grid.Column="1" Content="MethodTwo" Command="{Binding MethodTwoCommand}" CommandParameter="5" HorizontalContentAlignment="Center" HorizontalAlignment="Stretch" ></Button>
+			<Button Grid.Row="17" Grid.Column="1" Content="MethodThree" Command="{Binding MethodThreeCommand}" HorizontalContentAlignment="Center" HorizontalAlignment="Stretch" ></Button>
+			<Button Grid.Row="18" Grid.Column="1" Content="MethodFour" Command="{Binding MethodFourCommand}" CommandParameter="3" HorizontalContentAlignment="Center" HorizontalAlignment="Stretch" ></Button>
+			<TextBlock Grid.Row="19" Grid.Column="1" Text="{Binding Message}"  ></TextBlock>
+			<CheckBox Grid.Row="20" Grid.Column="1" IsChecked="{Binding Toggle}" ></CheckBox>
 
 		</Grid>	
 	</Grid>

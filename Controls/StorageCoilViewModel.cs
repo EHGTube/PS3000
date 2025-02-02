@@ -1,12 +1,14 @@
 ﻿using CommunityToolkit.Mvvm.ComponentModel;
 using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using CommunityToolkit.Mvvm.Input;
 using MsBox.Avalonia;
 using MsBox.Avalonia.Enums;
+using MySql.Data.MySqlClient;
 
 namespace PS3000.Controls
 {
@@ -52,9 +54,16 @@ namespace PS3000.Controls
         
         private async Task MethodFour(string parameter)
         {
-            this.Message = $"MethodFour Called: {parameter}";
+
+            
+            var box = MessageBoxManager
+                .GetMessageBoxStandard("Bestätigung",
+                    $"MethodFour Called: {parameter}",
+                    ButtonEnum.YesNo);
+            
+            var result = await box.ShowAsync();
+            
             this.toggle = !this.toggle;
-            await Task.Delay(TimeSpan.FromSeconds(1));
         }
         
         
@@ -70,80 +79,111 @@ namespace PS3000.Controls
         public float coilWT;
 
         public int CoilLength => (int)Math.Round(coilWeight / coilWidth / coilWT / 7.97f * 1000, 0);
+        
+        string ConnectionString = PS3000.Properties.Resources.ConnectionString;
+        
+        [ObservableProperty]
+        private ObservableCollection<string> coilSuppliers = new();
+        [ObservableProperty]
+        private ObservableCollection<string> coilGrades = new();
 
-        // public async Task ShowConfirmationAsync()
+        public StorageCoilViewModel()
+        {
+            LoadDataAsync();
+        }
+
+        [RelayCommand]
+        private async Task LoadDataAsync()
+        {
+            try
+            {
+                using var connection = new MySqlConnection(ConnectionString);
+                await connection.OpenAsync();
+
+                string query = "SELECT * FROM lieferanten;";
+                using var command = new MySqlCommand(query, connection);
+                using var reader = await command.ExecuteReaderAsync();
+
+                CoilSuppliers.Clear();
+                while (await reader.ReadAsync())
+                {
+                    CoilSuppliers.Add(reader["Name"].ToString());
+
+                }
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Error loading data: {ex.Message}");
+            }
+            
+            try
+            {
+                using var connection = new MySqlConnection(ConnectionString);
+                await connection.OpenAsync();
+
+                string query = "SELECT * FROM werkstoffe;";
+                using var command = new MySqlCommand(query, connection);
+                using var reader = await command.ExecuteReaderAsync();
+
+                CoilGrades.Clear();
+                while (await reader.ReadAsync())
+                {
+                    CoilGrades.Add(reader["Werkstoff"].ToString());
+
+                }
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Error loading data: {ex.Message}");
+            }
+        }        
+        
+        
+        
+        [RelayCommand]
+        private async void GridLoaded()
+        { 
+        // query = "SELECT * FROM werkstoffe";
+        //
+        // try
         // {
-        //     var box = MessageBoxManager
-        //         .GetMessageBoxStandard("Bestätigung",
-        //             "Ansprechpartner Mail:",
-        //             ButtonEnum.YesNo);
+        //     using (var connection = new MySqlConnection(connectionString))
+        //     {
+        //         connection.Open();
         //
-        //     var result = await box.ShowAsync();
-        //
-        //     // Handle the result as needed
+        //         using (var command = new MySqlCommand(query, connection))
+        //         using (var reader = command.ExecuteReader())
+        //         {
+        //             while (reader.Read())
+        //             {
+        //                 //Serach CMB Grade
+        //                 // Coil Creation Grade
+        //                 
+        //                 //SearchComboGrade.Items.Add(reader["Werkstoff"].ToString());
+        //                 //CoilcmbGrade.Items.Add(reader["Werkstoff"].ToString());
+        //             }
+        //         }
+        //     }
+        // }
+        // catch (Exception ex)
+        // {
+        //     // Handle errors (e.g., log them)
+        //     Console.WriteLine($"Error loading surcharges: {ex.Message}");
         // }
 
-        //string connectionString = PS3000.Properties.Resources.ConnectionString;
-
+        // SearchComboSupplier.SelectedIndex = -1;
+        // SearchComboGrade.SelectedIndex = -1;
+        // SearchComboWT.SelectedIndex = -1;
+        // SearchComboStatus.SelectedIndex = -1;
+        // CoilcmbGrade.SelectedIndex = -1;
+        // CoilcmbSupplier.SelectedIndex = -1;
+        }
+        
+        
+        
         //private void PopulateLists()
         //{
-        //    string query = "SELECT * FROM lieferanten";
-
-        //    try
-        //    {
-        //        using (var connection = new MySqlConnection(connectionString))
-        //        {
-        //            connection.Open();
-
-        //            using (var command = new MySqlCommand(query, connection))
-        //            using (var reader = command.ExecuteReader())
-        //            {
-        //                while (reader.Read())
-        //                {
-        //                    SearchComboSupplier.Items.Add(reader["Name"].ToString());
-        //                    CoilcmbSupplier.Items.Add(reader["Name"].ToString());
-        //                }
-        //            }
-        //        }
-        //    }
-        //    catch (Exception ex)
-        //    {
-        //        // Handle errors (e.g., log them)
-        //        Console.WriteLine($"Error loading surcharges: {ex.Message}");
-        //    }
-
-        //    query = "SELECT * FROM werkstoffe";
-
-        //    try
-        //    {
-        //        using (var connection = new MySqlConnection(connectionString))
-        //        {
-        //            connection.Open();
-
-        //            using (var command = new MySqlCommand(query, connection))
-        //            using (var reader = command.ExecuteReader())
-        //            {
-        //                while (reader.Read())
-        //                {
-        //                    SearchComboGrade.Items.Add(reader["Werkstoff"].ToString());
-        //                    CoilcmbGrade.Items.Add(reader["Werkstoff"].ToString());
-        //                }
-        //            }
-        //        }
-        //    }
-        //    catch (Exception ex)
-        //    {
-        //        // Handle errors (e.g., log them)
-        //        Console.WriteLine($"Error loading surcharges: {ex.Message}");
-        //    }
-
-
-        //    SearchComboSupplier.SelectedIndex = -1;
-        //    SearchComboGrade.SelectedIndex = -1;
-        //    SearchComboWT.SelectedIndex = -1;
-        //    SearchComboStatus.SelectedIndex = -1;
-        //    CoilcmbGrade.SelectedIndex = -1;
-        //    CoilcmbSupplier.SelectedIndex = -1;
+        //    
         //}
 
         //private void btnCoilsNewCoilSave_Click(object sender, EventArgs e)

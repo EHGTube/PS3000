@@ -54,8 +54,6 @@ namespace PS3000.Controls
         
         private async Task MethodFour(string parameter)
         {
-
-            
             var box = MessageBoxManager
                 .GetMessageBoxStandard("Bestätigung",
                     $"MethodFour Called: {parameter}",
@@ -86,6 +84,10 @@ namespace PS3000.Controls
         private ObservableCollection<string> coilSuppliers = new();
         [ObservableProperty]
         private ObservableCollection<string> coilGrades = new();
+        [ObservableProperty]
+        private ObservableCollection<string> coilWTGroups = new();
+        [ObservableProperty]
+        private ObservableCollection<string> coilWTStatus = new();
 
         public StorageCoilViewModel()
         {
@@ -136,55 +138,196 @@ namespace PS3000.Controls
             {
                 Console.WriteLine($"Error loading data: {ex.Message}");
             }
+            
+            try
+            {
+                using var connection = new MySqlConnection(ConnectionString);
+                await connection.OpenAsync();
+
+                string query = "SELECT * FROM coilswsgruppen;";
+                using var command = new MySqlCommand(query, connection);
+                using var reader = await command.ExecuteReaderAsync();
+
+                CoilWTGroups.Clear();
+                while (await reader.ReadAsync())
+                {
+                    CoilWTGroups.Add(reader["WSGruppe"].ToString());
+
+                }
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Error loading data: {ex.Message}");
+            }
+            
+            try
+            {
+                using var connection = new MySqlConnection(ConnectionString);
+                await connection.OpenAsync();
+
+                string query = "SELECT * FROM coilstatus;";
+                using var command = new MySqlCommand(query, connection);
+                using var reader = await command.ExecuteReaderAsync();
+
+                coilWTStatus.Clear();
+                while (await reader.ReadAsync())
+                {
+                    coilWTStatus.Add(reader["Beschreibung"].ToString());
+
+                }
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Error loading data: {ex.Message}");
+            }
         }        
         
         
+        [ObservableProperty]
+        private ObservableCollection<CoilAttribute> coilSearchAttributes = new();
         
-        [RelayCommand]
-        private async void GridLoaded()
-        { 
-        // query = "SELECT * FROM werkstoffe";
-        //
-        // try
-        // {
-        //     using (var connection = new MySqlConnection(connectionString))
-        //     {
-        //         connection.Open();
-        //
-        //         using (var command = new MySqlCommand(query, connection))
-        //         using (var reader = command.ExecuteReader())
-        //         {
-        //             while (reader.Read())
-        //             {
-        //                 //Serach CMB Grade
-        //                 // Coil Creation Grade
-        //                 
-        //                 //SearchComboGrade.Items.Add(reader["Werkstoff"].ToString());
-        //                 //CoilcmbGrade.Items.Add(reader["Werkstoff"].ToString());
-        //             }
-        //         }
-        //     }
-        // }
-        // catch (Exception ex)
-        // {
-        //     // Handle errors (e.g., log them)
-        //     Console.WriteLine($"Error loading surcharges: {ex.Message}");
-        // }
+        [ObservableProperty]
+        private string selectedWallThickness;
+        [ObservableProperty]
+        private string selectedGrade;
+        [ObservableProperty]
+        private string selectedSupplier;
+        [ObservableProperty]
+        private string selectedStatus;
 
-        // SearchComboSupplier.SelectedIndex = -1;
-        // SearchComboGrade.SelectedIndex = -1;
-        // SearchComboWT.SelectedIndex = -1;
-        // SearchComboStatus.SelectedIndex = -1;
-        // CoilcmbGrade.SelectedIndex = -1;
-        // CoilcmbSupplier.SelectedIndex = -1;
-        }
-        
-        
-        
-        //private void PopulateLists()
-        //{
-        //    
-        //}
+        [RelayCommand]
+        private async Task LoadCoilsInStorageAsync()        
+        {
+            string GradeQuery = "";
+            string SupplierQuery = "";
+            string WTQuery = ""; 
+            string Addon = "";
+            string StatusQuery = "";
+            
+                
+                if (!String.IsNullOrEmpty(SelectedWallThickness) || !String.IsNullOrEmpty(selectedGrade) || !String.IsNullOrEmpty(selectedSupplier) || !String.IsNullOrEmpty(selectedStatus))
+                {
+                
+                    if (!String.IsNullOrEmpty(SelectedWallThickness))
+                    {
+                        WTQuery = $@"WSGruppe = '{SelectedWallThickness}'";
+                    }
+                
+                    if (!String.IsNullOrEmpty(selectedGrade))
+                    {
+                        if (!String.IsNullOrEmpty(SelectedWallThickness))
+                        {
+                            GradeQuery = $@" AND Werkstoff = '{selectedGrade}'";
+                        }
+                        else
+                        {
+                            GradeQuery = $@"Werkstoff = '{selectedGrade}'";
+                        }
+                    }
+                
+                    if (!String.IsNullOrEmpty(selectedSupplier))
+                    {
+                        if (!String.IsNullOrEmpty(SelectedWallThickness) || !String.IsNullOrEmpty(selectedGrade))
+                        {
+                            SupplierQuery = $@" AND Lieferant = '{selectedSupplier}'";
+                        }
+                        else
+                        {
+                            SupplierQuery = $@"Lieferant = '{selectedSupplier}'";
+                        }
+                    }
+                
+                    if (!String.IsNullOrEmpty(selectedStatus))
+                    {
+                        if (!String.IsNullOrEmpty(selectedSupplier) || !String.IsNullOrEmpty(selectedGrade) || !String.IsNullOrEmpty(SelectedWallThickness))
+                        {
+                            StatusQuery = $@" AND Status = '{selectedStatus}' OR Status IS NULL";
+                        }
+                        else
+                        {
+                            StatusQuery = $@"Status = '{selectedStatus}'";
+                        }
+                    }
+                
+                    // Build and execute the query
+                    Addon = $@"WHERE {WTQuery}{GradeQuery}{SupplierQuery}{StatusQuery}";
+                }
+            
+            
+            CoilSearchAttributes.Clear();
+
+            string query = "SELECT * FROM lagercoils " + Addon;
+            
+            Console.WriteLine(query);
+
+            try
+            {
+                using var connection = new MySqlConnection(ConnectionString);
+                await connection.OpenAsync();
+
+                using var command = new MySqlCommand(query, connection);
+                using var reader = await command.ExecuteReaderAsync();
+
+                while (await reader.ReadAsync())
+                {
+                    var statusValue = int.Parse(reader[1]?.ToString() ?? "0");
+                    var ausführungValue = int.Parse(reader[9]?.ToString() ?? "0");
+
+                    var attribute = new CoilAttribute
+                    {
+                        LaufendeCoilnummer = int.Parse(reader[0]?.ToString() ?? "0"),
+                        Status = statusValue switch
+                        {
+                            0 => "Unbekannt",
+                            1 => "Zu Lieferant Unterwegs",
+                            2 => "Lager Lieferant",
+                            3 => "Unterwegs zu EHG",
+                            4 => "Lager",
+                            5 => "Spaltplan",
+                            6 => "Gespalten",
+                            7 => "Verarbeitet",
+                            8 => "Band",
+                            9 => "Restband",
+                            _ => "Unbekannt"
+                        },
+                        WSGruppe = float.Parse(reader[2]?.ToString() ?? "0"),
+                        Charge = reader[3]?.ToString() ?? string.Empty,
+                        Wandstärke = float.Parse(reader[4]?.ToString() ?? "0"),
+                        Besäumt = reader[5].ToString() == "1" ? "Ja" : "Nein",
+                        Werkstoff = await GetFieldValueAsync("Werkstoff", reader[6].ToString(), "werkstoffe", "LaufendeWerkstoffnummer"),
+                        //Werkstoff = reader[6]?.ToString() ?? string.Empty,
+                        Kaufdatum = DateTime.TryParse(reader[7]?.ToString(), out var kaufDatum) 
+                            ? kaufDatum.ToString("yyyy-MM-dd") 
+                            : string.Empty,
+                        Lieferant = reader[8]?.ToString() ?? string.Empty,
+                        Ausführung = ausführungValue switch
+                        {
+                            0 => "1C",
+                            1 => "1E",
+                            2 => "1D",
+                            3 => "2C",
+                            4 => "2E",
+                            5 => "2D",
+                            6 => "2B",
+                            7 => "2R",
+                            _ => "Unbekannt"
+                        },
+                        Breite = int.Parse(reader[10]?.ToString() ?? "0"),
+                        Gewicht = int.Parse(reader[11]?.ToString() ?? "0"),
+                        Länge = int.Parse(reader[12]?.ToString() ?? "0"),
+                        Preis = float.Parse(reader[13]?.ToString() ?? "0"),
+                        Notizen = reader[14]?.ToString() ?? string.Empty,
+                    };
+
+                    CoilSearchAttributes.Add(attribute);
+                }
+
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Error loading coils: {ex.Message}");
+            }
+         }
 
         //private void btnCoilsNewCoilSave_Click(object sender, EventArgs e)
         //{
@@ -559,311 +702,6 @@ namespace PS3000.Controls
         //            }
         //        }
         //    }
-        //}
-
-        // public ObservableCollection<CoilSearchAttributes> CoilSearchAttribute { get; set; } = new();
-        //
-        // public class CoilSearchAttributes
-        // {
-        //     public string LaufendeCoilnummer { get; set; }
-        //     public string Status { get; set; }
-        //     public string WSGruppe { get; set; }
-        //     public string Charge { get; set; }
-        //     public string Wandstärke { get; set; }
-        //     public string Besäumt { get; set; }
-        //     public string Werkstoff { get; set; }
-        //     public string Kaufdatum { get; set; }
-        //     public string Lieferant { get; set; }
-        //     public string Ausführung { get; set; }
-        //     public string Breite { get; set; }
-        //     public string Gewicht { get; set; }
-        //     public string Länge { get; set; }
-        //     public string Preis { get; set; }
-        //     public string Notizen { get; set; }
-        // }
-        //
-        // private async void LoadCoilsInStorage(string Selectors)
-        // {
-        //     CoilSearchAttribute.Clear();
-        //
-        //     string query = $"SELECT * FROM lagercoils";
-        //
-        //     try
-        //     {
-        //         using (var connection = new MySqlConnection(connectionString))
-        //         {
-        //             connection.Open();
-        //
-        //             using (var command = new MySqlCommand(query, connection))
-        //             using (var reader = command.ExecuteReader())
-        //             {
-        //                 while (reader.Read())
-        //                 {
-        //                     var Attribute = new CoilSearchAttributes
-        //                     {
-        //                         LaufendeCoilnummer = reader[0].ToString(),
-        //                         Status = reader[1].ToString(),
-        //                         WSGruppe = reader[2].ToString(),
-        //                         Charge = reader[3].ToString(),
-        //                         Wandstärke = reader[4].ToString(),
-        //                         Besäumt = reader[5].ToString(),
-        //                         Werkstoff = reader[6].ToString(),
-        //                         Kaufdatum = reader[7].ToString(),
-        //                         Lieferant = reader[8].ToString(),
-        //                         Ausführung = reader[9].ToString(),
-        //                         Breite = reader[10].ToString(),
-        //                         Gewicht = reader[11].ToString(),
-        //                         Länge = reader[12].ToString(),
-        //                         Preis = reader[13].ToString(),
-        //                         Notizen = reader[14].ToString(),
-        //                     };
-        //
-        //                     CoilSearchAttribute.Add(Attribute);
-        //                 }
-        //             }
-        //         }
-        //     }
-        //     catch (Exception ex)
-        //     {
-        //         // Handle errors (e.g., log them)
-        //         Console.WriteLine($"Error loading surcharges: {ex.Message}");
-        //     }
-        //
-        //
-        //     //    ListCoils.Items.Clear();
-        //     //    ListCoils.Columns.Clear();
-        //
-        //     //    // Add columns to the ListView
-        //     //    ListCoils.Columns.Add("Coilnummer", -2);
-        //     //    ListCoils.Columns.Add("Status", -2);
-        //     //    ListCoils.Columns.Add("WSGruppe", -2);
-        //     //    ListCoils.Columns.Add("Wandstärke", -2);
-        //     //    ListCoils.Columns.Add("Besäumt", -2);
-        //     //    ListCoils.Columns.Add("Werkstoff", -2);
-        //     //    ListCoils.Columns.Add("Kaufdatum", -2);
-        //     //    ListCoils.Columns.Add("Lieferant", -2);
-        //     //    ListCoils.Columns.Add("Ausführung", -2);
-        //     //    ListCoils.Columns.Add("Breite", -2);
-        //     //    ListCoils.Columns.Add("Gewicht", -2);
-        //     //    ListCoils.Columns.Add("Länge", -2);
-        //     //    ListCoils.Columns.Add("Preis", -2);
-        //     //    ListCoils.Columns.Add("Notizen", -2);
-        //
-        //     //    // Fetch total number of rows
-        //     //    int totalRows = GetTotalRowCount(Selectors);
-        //     //    const int pageSize = 1000; // Number of rows to fetch at a time
-        //     //    int totalPages = (int)Math.Ceiling((double)totalRows / pageSize);
-        //
-        //     //    // Fetch rows in batches
-        //     //    for (int currentPage = 0; currentPage < totalPages; currentPage++)
-        //     //    {
-        //     //        List<string[]> rows = CoilsGetRows(currentPage, pageSize, Selectors);
-        //
-        //     //        foreach (ColumnHeader column in ListCoils.Columns)
-        //     //        {
-        //     //            column.AutoResize(ColumnHeaderAutoResizeStyle.HeaderSize); // Resize based on header size
-        //     //        }
-        //
-        //     //        //await Task.Delay(250);
-        //
-        //     //        // Add each row to the ListView with a delay
-        //     //        foreach (var row in rows)
-        //     //        {
-        //     //            ListViewItem item = new ListViewItem(row[0]);
-        //
-        //     //            for (int i = 1; i < row.Length; i++)
-        //     //            {
-        //     //                item.SubItems.Add(row[i]);
-        //     //            }
-        //
-        //     //            ListCoils.Items.Add(item);
-        //     //        }
-        //     //    }
-        //
-        //     //    foreach (ColumnHeader column in ListCoils.Columns)
-        //     //    {
-        //     //        column.AutoResize(ColumnHeaderAutoResizeStyle.HeaderSize); // Resize based on header size
-        //     //    }
-        //     //}
-        //
-        //     //private int GetTotalRowCount(string Selectors)
-        //     //{
-        //     //    using (MySqlConnection conn = new MySqlConnection(connectionString))
-        //     //    {
-        //     //        conn.Open();
-        //     //        string countQuery = $"SELECT COUNT(*) FROM lagercoils {Selectors}";
-        //
-        //     //        using (MySqlCommand cmd = new MySqlCommand(countQuery, conn))
-        //     //        {
-        //     //            return Convert.ToInt32(cmd.ExecuteScalar());
-        //     //        }
-        //     //    }
-        // }
-
-        //private List<string[]> CoilsGetRows(int pageNumber, int pageSize, string Selectors)
-        //{
-        //    var results = new List<string[]>();
-        //    int offset = pageNumber * pageSize;
-
-        //    using (MySqlConnection conn = new MySqlConnection(connectionString))
-        //    {
-        //        conn.Open();
-        //        string query = $"SELECT LaufendeCoilnummer, Status, WSGruppe, Wandstarke, Besaumt, Werkstoff, Kaufdatum, Lieferant, Ausfuhrung, Breite, Gewicht, Lange, Preis, Notizen FROM lagercoils {Selectors} LIMIT {pageSize} OFFSET {offset}";
-
-        //        using (MySqlCommand cmd = new MySqlCommand(query, conn))
-        //        {
-        //            using (MySqlDataReader reader = cmd.ExecuteReader())
-        //            {
-        //                while (reader.Read())
-        //                {
-        //                    string WSGruppe = reader["WSGruppe"].ToString();
-        //                    string Wandstarke = reader["Wandstarke"].ToString();
-
-        //                    string Besaumt = reader["Besaumt"].ToString() == "1" ? "Ja" : "Nein";
-        //                    string Werkstoff = GetFieldValue("Werkstoff", reader["Werkstoff"].ToString(), "werkstoffe", "LaufendeWerkstoffnummer");
-
-        //                    DateTime kaufdatum = Convert.ToDateTime(reader["Kaufdatum"]);
-        //                    string Kaufdatum = kaufdatum.ToString("yyyy-MM-dd");
-        //                    string Lieferant = GetFieldValue("Name", reader["Lieferant"].ToString(), "lieferanten", "LaufendeLieferantennummer");
-        //                    string Ausfuhrung = reader["Ausfuhrung"].ToString();
-        //                    string Breite = reader["Breite"].ToString();
-        //                    string Gewicht = reader["Gewicht"].ToString();
-        //                    string Lange = reader["Lange"].ToString();
-        //                    string Preis = reader["Preis"].ToString();
-        //                    string Notizen = reader["Notizen"].ToString();
-        //                    string Status = reader["Status"].ToString();
-
-        //                    switch (int.Parse(Ausfuhrung))
-        //                    {
-        //                        case 0:
-        //                            Ausfuhrung = "1C";
-        //                            break;
-        //                        case 1:
-        //                            Ausfuhrung = "1E";
-        //                            break;
-        //                        case 2:
-        //                            Ausfuhrung = "1D";
-        //                            break;
-        //                        case 3:
-        //                            Ausfuhrung = "2C";
-        //                            break;
-        //                        case 4:
-        //                            Ausfuhrung = "2E";
-        //                            break;
-        //                        case 5:
-        //                            Ausfuhrung = "2D";
-        //                            break;
-        //                        case 6:
-        //                            Ausfuhrung = "2B";
-        //                            break;
-        //                        case 7:
-        //                            Ausfuhrung = "2R";
-        //                            break;
-        //                    }
-
-
-        //                    if (String.IsNullOrEmpty(Status)) { Status = "0"; };
-        //                    switch (int.Parse(Status))
-        //                    {
-        //                        case 0:
-        //                            Status = "Unbekannt";
-        //                            break;
-        //                        case 1:
-        //                            Status = "Zu Lieferant Unterwegs";
-        //                            break;
-        //                        case 2:
-        //                            Status = "Lager Lieferant";
-        //                            break;
-        //                        case 3:
-        //                            Status = "Unterwegs zu EHG";
-        //                            break;
-        //                        case 4:
-        //                            Status = "Lager";
-        //                            break;
-        //                        case 5:
-        //                            Status = "Spaltplan";
-        //                            break;
-        //                        case 6:
-        //                            Status = "Gespalten";
-        //                            break;
-        //                        case 7:
-        //                            Status = "Verarbeitet";
-        //                            break;
-        //                        case 8:
-        //                            Status = "Band";
-        //                            break;
-        //                        case 9:
-        //                            Status = "Restband";
-        //                            break;
-
-        //                    }
-
-        //                    string LaufendeCoilnummer = reader["LaufendeCoilnummer"].ToString();
-
-        //                    results.Add(new string[] { LaufendeCoilnummer, Status, WSGruppe, Wandstarke, Besaumt, Werkstoff, Kaufdatum, Lieferant, Ausfuhrung, Breite, Gewicht, Lange, Preis, Notizen });
-        //                }
-        //            }
-        //        }
-        //    }
-        //    return results;
-
-        //private void btnCoilsSearch_Click(object? sender, Avalonia.Interactivity.RoutedEventArgs e)
-        //{
-        //    string GradeQuery = "";
-        //    string SupplierQuery = "";
-        //    string WTQuery = "";
-        //    string query = "";
-        //    string StatusQuery = "";
-
-        //    if (SearchComboWT.SelectedIndex != -1 || SearchComboGrade.SelectedIndex != -1 || SearchComboSupplier.SelectedIndex != -1 || SearchComboStatus.SelectedIndex != -1)
-        //    {
-
-        //        if (SearchComboWT.SelectedIndex != -1)
-        //        {
-        //            WTQuery = $@"WSGruppe = '{SearchComboWT.SelectedItem}'";
-        //        }
-
-        //        if (SearchComboGrade.SelectedIndex != -1)
-        //        {
-        //            if (SearchComboWT.SelectedIndex != -1)
-        //            {
-        //                GradeQuery = $@" AND Werkstoff = '{SearchComboGrade.SelectedIndex + 1}'";
-        //            }
-        //            else
-        //            {
-        //                GradeQuery = $@"Werkstoff = '{SearchComboGrade.SelectedIndex + 1}'";
-        //            }
-        //        }
-
-        //        if (SearchComboSupplier.SelectedIndex != -1)
-        //        {
-        //            if (SearchComboWT.SelectedIndex != -1 || SearchComboGrade.SelectedIndex != -1)
-        //            {
-        //                SupplierQuery = $@" AND Lieferant = '{SearchComboSupplier.SelectedIndex}'";
-        //            }
-        //            else
-        //            {
-        //                SupplierQuery = $@"Lieferant = '{SearchComboSupplier.SelectedIndex}'";
-        //            }
-        //        }
-
-        //        if (SearchComboStatus.SelectedIndex != -1)
-        //        {
-        //            if (SearchComboSupplier.SelectedIndex != -1 || SearchComboGrade.SelectedIndex != -1 || SearchComboWT.SelectedIndex != -1)
-        //            {
-        //                StatusQuery = $@" AND Status = '{SearchComboStatus.SelectedIndex}' OR Status IS NULL";
-        //            }
-        //            else
-        //            {
-        //                StatusQuery = $@"Status = '{SearchComboStatus.SelectedIndex}'";
-        //            }
-        //        }
-
-        //        // Build and execute the query
-        //        query = $@"WHERE {WTQuery}{GradeQuery}{SupplierQuery}{StatusQuery}";
-        //    }
-
-        //    LoadCoilsInStorage(query);
         //}
 
         //private void ListCoils_SelectedIndexChanged(object sender, EventArgs e)
@@ -1407,5 +1245,48 @@ namespace PS3000.Controls
         //        MessageBoxButtons.YesNo,
         //        MessageBoxIcon.Question);
         //}
+        
+        private async Task<string> GetFieldValueAsync(string returnColumn, string keyphrase, string table, string searchColumn)
+        {
+            string query = $"SELECT `{returnColumn}` FROM `prostahl`.`{table}` WHERE `{searchColumn}` LIKE @keyphrase ORDER BY `{searchColumn}` ASC LIMIT 1";
+
+            try
+            {
+                using var connection = new MySqlConnection(ConnectionString);
+                await connection.OpenAsync();
+
+                using var command = new MySqlCommand(query, connection);
+                command.Parameters.AddWithValue("@keyphrase", keyphrase);
+
+                object result = await command.ExecuteScalarAsync();
+                return result?.ToString() ?? string.Empty;
+            }
+            catch (Exception ex)
+            {
+                // Log the error (use a logging framework or similar, depending on your environment)
+                Console.WriteLine($"Error: {ex.Message}");
+                return string.Empty;
+            }
+        }
+
     }
 }
+    
+    public class CoilAttribute
+    {
+        public int LaufendeCoilnummer { get; set; }
+        public string Status { get; set; }
+        public float WSGruppe { get; set; }
+        public string Charge { get; set; }
+        public float Wandstärke { get; set; }
+        public string Besäumt { get; set; }
+        public string Werkstoff { get; set; }
+        public string Kaufdatum { get; set; }
+        public string Lieferant { get; set; }
+        public string Ausführung { get; set; }
+        public int Breite { get; set; }
+        public int Gewicht { get; set; }
+        public int Länge { get; set; }
+        public float Preis { get; set; }
+        public string Notizen { get; set; }
+    }

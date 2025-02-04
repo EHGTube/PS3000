@@ -8,76 +8,37 @@
 			 x:DataType="Control:StorageCoilViewModel"
 			 x:CompileBindings="True">
 
-	<Grid ColumnDefinitions="Auto,Auto" RowDefinitions="Auto">
+	<Grid ColumnDefinitions="Auto,Auto" RowDefinitions="*">
 		
-		<Grid ColumnDefinitions="Auto,Auto,Auto,Auto,Auto" RowDefinitions="Auto,Auto,Auto" Grid.Row="0" Grid.Column="0">
+		<Grid ColumnDefinitions="Auto,Auto,Auto,Auto,Auto" RowDefinitions="Auto,Auto,*" Grid.Row="0" Grid.Column="0">
 			<TextBlock Text="Lieferant:" Grid.Row="0" Grid.Column="0"/>
 			<TextBlock Text="Werkstoff:" Grid.Row="0" Grid.Column="1"/>
 			<TextBlock Text="Wandstärke:" Grid.Row="0" Grid.Column="2"/>
 			<TextBlock Text="Status:" Grid.Row="0" Grid.Column="3"/>
 
-			<ComboBox SelectedIndex="0" MaxDropDownHeight="100" Grid.Row="1" Grid.Column="0" ItemsSource="{Binding CoilSuppliers}">
+			<ComboBox SelectedIndex="0" Grid.Row="1" Grid.Column="0" MinWidth="170" HorizontalAlignment="Stretch" HorizontalContentAlignment="Stretch" ItemsSource="{Binding CoilSuppliers}" SelectedValue="{Binding SelectedSupplier}">
 			</ComboBox>
 
-			<ComboBox SelectedIndex="0" MaxDropDownHeight="100" Grid.Row="1" Grid.Column="1" ItemsSource="{Binding CoilGrades}">
+			<ComboBox SelectedIndex="0" Grid.Row="1" Grid.Column="1" MinWidth="100" HorizontalAlignment="Stretch" HorizontalContentAlignment="Stretch"  ItemsSource="{Binding CoilGrades}" SelectedValue="{Binding SelectedGrade}">
 			</ComboBox>
 
-			<ComboBox SelectedIndex="0" MaxDropDownHeight="100" Grid.Row="1" Grid.Column="2" Name="SearchComboWT">
-				<ComboBoxItem>0,8</ComboBoxItem>
-				<ComboBoxItem>1</ComboBoxItem>
-				<ComboBoxItem>1,2</ComboBoxItem>
-				<ComboBoxItem>1,5</ComboBoxItem>
-				<ComboBoxItem>2</ComboBoxItem>
-				<ComboBoxItem>2,5</ComboBoxItem>
-				<ComboBoxItem>3</ComboBoxItem>
-				<ComboBoxItem>3,5</ComboBoxItem>
-				<ComboBoxItem>4</ComboBoxItem>
-				<ComboBoxItem>4,5</ComboBoxItem>
-				<ComboBoxItem>5</ComboBoxItem>
-				<ComboBoxItem>6</ComboBoxItem>
-				<ComboBoxItem>6,3</ComboBoxItem>
-				<ComboBoxItem>7,11</ComboBoxItem>
-
+			<ComboBox SelectedIndex="0" Grid.Row="1" Grid.Column="2" MinWidth="100" HorizontalAlignment="Stretch" HorizontalContentAlignment="Stretch" ItemsSource="{Binding CoilWTGroups}" SelectedValue="{Binding SelectedWallThickness}" >
 			</ComboBox>
 
-			<ComboBox SelectedIndex="0" MaxDropDownHeight="100" Grid.Row="1" Grid.Column="3" Name="SearchComboStatus">
-				<ComboBoxItem>Unbekannt</ComboBoxItem>
-				<ComboBoxItem>Zu Lieferant Unterwegs</ComboBoxItem>
-				<ComboBoxItem>Lager Lieferant</ComboBoxItem>
-				<ComboBoxItem>UNterwegs zu EHG</ComboBoxItem>
-				<ComboBoxItem>Lager</ComboBoxItem>
-				<ComboBoxItem>Spaltplan</ComboBoxItem>
-				<ComboBoxItem>Gespalten</ComboBoxItem>
-				<ComboBoxItem>Verarbeitet</ComboBoxItem>
-				<ComboBoxItem>Band</ComboBoxItem>
-				<ComboBoxItem>Restband</ComboBoxItem>
+			<ComboBox SelectedIndex="0" Grid.Row="1" Grid.Column="3" MinWidth="200" HorizontalContentAlignment="Stretch" ItemsSource="{Binding CoilWTStatus}" SelectedValue="{Binding SelectedStatus}">
 			</ComboBox>
 
-			<Button Grid.Row="0" Grid.Column="4" Grid.RowSpan="2" >Suchen</Button>
+			<Button Grid.Row="0" Grid.Column="4" Grid.RowSpan="2" Command="{Binding LoadCoilsInStorageCommand}" >Suchen</Button>
 
 			<DataGrid AutoGenerateColumns="True" IsReadOnly="True"
 				GridLinesVisibility="All"
-				BorderThickness="1" BorderBrush="Gray" Grid.Row="3" Grid.Column="0" Grid.ColumnSpan="5" >
+				BorderThickness="1" BorderBrush="Gray" ItemsSource="{Binding CoilSearchAttributes}" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Grid.Row="3" Grid.Column="0" Grid.ColumnSpan="5" >
 			</DataGrid>
 		</Grid>
 
 		<Grid ColumnDefinitions="Auto,Auto,Auto" RowDefinitions="Auto,Auto,Auto,Auto,Auto,Auto,Auto,Auto,Auto,Auto,Auto,Auto,Auto,Auto,Auto,Auto,Auto,Auto,Auto,Auto" Grid.Row="0" Grid.Column="1">
 			<TextBlock Text="WS Gruppe:" Grid.Row="0" Grid.Column="0"/>
-			<ComboBox SelectedIndex="0" MaxDropDownHeight="100" HorizontalAlignment="Stretch" Grid.Row="0" Grid.Column="1" Name="CoilcmbWTGroup">
-				<ComboBoxItem>0,8</ComboBoxItem>
-				<ComboBoxItem>1</ComboBoxItem>
-				<ComboBoxItem>1,2</ComboBoxItem>
-				<ComboBoxItem>1,5</ComboBoxItem>
-				<ComboBoxItem>2</ComboBoxItem>
-				<ComboBoxItem>2,5</ComboBoxItem>
-				<ComboBoxItem>3</ComboBoxItem>
-				<ComboBoxItem>3,5</ComboBoxItem>
-				<ComboBoxItem>4</ComboBoxItem>
-				<ComboBoxItem>4,5</ComboBoxItem>
-				<ComboBoxItem>5</ComboBoxItem>
-				<ComboBoxItem>6</ComboBoxItem>
-				<ComboBoxItem>6,3</ComboBoxItem>
-				<ComboBoxItem>7,11</ComboBoxItem>
+			<ComboBox SelectedIndex="0" MaxDropDownHeight="100" HorizontalAlignment="Stretch" Grid.Row="0" Grid.Column="1" ItemsSource="{Binding CoilWTGroups}">
 			</ComboBox>
 			
 			<TextBlock Text="Soll WS:" Grid.Row="1" Grid.Column="0"/>
@@ -113,17 +74,7 @@
 			</ComboBox>
 			
 			<TextBlock Text="Status:" Grid.Row="8" Grid.Column="0"/>
-			<ComboBox SelectedIndex="0" MaxDropDownHeight="100" HorizontalAlignment="Stretch" Grid.Row="8" Grid.Column="1" Name="CoilcmbStatus">
-				<ComboBoxItem>Unbekannt</ComboBoxItem>
-				<ComboBoxItem>Zu Lieferant Unterwegs</ComboBoxItem>
-				<ComboBoxItem>Lager Lieferant</ComboBoxItem>
-				<ComboBoxItem>Unterwegs zu EHG</ComboBoxItem>
-				<ComboBoxItem>Lager</ComboBoxItem>
-				<ComboBoxItem>Spaltplan</ComboBoxItem>
-				<ComboBoxItem>Gespalten</ComboBoxItem>
-				<ComboBoxItem>Verarbeitet</ComboBoxItem>
-				<ComboBoxItem>Band</ComboBoxItem>
-				<ComboBoxItem>Restband</ComboBoxItem>
+			<ComboBox SelectedIndex="0" MaxDropDownHeight="100" HorizontalAlignment="Stretch" Grid.Row="8" Grid.Column="1" ItemsSource="{Binding CoilWTStatus}">
 			</ComboBox>
 			
 			<TextBlock Text="Breite:" Grid.Row="9" Grid.Column="0"/>
@@ -139,7 +90,6 @@
 			<TextBox Grid.Row="12" Grid.Column="1" Watermark="Preis €/kg"/>
 			
 			<Button Grid.Row="13" Grid.Column="1" Content="Coil Speichern" Command="{Binding MethodOneCommand}" HorizontalContentAlignment="Center" HorizontalAlignment="Stretch" ></Button>
-			<Button Grid.Row="14" Grid.Column="1" Content="Alles Laden" Command="{Binding GridLoadedCommand}" HorizontalContentAlignment="Center" HorizontalAlignment="Stretch" ></Button>
 
 			<Button Grid.Row="15" Grid.Column="1" Content="MethodOne" Command="{Binding MethodOneCommand}" HorizontalContentAlignment="Center" HorizontalAlignment="Stretch" ></Button>
 			<Button Grid.Row="16" Grid.Column="1" Content="MethodTwo" Command="{Binding MethodTwoCommand}" CommandParameter="5" HorizontalContentAlignment="Center" HorizontalAlignment="Stretch" ></Button>

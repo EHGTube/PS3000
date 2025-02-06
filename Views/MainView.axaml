@@ -40,9 +40,7 @@
 
 		</TabItem>
 		<TabItem Header="Lager Coils">
-			<ScrollViewer HorizontalScrollBarVisibility="Visible" VerticalScrollBarVisibility="Visible">
 				<controls:StorageCoil DataContext="{Binding StorageCoil}"/>
-			</ScrollViewer>
 
 		</TabItem>
 		<TabItem Header="Produktion">

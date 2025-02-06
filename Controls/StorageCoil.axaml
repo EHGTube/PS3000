@@ -29,74 +29,69 @@
 			</ComboBox>
 
 			<Button Grid.Row="0" Grid.Column="4" Grid.RowSpan="2" Command="{Binding LoadCoilsInStorageCommand}" >Suchen</Button>
-
+			
 			<DataGrid AutoGenerateColumns="True" IsReadOnly="True"
 				GridLinesVisibility="All"
-				BorderThickness="1" BorderBrush="Gray" ItemsSource="{Binding CoilSearchAttributes}" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Grid.Row="3" Grid.Column="0" Grid.ColumnSpan="5" >
+				BorderThickness="1" BorderBrush="Gray" SelectedItem="{Binding CoilSearchSelectedItem}" ItemsSource="{Binding CoilSearchAttributes}" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Grid.Row="3" Grid.Column="0" Grid.ColumnSpan="5" >
 			</DataGrid>
 		</Grid>
 
-		<Grid ColumnDefinitions="Auto,Auto,Auto" RowDefinitions="Auto,Auto,Auto,Auto,Auto,Auto,Auto,Auto,Auto,Auto,Auto,Auto,Auto,Auto,Auto,Auto,Auto,Auto,Auto,Auto" Grid.Row="0" Grid.Column="1">
-			<TextBlock Text="WS Gruppe:" Grid.Row="0" Grid.Column="0"/>
-			<ComboBox SelectedIndex="0" MaxDropDownHeight="100" HorizontalAlignment="Stretch" Grid.Row="0" Grid.Column="1" ItemsSource="{Binding CoilWTGroups}">
-			</ComboBox>
+		<Grid ColumnDefinitions="Auto,Auto,Auto" RowDefinitions="Auto,Auto,Auto,Auto,Auto,Auto,Auto,Auto,Auto,Auto,Auto,Auto,Auto,Auto,Auto,Auto,Auto,Auto,Auto,Auto,Auto,Auto" Grid.Row="0" Grid.Column="1">
 			
-			<TextBlock Text="Soll WS:" Grid.Row="1" Grid.Column="0"/>
-			<TextBox Grid.Row="1" Grid.Column="1" Watermark="Soll WS"/>
-			
-			<TextBlock Text="Ist WS:" Grid.Row="2" Grid.Column="0"/>
-			<TextBox Grid.Row="2" Grid.Column="1" Text="{Binding Path=CoilWT}" Watermark="Ist WS"/>
-			
-			<TextBlock Text="Werkstoff:" Grid.Row="3" Grid.Column="0"/>
-			<ComboBox SelectedIndex="0" MaxDropDownHeight="100" HorizontalAlignment="Stretch" Grid.Row="3" Grid.Column="1" ItemsSource="{Binding CoilGrades}">
-			</ComboBox>
-			
-			<TextBlock Text="Kaufdatum:" Grid.Row="4" Grid.Column="0"/>
-			<CalendarDatePicker Grid.Row="4" Grid.Column="1"/>
+			<Button Grid.Row="0" Grid.Column="1" Grid.RowSpan="2" Command="{Binding LoadCoilDetailsCommand}" >Coildetails Laden</Button>
 
-			<TextBlock Text="Charge:" Grid.Row="5" Grid.Column="0"/>
-			<TextBox Grid.Row="5" Grid.Column="1" Watermark="Charge"/>
-			
-			<TextBlock Text="Lieferant:" Grid.Row="6" Grid.Column="0"/>
-			<ComboBox SelectedIndex="0" MaxDropDownHeight="100" Grid.Row="6" HorizontalAlignment="Stretch" Grid.Column="1" ItemsSource="{Binding CoilSuppliers}" >
+			<TextBlock Text="WS Gruppe:" Grid.Row="2" Grid.Column="0"/>
+			<ComboBox HorizontalAlignment="Stretch" Grid.Row="2" Grid.Column="1" SelectedIndex="{Binding CoilWTGroup, Mode=TwoWay}" ItemsSource="{Binding CoilWTGroups}">
 			</ComboBox>
 			
-			<TextBlock Text="Ausführung:" Grid.Row="7" Grid.Column="0"/>
-			<ComboBox SelectedIndex="0" MaxDropDownHeight="100" Grid.Row="7" HorizontalAlignment="Stretch" Grid.Column="1" Name="CoilcmbExecution">
-				<ComboBoxItem>1C</ComboBoxItem>
-				<ComboBoxItem>1E</ComboBoxItem>
-				<ComboBoxItem>1D</ComboBoxItem>
-				<ComboBoxItem>2C</ComboBoxItem>
-				<ComboBoxItem>2E</ComboBoxItem>
-				<ComboBoxItem>2D</ComboBoxItem>
-				<ComboBoxItem>2B</ComboBoxItem>
-				<ComboBoxItem>2R</ComboBoxItem>
+			<TextBlock Text="Soll WS:" Grid.Row="3" Grid.Column="0"/>
+			<TextBox Grid.Row="3" Grid.Column="1" Text="{Binding CoilSetWT}" Watermark="Soll WS"/>
+			
+			<TextBlock Text="Ist WS:" Grid.Row="4" Grid.Column="0"/>
+			<TextBox Grid.Row="4" Grid.Column="1" Text="{Binding Path=CoilWT}" Watermark="Ist WS"/>
+			
+			<TextBlock Text="Werkstoff:" Grid.Row="5" Grid.Column="0"/>
+			<ComboBox HorizontalAlignment="Stretch" Grid.Row="5" Grid.Column="1" SelectedIndex="{Binding CoilGrade}" ItemsSource="{Binding CoilGrades}">
 			</ComboBox>
 			
-			<TextBlock Text="Status:" Grid.Row="8" Grid.Column="0"/>
-			<ComboBox SelectedIndex="0" MaxDropDownHeight="100" HorizontalAlignment="Stretch" Grid.Row="8" Grid.Column="1" ItemsSource="{Binding CoilWTStatus}">
-			</ComboBox>
-			
-			<TextBlock Text="Breite:" Grid.Row="9" Grid.Column="0"/>
-			<TextBox Grid.Row="9" Grid.Column="1" Text="{Binding CoilWidth}" Watermark="Breite"/>
-			
-			<TextBlock Text="Gewicht:" Grid.Row="10" Grid.Column="0"/>
-			<TextBox Grid.Row="10" Grid.Column="1" Text="{Binding CoilWeight}" Watermark="Gewicht"/>
-			
-			<TextBlock Text="Länge:" Grid.Row="11" Grid.Column="0"/>
-			<TextBox Grid.Row="11" Grid.Column="1" Text="{Binding CoilLength}" Name="CoiltxtLength" Watermark="Länge"/>
-			
-			<TextBlock Text="Preis €/kg:" Grid.Row="12" Grid.Column="0"/>
-			<TextBox Grid.Row="12" Grid.Column="1" Watermark="Preis €/kg"/>
-			
-			<Button Grid.Row="13" Grid.Column="1" Content="Coil Speichern" Command="{Binding MethodOneCommand}" HorizontalContentAlignment="Center" HorizontalAlignment="Stretch" ></Button>
+			<TextBlock Text="Kaufdatum:" Grid.Row="6" Grid.Column="0"/>
+			<CalendarDatePicker Grid.Row="6" SelectedDate="{Binding CoilPurchaseDate, Mode=TwoWay}" Grid.Column="1"/>
 
-			<Button Grid.Row="15" Grid.Column="1" Content="MethodOne" Command="{Binding MethodOneCommand}" HorizontalContentAlignment="Center" HorizontalAlignment="Stretch" ></Button>
-			<Button Grid.Row="16" Grid.Column="1" Content="MethodTwo" Command="{Binding MethodTwoCommand}" CommandParameter="5" HorizontalContentAlignment="Center" HorizontalAlignment="Stretch" ></Button>
-			<Button Grid.Row="17" Grid.Column="1" Content="MethodThree" Command="{Binding MethodThreeCommand}" HorizontalContentAlignment="Center" HorizontalAlignment="Stretch" ></Button>
-			<Button Grid.Row="18" Grid.Column="1" Content="MethodFour" Command="{Binding MethodFourCommand}" CommandParameter="3" HorizontalContentAlignment="Center" HorizontalAlignment="Stretch" ></Button>
-			<TextBlock Grid.Row="19" Grid.Column="1" Text="{Binding Message}"  ></TextBlock>
-			<CheckBox Grid.Row="20" Grid.Column="1" IsChecked="{Binding Toggle}" ></CheckBox>
+			<TextBlock Text="Charge:" Grid.Row="7" Grid.Column="0"/>
+			<TextBox Grid.Row="7" Grid.Column="1" Watermark="Charge" Text="{Binding CoilCharge}"/>
+			
+			<TextBlock Text="Lieferant:" Grid.Row="8" Grid.Column="0"/>
+			<ComboBox Grid.Row="8" HorizontalAlignment="Stretch" Grid.Column="1" SelectedIndex="{Binding CoilSuppliersSelected}" ItemsSource="{Binding CoilSuppliers}" >
+			</ComboBox>
+			
+			<TextBlock Text="Ausführung:" Grid.Row="9" Grid.Column="0"/>
+			<ComboBox  Grid.Row="9" HorizontalAlignment="Stretch" Grid.Column="1" SelectedIndex="{Binding CoilExecSelected}" ItemsSource="{Binding CoilExec}">
+			</ComboBox>
+			
+			<TextBlock Text="Status:" Grid.Row="10" Grid.Column="0"/>
+			<ComboBox  HorizontalAlignment="Stretch" Grid.Row="10" Grid.Column="1" SelectedIndex="{Binding CoilWTStatusSelected}" ItemsSource="{Binding CoilWTStatus}">
+			</ComboBox>
+			
+			<TextBlock Text="Breite:" Grid.Row="11" Grid.Column="0"/>
+			<TextBox Grid.Row="11" Grid.Column="1" Text="{Binding CoilWidth}" Watermark="Breite"/>
+			
+			<TextBlock Text="Gewicht:" Grid.Row="12" Grid.Column="0"/>
+			<TextBox Grid.Row="12" Grid.Column="1" Text="{Binding CoilWeight}" Watermark="Gewicht"/>
+			
+			<TextBlock Text="Länge:" Grid.Row="13" Grid.Column="0"/>
+			<TextBox Grid.Row="13" Grid.Column="1" Text="{Binding CoilLength}" Watermark="Länge"/>
+			
+			<TextBlock Text="Preis €/kg:" Grid.Row="14" Grid.Column="0"/>
+			<TextBox Grid.Row="14" Grid.Column="1" Text="{Binding CoilPrice}" Watermark="Preis €/kg"/>
+			
+			<Button Grid.Row="15" Grid.Column="1" Content="Coil Speichern" Command="{Binding SaveCoilCommand}" HorizontalContentAlignment="Center" HorizontalAlignment="Stretch" ></Button>
+
+			<Button Grid.Row="16" Grid.Column="1" Content="MethodOne" Command="{Binding MethodOneCommand}" HorizontalContentAlignment="Center" HorizontalAlignment="Stretch" ></Button>
+			<Button Grid.Row="17" Grid.Column="1" Content="MethodTwo" Command="{Binding MethodTwoCommand}" CommandParameter="5" HorizontalContentAlignment="Center" HorizontalAlignment="Stretch" ></Button>
+			<Button Grid.Row="18" Grid.Column="1" Content="MethodThree" Command="{Binding MethodThreeCommand}" HorizontalContentAlignment="Center" HorizontalAlignment="Stretch" ></Button>
+			<Button Grid.Row="19" Grid.Column="1" Content="MethodFour" Command="{Binding MethodFourCommand}" CommandParameter="3" HorizontalContentAlignment="Center" HorizontalAlignment="Stretch" ></Button>
+			<TextBlock Grid.Row="20" Grid.Column="1" Text="{Binding Message}"  ></TextBlock>
+			<CheckBox Grid.Row="21" Grid.Column="1" IsChecked="{Binding Toggle}" ></CheckBox>
 
 		</Grid>	
 	</Grid>

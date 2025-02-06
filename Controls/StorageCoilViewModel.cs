@@ -88,6 +88,8 @@ namespace PS3000.Controls
         private ObservableCollection<string> coilWTGroups = new();
         [ObservableProperty]
         private ObservableCollection<string> coilWTStatus = new();
+        [ObservableProperty]
+        private ObservableCollection<string> coilExec = new();
 
         public StorageCoilViewModel()
         {
@@ -180,6 +182,28 @@ namespace PS3000.Controls
             {
                 Console.WriteLine($"Error loading data: {ex.Message}");
             }
+            
+            
+            try
+            {
+                using var connection = new MySqlConnection(ConnectionString);
+                await connection.OpenAsync();
+
+                string query = "SELECT * FROM coilausfuhrung;";
+                using var command = new MySqlCommand(query, connection);
+                using var reader = await command.ExecuteReaderAsync();
+
+                coilExec.Clear();
+                while (await reader.ReadAsync())
+                {
+                    coilExec.Add(reader["Beschreibung"].ToString());
+
+                }
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Error loading data: {ex.Message}");
+            }
         }        
         
         
@@ -198,6 +222,8 @@ namespace PS3000.Controls
         [RelayCommand]
         private async Task LoadCoilsInStorageAsync()        
         {
+            CoilSearchAttributes.Clear();
+            
             string GradeQuery = "";
             string SupplierQuery = "";
             string WTQuery = ""; 
@@ -205,56 +231,57 @@ namespace PS3000.Controls
             string StatusQuery = "";
             
                 
-                if (!String.IsNullOrEmpty(SelectedWallThickness) || !String.IsNullOrEmpty(selectedGrade) || !String.IsNullOrEmpty(selectedSupplier) || !String.IsNullOrEmpty(selectedStatus))
+            if (!String.IsNullOrEmpty(SelectedWallThickness) || !String.IsNullOrEmpty(selectedGrade) || !String.IsNullOrEmpty(selectedSupplier) || !String.IsNullOrEmpty(selectedStatus))
+            {
+                if (!String.IsNullOrEmpty(SelectedWallThickness))
                 {
-                
-                    if (!String.IsNullOrEmpty(SelectedWallThickness))
-                    {
-                        WTQuery = $@"WSGruppe = '{SelectedWallThickness}'";
-                    }
-                
-                    if (!String.IsNullOrEmpty(selectedGrade))
-                    {
-                        if (!String.IsNullOrEmpty(SelectedWallThickness))
-                        {
-                            GradeQuery = $@" AND Werkstoff = '{selectedGrade}'";
-                        }
-                        else
-                        {
-                            GradeQuery = $@"Werkstoff = '{selectedGrade}'";
-                        }
-                    }
-                
-                    if (!String.IsNullOrEmpty(selectedSupplier))
-                    {
-                        if (!String.IsNullOrEmpty(SelectedWallThickness) || !String.IsNullOrEmpty(selectedGrade))
-                        {
-                            SupplierQuery = $@" AND Lieferant = '{selectedSupplier}'";
-                        }
-                        else
-                        {
-                            SupplierQuery = $@"Lieferant = '{selectedSupplier}'";
-                        }
-                    }
-                
-                    if (!String.IsNullOrEmpty(selectedStatus))
-                    {
-                        if (!String.IsNullOrEmpty(selectedSupplier) || !String.IsNullOrEmpty(selectedGrade) || !String.IsNullOrEmpty(SelectedWallThickness))
-                        {
-                            StatusQuery = $@" AND Status = '{selectedStatus}' OR Status IS NULL";
-                        }
-                        else
-                        {
-                            StatusQuery = $@"Status = '{selectedStatus}'";
-                        }
-                    }
-                
-                    // Build and execute the query
-                    Addon = $@"WHERE {WTQuery}{GradeQuery}{SupplierQuery}{StatusQuery}";
+                    WTQuery = $@"WSGruppe = '{SelectedWallThickness.Replace(',','.')}'";
                 }
             
+                if (!String.IsNullOrEmpty(selectedGrade))
+                {
+                    if (!String.IsNullOrEmpty(SelectedWallThickness))
+                    {
+                        GradeQuery = $@" AND Werkstoff = '{selectedGrade}'";
+                    }
+                    else
+                    {
+                        GradeQuery = $@"Werkstoff = '{selectedGrade}'";
+                    }
+                }
             
-            CoilSearchAttributes.Clear();
+                if (!String.IsNullOrEmpty(selectedSupplier))
+                {
+                    string SupplierCode = await GetFieldValueAsync("LaufendeLieferantennummer", selectedSupplier, "lieferanten",
+                        "Name");
+                    
+                    if (!String.IsNullOrEmpty(SelectedWallThickness) || !String.IsNullOrEmpty(selectedGrade))
+                    {
+                        SupplierQuery = $@" AND Lieferant = '{SupplierCode}'";
+                    }
+                    else
+                    {
+                        SupplierQuery = $@"Lieferant = '{SupplierCode}'";
+                    }
+                }
+            
+                if (!String.IsNullOrEmpty(selectedStatus))
+                {
+                    string StatusCode = await GetFieldValueAsync("Position", selectedStatus, "coilstatus",
+                        "Beschreibung");
+                    if (!String.IsNullOrEmpty(selectedSupplier) || !String.IsNullOrEmpty(selectedGrade) || !String.IsNullOrEmpty(SelectedWallThickness))
+                    {
+                        StatusQuery = $@" AND Status = '{StatusCode}' OR Status IS NULL";
+                    }
+                    else
+                    {
+                        StatusQuery = $@"Status = '{StatusCode}'";
+                    }
+                }
+            
+                // Build and execute the query
+                Addon = $@"WHERE {WTQuery}{GradeQuery}{SupplierQuery}{StatusQuery}";
+            }
 
             string query = "SELECT * FROM lagercoils " + Addon;
             
@@ -270,48 +297,20 @@ namespace PS3000.Controls
 
                 while (await reader.ReadAsync())
                 {
-                    var statusValue = int.Parse(reader[1]?.ToString() ?? "0");
-                    var ausführungValue = int.Parse(reader[9]?.ToString() ?? "0");
-
                     var attribute = new CoilAttribute
                     {
                         LaufendeCoilnummer = int.Parse(reader[0]?.ToString() ?? "0"),
-                        Status = statusValue switch
-                        {
-                            0 => "Unbekannt",
-                            1 => "Zu Lieferant Unterwegs",
-                            2 => "Lager Lieferant",
-                            3 => "Unterwegs zu EHG",
-                            4 => "Lager",
-                            5 => "Spaltplan",
-                            6 => "Gespalten",
-                            7 => "Verarbeitet",
-                            8 => "Band",
-                            9 => "Restband",
-                            _ => "Unbekannt"
-                        },
+                        Status = await GetFieldValueAsync("Beschreibung", reader[1].ToString(), "coilstatus", "Position"),
                         WSGruppe = float.Parse(reader[2]?.ToString() ?? "0"),
                         Charge = reader[3]?.ToString() ?? string.Empty,
                         Wandstärke = float.Parse(reader[4]?.ToString() ?? "0"),
                         Besäumt = reader[5].ToString() == "1" ? "Ja" : "Nein",
                         Werkstoff = await GetFieldValueAsync("Werkstoff", reader[6].ToString(), "werkstoffe", "LaufendeWerkstoffnummer"),
-                        //Werkstoff = reader[6]?.ToString() ?? string.Empty,
                         Kaufdatum = DateTime.TryParse(reader[7]?.ToString(), out var kaufDatum) 
                             ? kaufDatum.ToString("yyyy-MM-dd") 
                             : string.Empty,
-                        Lieferant = reader[8]?.ToString() ?? string.Empty,
-                        Ausführung = ausführungValue switch
-                        {
-                            0 => "1C",
-                            1 => "1E",
-                            2 => "1D",
-                            3 => "2C",
-                            4 => "2E",
-                            5 => "2D",
-                            6 => "2B",
-                            7 => "2R",
-                            _ => "Unbekannt"
-                        },
+                        Lieferant = await GetFieldValueAsync("Name", reader[8].ToString(), "lieferanten", "LaufendeLieferantennummer"),
+                        Ausführung = await GetFieldValueAsync("Beschreibung", reader[9].ToString(), "coilausfuhrung", "Position"),
                         Breite = int.Parse(reader[10]?.ToString() ?? "0"),
                         Gewicht = int.Parse(reader[11]?.ToString() ?? "0"),
                         Länge = int.Parse(reader[12]?.ToString() ?? "0"),
@@ -329,6 +328,127 @@ namespace PS3000.Controls
             }
          }
 
+        
+        [ObservableProperty]
+        private CoilAttribute coilSearchSelectedItem;
+        
+        [RelayCommand]        
+        private async Task SaveCoil()
+        {
+            if (CoilSearchSelectedItem != null)
+            {
+                
+                
+                
+                var box = MessageBoxManager
+                    .GetMessageBoxStandard("Bestätigung",
+                        $"Selection: \n" +
+                        $"LaufendeCoilnummer: {CoilSearchSelectedItem.LaufendeCoilnummer}\n" +
+                        $"Status: {CoilSearchSelectedItem.Status}\n" +
+                        $"Werkstoff: {CoilSearchSelectedItem.Werkstoff}\n" +
+                        $"Wandstärke: {CoilSearchSelectedItem.Wandstärke}",
+                        ButtonEnum.YesNo);
+            
+                var result = await box.ShowAsync();
+            }
+            else
+            {
+                var box = MessageBoxManager
+                    .GetMessageBoxStandard("Bestätigung",
+                        "Nothing Selected!",
+                        ButtonEnum.Ok);
+            
+                var result = await box.ShowAsync();
+            }
+            CoilSearchAttributes.Clear();
+        }
+
+        [RelayCommand]
+        private async Task UpdateCoilDetails()
+        {
+            var box = MessageBoxManager
+                .GetMessageBoxStandard("Bestätigung",
+                    "Selection Changed!",
+                    ButtonEnum.Ok);
+            
+            var result = await box.ShowAsync();
+        }
+        
+        
+        [ObservableProperty]
+        int coilWTGroup;
+        [ObservableProperty]
+        string coilSetWT;
+        [ObservableProperty]
+        int coilGrade;
+        [ObservableProperty]
+        DateTime? coilPurchaseDate = DateTime.Today;
+        [ObservableProperty]
+        string coilCharge;
+        [ObservableProperty]
+        int coilSuppliersSelected;
+        [ObservableProperty]
+        int coilExecSelected;
+        [ObservableProperty]
+        int coilWTStatusSelected;
+        [ObservableProperty]
+        string coilPrice;
+        
+        [RelayCommand]
+        private async Task LoadCoilDetails()
+        {
+
+            CoilWTGroup = int.Parse(await GetFieldValueAsync("Position", (await GetFieldValueAsync("WSGruppe",
+                        coilSearchSelectedItem.LaufendeCoilnummer.ToString(),
+                        "lagercoils", "LaufendeCoilnummer")).Replace(',', '.').TrimEnd('0').TrimEnd('.'),
+                    "coilswsgruppen", "WSGruppe"));
+            
+            CoilGrade = int.Parse(await GetFieldValueAsync("Werkstoff",
+                coilSearchSelectedItem.LaufendeCoilnummer.ToString(),
+                "lagercoils", "LaufendeCoilnummer"))-1;
+
+            CoilSetWT = await GetFieldValueAsync("WSGruppe",
+                coilSearchSelectedItem.LaufendeCoilnummer.ToString(),
+                "lagercoils", "LaufendeCoilnummer");
+
+            CoilWT = float.Parse(await GetFieldValueAsync("Wandstarke",
+                coilSearchSelectedItem.LaufendeCoilnummer.ToString(),
+                "lagercoils", "LaufendeCoilnummer"));
+
+             CoilPurchaseDate = DateTime.Parse(await GetFieldValueAsync("Kaufdatum",
+                 coilSearchSelectedItem.LaufendeCoilnummer.ToString(),
+                 "lagercoils", "LaufendeCoilnummer"));
+
+            CoilCharge = await GetFieldValueAsync("Charge",
+                coilSearchSelectedItem.LaufendeCoilnummer.ToString(),
+                "lagercoils", "LaufendeCoilnummer");
+
+            CoilSuppliersSelected = int.Parse(await GetFieldValueAsync("Lieferant",
+                coilSearchSelectedItem.LaufendeCoilnummer.ToString(),
+                "lagercoils", "LaufendeCoilnummer"))-1;
+
+            CoilExecSelected = int.Parse(await GetFieldValueAsync("Ausfuhrung",
+                coilSearchSelectedItem.LaufendeCoilnummer.ToString(),
+                "lagercoils", "LaufendeCoilnummer"));
+            
+            CoilWTStatusSelected = int.Parse(await GetFieldValueAsync("Status",
+                coilSearchSelectedItem.LaufendeCoilnummer.ToString(),
+                "lagercoils", "LaufendeCoilnummer"));
+            
+            CoilWidth = float.Parse(await GetFieldValueAsync("Breite",
+                coilSearchSelectedItem.LaufendeCoilnummer.ToString(),
+                "lagercoils", "LaufendeCoilnummer"));
+            
+            CoilWeight = float.Parse(await GetFieldValueAsync("Gewicht",
+                coilSearchSelectedItem.LaufendeCoilnummer.ToString(),
+                "lagercoils", "LaufendeCoilnummer"));
+
+             CoilPrice = await GetFieldValueAsync("Preis",
+                 coilSearchSelectedItem.LaufendeCoilnummer.ToString(),
+                 "lagercoils", "LaufendeCoilnummer");
+        }
+        
+        
         //private void btnCoilsNewCoilSave_Click(object sender, EventArgs e)
         //{
         //    if (ListCoils.SelectedItems.Count > 0)
@@ -1257,7 +1377,9 @@ namespace PS3000.Controls
 
                 using var command = new MySqlCommand(query, connection);
                 command.Parameters.AddWithValue("@keyphrase", keyphrase);
-
+                string formattedQuery = query.Replace("@keyphrase", $"'{keyphrase}'");
+                Console.WriteLine($"Query: {formattedQuery}");
+                
                 object result = await command.ExecuteScalarAsync();
                 return result?.ToString() ?? string.Empty;
             }

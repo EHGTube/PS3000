@@ -2,8 +2,11 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:Control="clr-namespace:PS3000.Controls"
              mc:Ignorable="d" d:DesignWidth="1920" d:DesignHeight="1080"
-             x:Class="PS3000.MasterData">
+             x:Class="PS3000.MasterData"
+             x:DataType="Control:MasterDataViewModel"
+             x:CompileBindings="True">
 Here we need to add: 
 
 1. Suppliers

@@ -2,8 +2,11 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:Control="clr-namespace:PS3000.Controls"
              mc:Ignorable="d" d:DesignWidth="1920" d:DesignHeight="1080"
-             x:Class="PS3000.Orders">
+             x:Class="PS3000.Orders"
+             x:DataType="Control:OrdersViewModel"
+             x:CompileBindings="True">
 	<Grid>
 		<Grid.ColumnDefinitions>
 			<ColumnDefinition Width="Auto"/>
@@ -139,7 +142,7 @@
 
 			<TextBlock DockPanel.Dock="Top" >Zuschläge:</TextBlock>
 
-			<DataGrid ItemsSource="{Binding SurchargeData}"
+			<DataGrid
 				AutoGenerateColumns="True"
 				GridLinesVisibility="All"
 				BorderThickness="1" BorderBrush="Gray">
@@ -163,7 +166,7 @@
 
 				<TextBox  Watermark="Position" Grid.Row="0" Grid.Column="1"/>
 
-				<DataGrid HeadersVisibility="None" Width="50" Grid.Row="0" Grid.RowSpan="2" Grid.Column="0" ColumnWidth="50" HorizontalScrollBarVisibility="Hidden" Height="160" ItemsSource="{Binding InquiryPositions}"
+				<DataGrid HeadersVisibility="None" Width="50" Grid.Row="0" Grid.RowSpan="2" Grid.Column="0" ColumnWidth="50" HorizontalScrollBarVisibility="Hidden" Height="160"
 					AutoGenerateColumns="True"
 					GridLinesVisibility="All"
 					BorderThickness="1" BorderBrush="Gray" IsReadOnly="True">

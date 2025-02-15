@@ -2,8 +2,11 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:Control="clr-namespace:PS3000.Controls"
              mc:Ignorable="d" d:DesignWidth="1920" d:DesignHeight="1080"
-             x:Class="PS3000.Inquiries">
+             x:Class="PS3000.Inquiries"
+             x:DataType="Control:InquiriesViewModel"
+             x:CompileBindings="True">
 
 	<Grid>
 		<Grid.ColumnDefinitions>
@@ -105,7 +108,7 @@
 		</Button>
 
 		<TextBlock Margin="0 0 0 0" Grid.Row="0" Grid.Column="5" Grid.ColumnSpan="2" TextAlignment="Center" >Zuschläge:</TextBlock>
-		<DataGrid Margin="20 0 0 50" Grid.Row="1" Grid.Column="5" Grid.ColumnSpan="2" Grid.RowSpan="5" Height="160" ItemsSource="{Binding SurchargeData}"
+		<DataGrid Margin="20 0 0 50" Grid.Row="1" Grid.Column="5" Grid.ColumnSpan="2" Grid.RowSpan="5" Height="160"
 			AutoGenerateColumns="True"
 			GridLinesVisibility="All"
 			BorderThickness="1" BorderBrush="Gray">
@@ -135,7 +138,7 @@
 		<TextBlock Text="Auftragsposition:" TextAlignment="End" Grid.Row="11" Grid.Column="5" Margin="20 0 0 5" VerticalAlignment="Center"/>
 		<TextBox  Watermark="Position" Grid.Row="11" Grid.Column="6" Margin="20 0 0 10"/>
 
-		<DataGrid Margin="0 0 0 100" HeadersVisibility="None" Width="50" Grid.Row="12" ColumnWidth="50" HorizontalScrollBarVisibility="Hidden" Grid.Column="5"  Grid.RowSpan="5" Height="160" ItemsSource="{Binding InquiryPositions}"
+		<DataGrid Margin="0 0 0 100" HeadersVisibility="None" Width="50" Grid.Row="12" ColumnWidth="50" HorizontalScrollBarVisibility="Hidden" Grid.Column="5"  Grid.RowSpan="5" Height="160"
 			AutoGenerateColumns="True"
 			GridLinesVisibility="All"
 			BorderThickness="1" BorderBrush="Gray">

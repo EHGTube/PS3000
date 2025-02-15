@@ -23,4 +23,6 @@ public partial class StorageCoil : UserControl
     {
         InitializeComponent();
     }
+    
+    
 }

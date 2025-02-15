@@ -2,12 +2,25 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:Control="clr-namespace:PS3000.Controls"
              mc:Ignorable="d" d:DesignWidth="1920" d:DesignHeight="1080"
-             x:Class="PS3000.Customers">
+             x:Class="PS3000.Customers"
+			 x:DataType="Control:CustomersViewModel"
+			 x:CompileBindings="True">
+	<Window.DataContext>
+		<Control:CustomersViewModel />
+	</Window.DataContext>
+	
 	<ScrollViewer HorizontalScrollBarVisibility="Visible" VerticalScrollBarVisibility="Visible">
 		<Grid ColumnDefinitions="200,200,200,200,200,200,*" RowDefinitions="Auto,Auto,Auto,Auto,Auto,Auto,Auto,Auto,Auto,Auto,Auto,Auto,Auto,Auto,Auto,Auto,Auto,Auto,Auto,Auto,Auto"  Margin="10">
-			<TextBox  Watermark="Lieferanschrift" Name="textCustomersDeliveryAdressSearch" TextChanged="textCustomersDeliveryAdressSearch_TextChanged" Grid.Row="0" Grid.ColumnSpan="2" Margin="0 30 0 10" />
-			<ListBox x:Name="ListCustomersDeliveryAdressList" SelectionChanged="DeliveryAdressSearchBox_TextChanged" Height="200" Width="400" Grid.Row="1" Grid.RowSpan="5" Grid.Column="0" Grid.ColumnSpan="2" Margin="0 0 0 10"/>
+			<TextBox  Watermark="Lieferanschrift" Text="{Binding DeliveryAdressSearch}" Grid.Row="0" Grid.ColumnSpan="2" Margin="0 30 0 10" />
+			<ItemsControl ItemsSource="{Binding Name}" Height="200" Width="400" Grid.Row="1" Grid.RowSpan="5" Grid.Column="0" Grid.ColumnSpan="2" Margin="0 0 0 10">
+				<ItemsControl.ItemTemplate>
+					<DataTemplate>
+						<Control:CustomersViewModel />
+					</DataTemplate>
+				</ItemsControl.ItemTemplate>
+			</ItemsControl>
 			<TextBlock Text="Lieferanschrift Details:" TextAlignment="Center" Grid.Row="6" Grid.Column="0" Grid.ColumnSpan="2" Margin="0 0 0 10"/>
 			<TextBlock Text="Lieferanschrift Nr.:" TextAlignment="End" Grid.Row="8" Grid.Column="0" Margin="0 0 10 5" VerticalAlignment="Center"/>
 			<TextBox  Watermark="Lieferanschrift Nr." Name="textCustomersDeliveryAdressNumber" Grid.Row="8" Grid.Column="1" Margin="0 0 0 10"/>
@@ -29,12 +42,12 @@
 			<TextBlock Text="Avis. Telefonnummer" TextAlignment="End" Grid.Row="16" Grid.Column="0" Margin="0 0 10 5" VerticalAlignment="Center"/>
 			<TextBox  Watermark="Avis. E-Mail" Name="textCustomersDeliveryAdressContactMail" Grid.Row="17" Grid.Column="1" Margin="0 0 0 10"/>
 			<TextBlock Text="Avis. E-Mail:" TextAlignment="End" Grid.Row="17" Grid.Column="0" Margin="0 0 10 5" VerticalAlignment="Center"/>
-			<Button Content="Lieferanschrift Speichern" Click="btnCustomersSaveDeliveryAdress_Click" Grid.Row="18" Grid.Column="1" Grid.RowSpan="0" Grid.ColumnSpan="1" />
-			<Button Content="Lieferanschriftdaten Leeren" Click="btnDeliveryInfoClear_Click" Grid.Row="19" Grid.Column="1" Grid.RowSpan="0" Grid.ColumnSpan="1" />
+			<Button Content="Lieferanschrift Speichern" Grid.Row="18" Grid.Column="1" Grid.RowSpan="0" Grid.ColumnSpan="1" />
+			<Button Content="Lieferanschriftdaten Leeren" Grid.Row="19" Grid.Column="1" Grid.RowSpan="0" Grid.ColumnSpan="1" />
 
 
-			<TextBox  Watermark="Kunde" Grid.Row="0" Name="textCustomerNameSearch" TextChanged="textCustomerNameSearch_TextChanged" Grid.ColumnSpan="2" Grid.Column="2" Margin="0 30 0 10"/>
-			<ListBox x:Name="ListCustomersCustomerList" SelectionChanged="ListCustomersCustomerList_SelectedIndexChanged" Height="200" Width="400" HorizontalAlignment="Right" Grid.Row="1" Grid.RowSpan="5" Grid.Column="2" Grid.ColumnSpan="2" Margin="0 0 0 10"/>
+			<TextBox  Watermark="Kunde" Grid.Row="0" Name="textCustomerNameSearch" Grid.ColumnSpan="2" Grid.Column="2" Margin="0 30 0 10"/>
+			<ListBox x:Name="ListCustomersCustomerList"  Height="200" Width="400" HorizontalAlignment="Right" Grid.Row="1" Grid.RowSpan="5" Grid.Column="2" Grid.ColumnSpan="2" Margin="0 0 0 10"/>
 			<TextBlock Text="Kunden Details:" TextAlignment="Center" Grid.Row="6" Grid.Column="2" Grid.ColumnSpan="4" Margin="0 0 0 10"/>
 			<TextBlock Text="Einkäufer Name:" TextAlignment="End" Grid.Row="8" Grid.Column="2" Margin="0 0 10 5" VerticalAlignment="Center"/>
 			<TextBox  Watermark="Einkäufer Name" Name="textCustomersPurchaserName" Grid.Row="8" Grid.Column="3" Margin="0 0 0 10"/>
@@ -76,9 +89,9 @@
 			<TextBox  Watermark="Nettofrist" Name="textCustomerNettoTerm" Grid.Row="19" Grid.Column="5" Margin="0 0 0 10"/>
 			<TextBlock Text="Nettofrist:" TextAlignment="End" Grid.Row="19" Grid.Column="4" Margin="0 0 10 5" VerticalAlignment="Center"/>
 			<TextBlock Margin="20 30 0 10" Grid.Row="0" Grid.Column="6" >Notizen:</TextBlock>
-			<TextBox Margin="20 -10 0 -50" Name="textCustomerNotes" LostFocus="textCustomerNotes_LostFocus" AcceptsReturn="True" Grid.RowSpan="19" Grid.Row="1" Grid.Column="7" TextWrapping="Wrap" HorizontalAlignment="Stretch" VerticalAlignment="Stretch"/>
-			<Button Content="Kundendaten Speichern" Click="btnNewCustomer_Click" Grid.Row="18" Grid.Column="3" Grid.RowSpan="0" Grid.ColumnSpan="2" />
-			<Button Content="Kundendaten Leeren" Click="btnCustomerInfoClear_Click" Grid.Row="19" Grid.Column="3" Grid.RowSpan="0" Grid.ColumnSpan="2" />
+			<TextBox Margin="20 -10 0 -50" Name="textCustomerNotes" AcceptsReturn="True" Grid.RowSpan="19" Grid.Row="1" Grid.Column="7" TextWrapping="Wrap" HorizontalAlignment="Stretch" VerticalAlignment="Stretch"/>
+			<Button Content="Kundendaten Speichern" Grid.Row="18" Grid.Column="3" Grid.RowSpan="0" Grid.ColumnSpan="2" />
+			<Button Content="Kundendaten Leeren" Grid.Row="19" Grid.Column="3" Grid.RowSpan="0" Grid.ColumnSpan="2" />
 
 		</Grid>
 	</ScrollViewer>

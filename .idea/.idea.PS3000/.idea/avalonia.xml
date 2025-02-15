@@ -3,9 +3,14 @@
   <component name="AvaloniaProject">
     <option name="projectPerEditor">
       <map>
+        <entry key="Controls/Customers.axaml" value="../PS3000.Desktop/PS3000.Desktop.csproj" />
         <entry key="Controls/Inquiries.axaml" value="../PS3000.Desktop/PS3000.Desktop.csproj" />
+        <entry key="Controls/Invoices.axaml" value="../PS3000.Desktop/PS3000.Desktop.csproj" />
+        <entry key="Controls/MasterData.axaml" value="../PS3000.Desktop/PS3000.Desktop.csproj" />
+        <entry key="Controls/Orders.axaml" value="../PS3000.Desktop/PS3000.Desktop.csproj" />
         <entry key="Controls/StorageCoil.axaml" value="../PS3000.Desktop/PS3000.Desktop.csproj" />
         <entry key="Views/MainView.axaml" value="../PS3000.Desktop/PS3000.Desktop.csproj" />
+        <entry key="Views/MainWindow.axaml" value="../PS3000.Desktop/PS3000.Desktop.csproj" />
       </map>
     </option>
   </component>

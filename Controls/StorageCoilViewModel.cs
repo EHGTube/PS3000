@@ -6,6 +6,8 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using CommunityToolkit.Mvvm.Input;
+using Dapper;
+using Microsoft.Data.SqlClient;
 using MsBox.Avalonia;
 using MsBox.Avalonia.Enums;
 using MySql.Data.MySqlClient;
@@ -75,8 +77,10 @@ namespace PS3000.Controls
         [ObservableProperty]
         [NotifyPropertyChangedFor(nameof(CoilLength))]
         public float coilWT;
-
+        
         public int CoilLength => (int)Math.Round(coilWeight / coilWidth / coilWT / 7.97f * 1000, 0);
+        
+        
         
         string ConnectionString = PS3000.Properties.Resources.ConnectionString;
         
@@ -219,6 +223,26 @@ namespace PS3000.Controls
         [ObservableProperty]
         private string selectedStatus;
 
+                
+        [ObservableProperty]
+        int coilWTGroup;
+        [ObservableProperty]
+        string coilSetWT;
+        [ObservableProperty]
+        int coilGrade;
+        [ObservableProperty]
+        DateTime? coilPurchaseDate = DateTime.Today;
+        [ObservableProperty]
+        string coilCharge;
+        [ObservableProperty]
+        int coilSuppliersSelected;
+        [ObservableProperty]
+        int coilExecSelected;
+        [ObservableProperty]
+        int coilWTStatusSelected;
+        [ObservableProperty]
+        string coilPrice;
+        
         [RelayCommand]
         private async Task LoadCoilsInStorageAsync()        
         {
@@ -338,18 +362,37 @@ namespace PS3000.Controls
             if (CoilSearchSelectedItem != null)
             {
                 
-                
-                
+                Console.WriteLine("Start");
                 var box = MessageBoxManager
                     .GetMessageBoxStandard("Bestätigung",
                         $"Selection: \n" +
-                        $"LaufendeCoilnummer: {CoilSearchSelectedItem.LaufendeCoilnummer}\n" +
-                        $"Status: {CoilSearchSelectedItem.Status}\n" +
-                        $"Werkstoff: {CoilSearchSelectedItem.Werkstoff}\n" +
-                        $"Wandstärke: {CoilSearchSelectedItem.Wandstärke}",
+                        $"LaufendeCoilnummer: {coilSearchSelectedItem.LaufendeCoilnummer.ToString()}\n" +
+                        $"Soll WS: {coilSetWT}\n"+
+                        $"Ist WS: {CoilWT}\n"+
+                        $"Werkstoff: {await GetFieldValueAsync("Werkstoff",
+                            CoilGrade.ToString(),
+                            "werkstoffe", "LaufendeWerkstoffnummer")}\n"+
+                        $"Kaufdatum: {CoilPurchaseDate}\n"+
+                        $"Charge: {CoilCharge}\n"+
+                        $"Lieferant: {await GetFieldValueAsync("Name",
+                            CoilSuppliersSelected.ToString(),
+                            "lieferanten", "LaufendeLieferantennummer")}\n"+
+                        $"Ausführung: {await GetFieldValueAsync("Beschreibung",
+                            CoilExecSelected.ToString(),
+                            "coilausfuhrung", "Position")}\n"+
+                        $"Status: {await GetFieldValueAsync("Beschreibung",
+                            CoilWTStatusSelected.ToString(),
+                            "coilstatus", "Position")}\n"+
+                        $"Breite: {CoilWidth}\n"+
+                        $"Gewicht: {CoilWeight}\n" +
+                        $"Länge: {CoilLength}\n"+
+                        $"Preis €/kg: {CoilPrice}\n",
                         ButtonEnum.YesNo);
             
                 var result = await box.ShowAsync();
+                Console.WriteLine("END");
+
+                
             }
             else
             {
@@ -360,9 +403,8 @@ namespace PS3000.Controls
             
                 var result = await box.ShowAsync();
             }
-            CoilSearchAttributes.Clear();
         }
-
+        
         [RelayCommand]
         private async Task UpdateCoilDetails()
         {
@@ -375,28 +417,13 @@ namespace PS3000.Controls
         }
         
         
-        [ObservableProperty]
-        int coilWTGroup;
-        [ObservableProperty]
-        string coilSetWT;
-        [ObservableProperty]
-        int coilGrade;
-        [ObservableProperty]
-        DateTime? coilPurchaseDate = DateTime.Today;
-        [ObservableProperty]
-        string coilCharge;
-        [ObservableProperty]
-        int coilSuppliersSelected;
-        [ObservableProperty]
-        int coilExecSelected;
-        [ObservableProperty]
-        int coilWTStatusSelected;
-        [ObservableProperty]
-        string coilPrice;
-        
         [RelayCommand]
         private async Task LoadCoilDetails()
         {
+            var connectionString = "Server=127.0.0.1;Port=3306;Database=prostahl;Uid=root;Pwd=1234;Initial Catalog=DapperDB;Integrated Security=true;TrustServerCertificate=True";
+            
+            
+            var connection = new SqlConnection(connectionString);
 
             CoilWTGroup = int.Parse(await GetFieldValueAsync("Position", (await GetFieldValueAsync("WSGruppe",
                         coilSearchSelectedItem.LaufendeCoilnummer.ToString(),
@@ -406,10 +433,15 @@ namespace PS3000.Controls
             CoilGrade = int.Parse(await GetFieldValueAsync("Werkstoff",
                 coilSearchSelectedItem.LaufendeCoilnummer.ToString(),
                 "lagercoils", "LaufendeCoilnummer"))-1;
+            
+            var sql = $"SELECT `WSGruppe` FROM `prostahl`.`lagercoils` WHERE `LaufendeCoilnummer` LIKE {coilSearchSelectedItem.LaufendeCoilnummer.ToString()} ORDER BY `LaufendeCoilnummer` ASC LIMIT 1";
+            var product = connection.QuerySingle(sql).ToList();
 
-            CoilSetWT = await GetFieldValueAsync("WSGruppe",
-                coilSearchSelectedItem.LaufendeCoilnummer.ToString(),
-                "lagercoils", "LaufendeCoilnummer");
+            CoilSetWT = product.WSGruppe;
+
+            // CoilSetWT = await GetFieldValueAsync("WSGruppe",
+            //     coilSearchSelectedItem.LaufendeCoilnummer.ToString(),
+            //     "lagercoils", "LaufendeCoilnummer");
 
             CoilWT = float.Parse(await GetFieldValueAsync("Wandstarke",
                 coilSearchSelectedItem.LaufendeCoilnummer.ToString(),
@@ -447,6 +479,7 @@ namespace PS3000.Controls
                  coilSearchSelectedItem.LaufendeCoilnummer.ToString(),
                  "lagercoils", "LaufendeCoilnummer");
         }
+        
         
         
         //private void btnCoilsNewCoilSave_Click(object sender, EventArgs e)

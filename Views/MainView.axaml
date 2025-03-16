@@ -10,7 +10,7 @@
 	<UserControl.DataContext>
 		<vm:MainViewModel />
 	</UserControl.DataContext>
-
+	
 	<TabControl Margin="4">
 		<TabItem Header="Aufträge">
 			<ScrollViewer HorizontalScrollBarVisibility="Visible" VerticalScrollBarVisibility="Visible">
@@ -31,14 +31,15 @@
 		</TabItem>
 
 		<TabItem Header="Kunden">
-			<controls:Customers/>
+			<controls:Customers DataContext="{Binding CustomersViewModel}"/>
 		</TabItem>
+		
 		<TabItem Header="Lager Rohre">
 			<ScrollViewer HorizontalScrollBarVisibility="Visible" VerticalScrollBarVisibility="Visible">
 				<TextBlock Margin="5">This is tab 3 content</TextBlock>
 			</ScrollViewer>
-
 		</TabItem>
+		
 		<TabItem Header="Lager Coils">
 				<controls:StorageCoil DataContext="{Binding StorageCoil}"/>
 

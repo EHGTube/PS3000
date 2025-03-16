@@ -1,0 +1,3 @@
+1. Replace "Search" Boxes in Customers.axaml
+2. Replace "Load CoilDetails" Button in StorageCoil
+3. 

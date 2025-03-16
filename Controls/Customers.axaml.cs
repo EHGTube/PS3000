@@ -7,6 +7,8 @@ using System;
 using System.Collections.Generic;
 using MySql;
 using MySql.Data.MySqlClient;
+using PS3000.Controls;
+using PS3000.ViewModels;
 
 namespace PS3000;
 

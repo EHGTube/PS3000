@@ -5,7 +5,6 @@ using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
 using System.Text;
-using System.Threading.Tasks;
 using CommunityToolkit.Mvvm.Input;
 using MsBox.Avalonia;
 using MsBox.Avalonia.Enums;
@@ -17,29 +16,182 @@ namespace PS3000.Controls;
 public partial class CustomersViewModel : ObservableObject
 {
     public string? Name { get; init; }
+    
+    private string _selectedCustomer;
+    public string SelectedCustomer
+    {
+        get => _selectedCustomer;
+        set
+        {
+            if (SetProperty(ref _selectedCustomer, value)) // This returns true if the value actually changed
+            {
+                // This code runs whenever SelectedCustomer changes
+                OnSelectedCustomerChanged();
+            }
+        }
+    }
 
-
+    [ObservableProperty]
+    string customersDeliveryAdressCompany;
+    [ObservableProperty]
+    string customersDeliveryAdressStreet;
+    [ObservableProperty]
+    string customersDeliveryAdressNumber;
+    [ObservableProperty]
+    string customersDeliveryAdressHouseNo;
+    [ObservableProperty]
+    string customersDeliveryAdressPostCode;
+    [ObservableProperty]
+    string customersDeliveryAdressCity;
+    [ObservableProperty]
+    string customersDeliveryAdressCountry;
+    [ObservableProperty]
+    string customersDeliveryAdressContactName;
+    [ObservableProperty]
+    string customersDeliveryAdressContactPhone;
+    [ObservableProperty]
+    string customersDeliveryAdressContactMail;
+    
+    [ObservableProperty]
+    string customerNameSearch;
+    [ObservableProperty]
+    string customersPurchaserName;
+    [ObservableProperty]
+    string customersPurchaserPhone;
+    [ObservableProperty]
+    string customersPurchaserMail;
+    [ObservableProperty]
+    string customersBookkeeperName;
+    [ObservableProperty]
+    string customersBookkeeperPhone;
+    [ObservableProperty]
+    string customersBookkeeperMail;
+    [ObservableProperty]
+    string customersCertificateMail;
+    [ObservableProperty]
+    string customersInvoiceMail;
+    [ObservableProperty]
+    string customersNumber;
+    [ObservableProperty]
+    string customersName;
+    [ObservableProperty]
+    string customershortName;
+    [ObservableProperty]
+    string customerstreet;
+    [ObservableProperty]
+    string customersHouseNo;
+    [ObservableProperty]
+    string customersCity;
+    [ObservableProperty]
+    string customersPostCode;
+    [ObservableProperty]
+    string customersCountry;
+    [ObservableProperty]
+    string customerSkonto;
+    [ObservableProperty]
+    string customerSkontoTerm;
+    [ObservableProperty]
+    string customersNettoTerm;
+    [ObservableProperty]
+    string customersNotes;
+    
+    
+    private async void OnSelectedCustomerChanged()
+    {
+        CustomersDeliveryAdressCompany = SelectedCustomer;
+        CustomersDeliveryAdressStreet = await GetFieldValueAsync("Straße", SelectedCustomer, "lieferanschrift", "Firmenname");
+        CustomersDeliveryAdressHouseNo = await GetFieldValueAsync("Hausnummer", SelectedCustomer, "lieferanschrift", "Firmenname");
+        CustomersDeliveryAdressPostCode = await GetFieldValueAsync("PLZ", SelectedCustomer, "lieferanschrift", "Firmenname");
+        CustomersDeliveryAdressCity = await GetFieldValueAsync("Stadt", SelectedCustomer, "lieferanschrift", "Firmenname");
+        CustomersDeliveryAdressCountry = await GetFieldValueAsync("Land", SelectedCustomer, "lieferanschrift", "Firmenname");
+        CustomersDeliveryAdressContactName = await GetFieldValueAsync("Ansprechpartner", SelectedCustomer, "lieferanschrift", "Firmenname");
+        CustomersDeliveryAdressContactPhone = await GetFieldValueAsync("Ansprechpartner_Telefon", SelectedCustomer, "lieferanschrift", "Firmenname");
+        CustomersDeliveryAdressContactMail = await GetFieldValueAsync("Ansprechpartner_Mail", SelectedCustomer, "lieferanschrift", "Firmenname");
+        CustomersDeliveryAdressNumber = await GetFieldValueAsync("Lieferanschrift_Nummer", SelectedCustomer, "lieferanschrift", "Firmenname");
+    }
+    
     [ObservableProperty] 
     private string deliveryAdressSearch;
-
+    
+    public ObservableCollection<string> DeliveryAdressList { get; private set; } = new ObservableCollection<string>();
+    
+    [RelayCommand]
+    private async Task SearchDeliveryAdress(string value)
+    {
+        
+        if (value != null)
+        {
+            DeliveryAdressList.Clear();
+        
+            try
+            {
+                using (MySql.Data.MySqlClient.MySqlConnection connection = new MySql.Data.MySqlClient.MySqlConnection(ConnectionString))
+                {
+                    connection.Open();
+        
+                    string query = $"SELECT * FROM `prostahl`.`lieferanschrift` WHERE CONCAT_WS(' ', `Firmenname`, `Straße`, `Hausnummer`, `PLZ`, `Stadt`, `Land`, `Ansprechpartner`, `Ansprechpartner_Telefon`, `Ansprechpartner_Mail`) LIKE '%{value}%' ORDER BY `Firmenname` ASC LIMIT 1000;\r\n";
+                    MySql.Data.MySqlClient.MySqlCommand command = new MySql.Data.MySqlClient.MySqlCommand(query, connection);
+        
+                    using (MySql.Data.MySqlClient.MySqlDataReader reader = command.ExecuteReader())
+                    {
+                        while (reader.Read())
+                        {
+                            // Read values from columns
+                            string readout = reader.GetString(1); // Assuming the searched value is at index 1
+        
+                            // Do something with the values...
+                            DeliveryAdressList.Add(readout);
+                        }
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                var box = MessageBoxManager
+                  .GetMessageBoxStandard("Error", ex.Message,
+                      ButtonEnum.YesNo);
+        
+                var result = await box.ShowAsync();
+            }
+        }
+    }
+    
+    
     partial void OnDeliveryAdressSearchChanged(string value)
     {
-        RunSearchAsync();
+        SearchDeliveryAdress(value);
     }
-    
-    
-    private async Task RunSearchAsync()
+
+    [RelayCommand]
+    private void DeleteDeliveryAdressSearch()
+    {
+        CustomersDeliveryAdressCompany = "";
+        CustomersDeliveryAdressStreet = "";
+        CustomersDeliveryAdressHouseNo = "";
+        CustomersDeliveryAdressPostCode = "";
+        CustomersDeliveryAdressCity = "";
+        CustomersDeliveryAdressCountry = "";
+        CustomersDeliveryAdressContactName = "";
+        CustomersDeliveryAdressContactPhone = "";
+        CustomersDeliveryAdressContactMail = "";
+        CustomersDeliveryAdressNumber = "";
+        DeliveryAdressSearch = "";
+        DeliveryAdressList.Clear();
+    }
+
+    [RelayCommand]
+    private async void AddCustomer()
     {
         var box = MessageBoxManager
-            .GetMessageBoxStandard("Bestätigung",
-                $"MethodFour Called:",
-                ButtonEnum.YesNo);
-            
+        .GetMessageBoxStandard("Best�tigung",
+            "Lieferanschri",
+        ButtonEnum.YesNo);
+        
         var result = await box.ShowAsync();
     }
-    
-    string ConnectionString = PS3000.Properties.Resources.ConnectionString;
 
+    string ConnectionString = PS3000.Properties.Resources.ConnectionString;
+    
     
     private async Task<string> GetFieldValueAsync(string returnColumn, string keyphrase, string table, string searchColumn)
     {
@@ -394,10 +546,7 @@ public partial class CustomersViewModel : ObservableObject
     //     }
     // }
     //
-    // private void textCustomersDeliveryAdressSearch_TextChanged(object? sender, Avalonia.Interactivity.RoutedEventArgs e)
-    // {
-    //     CustomerDeliveryAdressSearchList();
-    // }
+
     //
     // private void CustomerDeliveryAdressInformationClear()
     // {
@@ -413,50 +562,7 @@ public partial class CustomersViewModel : ObservableObject
     //     textCustomersDeliveryAdressNumber.Text = "";
     // }
     //
-    // private async void CustomerDeliveryAdressSearchList()
-    // {
-    //     //TO ADAPT MORE DB Searches:
-    //     //Change the "lieferanschrift to which table it should look through
-    //     // Change Query String to match all Rows of your DB it should search for.
-    //     //Set the Textbox for Search Code Source
-    //     //Set the supposed readout index value (maybe its earlier or later)
-    //
-    //     if (textCustomersDeliveryAdressSearch.Text != null)
-    //     {
-    //         ListCustomersDeliveryAdressList.Items.Clear();
-    //
-    //         try
-    //         {
-    //             using (MySql.Data.MySqlClient.MySqlConnection connection = new MySql.Data.MySqlClient.MySqlConnection(connectionString))
-    //             {
-    //                 connection.Open();
-    //
-    //                 string query = $"SELECT * FROM `prostahl`.`lieferanschrift` WHERE CONCAT_WS(' ', `Firmenname`, `Stra�e`, `Hausnummer`, `PLZ`, `Stadt`, `Land`, `Ansprechpartner`, `Ansprechpartner_Telefon`, `Ansprechpartner_Mail`) LIKE '%{textCustomersDeliveryAdressSearch.Text}%' ORDER BY `Firmenname` ASC LIMIT 1000;\r\n";
-    //                 MySql.Data.MySqlClient.MySqlCommand command = new MySql.Data.MySqlClient.MySqlCommand(query, connection);
-    //
-    //                 using (MySql.Data.MySqlClient.MySqlDataReader reader = command.ExecuteReader())
-    //                 {
-    //                     while (reader.Read())
-    //                     {
-    //                         // Read values from columns
-    //                         string readout = reader.GetString(1); // Assuming the searched value is at index 1
-    //
-    //                         // Do something with the values...
-    //                         ListCustomersDeliveryAdressList.Items.Add(readout);
-    //                     }
-    //                 }
-    //             }
-    //         }
-    //         catch (Exception ex)
-    //         {
-    //             var box = MessageBoxManager
-    //               .GetMessageBoxStandard("Error", ex.Message,
-    //                   ButtonEnum.YesNo);
-    //
-    //             var result = await box.ShowAsync();
-    //         }
-    //     }
-    // }
+    
     //
     // private void btnDeliveryInfoClear_Click(object? sender, Avalonia.Interactivity.RoutedEventArgs e)
     // {

@@ -9,151 +9,89 @@ using CommunityToolkit.Mvvm.Input;
 using MsBox.Avalonia;
 using MsBox.Avalonia.Enums;
 using MySql.Data.MySqlClient;
+using Dapper;
 
 
 namespace PS3000.Controls;
 
 public partial class CustomersViewModel : ObservableObject
 {
-    public string? Name { get; init; }
     
-    private string _selectedCustomer;
-    public string SelectedCustomer
-    {
-        get => _selectedCustomer;
-        set
-        {
-            if (SetProperty(ref _selectedCustomer, value)) // This returns true if the value actually changed
-            {
-                // This code runs whenever SelectedCustomer changes
-                OnSelectedCustomerChanged();
-            }
-        }
-    }
-
-    [ObservableProperty]
-    string customersDeliveryAdressCompany;
-    [ObservableProperty]
-    string customersDeliveryAdressStreet;
-    [ObservableProperty]
-    string customersDeliveryAdressNumber;
-    [ObservableProperty]
-    string customersDeliveryAdressHouseNo;
-    [ObservableProperty]
-    string customersDeliveryAdressPostCode;
-    [ObservableProperty]
-    string customersDeliveryAdressCity;
-    [ObservableProperty]
-    string customersDeliveryAdressCountry;
-    [ObservableProperty]
-    string customersDeliveryAdressContactName;
-    [ObservableProperty]
-    string customersDeliveryAdressContactPhone;
-    [ObservableProperty]
-    string customersDeliveryAdressContactMail;
-    
-    [ObservableProperty]
-    string customerNameSearch;
-    [ObservableProperty]
-    string customersPurchaserName;
-    [ObservableProperty]
-    string customersPurchaserPhone;
-    [ObservableProperty]
-    string customersPurchaserMail;
-    [ObservableProperty]
-    string customersBookkeeperName;
-    [ObservableProperty]
-    string customersBookkeeperPhone;
-    [ObservableProperty]
-    string customersBookkeeperMail;
-    [ObservableProperty]
-    string customersCertificateMail;
-    [ObservableProperty]
-    string customersInvoiceMail;
-    [ObservableProperty]
-    string customersNumber;
-    [ObservableProperty]
-    string customersName;
-    [ObservableProperty]
-    string customershortName;
-    [ObservableProperty]
-    string customerstreet;
-    [ObservableProperty]
-    string customersHouseNo;
-    [ObservableProperty]
-    string customersCity;
-    [ObservableProperty]
-    string customersPostCode;
-    [ObservableProperty]
-    string customersCountry;
-    [ObservableProperty]
-    string customerSkonto;
-    [ObservableProperty]
-    string customerSkontoTerm;
-    [ObservableProperty]
-    string customersNettoTerm;
-    [ObservableProperty]
-    string customersNotes;
-    
-    
-    private async void OnSelectedCustomerChanged()
-    {
-        CustomersDeliveryAdressCompany = SelectedCustomer;
-        CustomersDeliveryAdressStreet = await GetFieldValueAsync("Straße", SelectedCustomer, "lieferanschrift", "Firmenname");
-        CustomersDeliveryAdressHouseNo = await GetFieldValueAsync("Hausnummer", SelectedCustomer, "lieferanschrift", "Firmenname");
-        CustomersDeliveryAdressPostCode = await GetFieldValueAsync("PLZ", SelectedCustomer, "lieferanschrift", "Firmenname");
-        CustomersDeliveryAdressCity = await GetFieldValueAsync("Stadt", SelectedCustomer, "lieferanschrift", "Firmenname");
-        CustomersDeliveryAdressCountry = await GetFieldValueAsync("Land", SelectedCustomer, "lieferanschrift", "Firmenname");
-        CustomersDeliveryAdressContactName = await GetFieldValueAsync("Ansprechpartner", SelectedCustomer, "lieferanschrift", "Firmenname");
-        CustomersDeliveryAdressContactPhone = await GetFieldValueAsync("Ansprechpartner_Telefon", SelectedCustomer, "lieferanschrift", "Firmenname");
-        CustomersDeliveryAdressContactMail = await GetFieldValueAsync("Ansprechpartner_Mail", SelectedCustomer, "lieferanschrift", "Firmenname");
-        CustomersDeliveryAdressNumber = await GetFieldValueAsync("Lieferanschrift_Nummer", SelectedCustomer, "lieferanschrift", "Firmenname");
-    }
+    //Following is to search the Delivery Adresses
     
     [ObservableProperty] 
     private string deliveryAdressSearch;
     
     public ObservableCollection<string> DeliveryAdressList { get; private set; } = new ObservableCollection<string>();
-    
+
     [RelayCommand]
     private async Task SearchDeliveryAdress(string value)
     {
         
-        if (value != null)
+        if (!string.IsNullOrEmpty(value))
         {
-            DeliveryAdressList.Clear();
-        
             try
             {
-                using (MySql.Data.MySqlClient.MySqlConnection connection = new MySql.Data.MySqlClient.MySqlConnection(ConnectionString))
+                DeliveryAdressList.Clear();
+        
+                using var connection = new MySqlConnection(ConnectionString);
+                await connection.OpenAsync();
+        
+                // Use parameterized query to prevent SQL injection
+                string query = @"
+                    SELECT CompanyName 
+                    FROM `prostahl`.`deliveryadress` 
+                    WHERE CONCAT_WS(' ', 
+                        `CompanyName`,
+                        `Street`,
+                        `HouseNo`,
+                        `Postcode`,
+                        `City`,
+                        `Country`,
+                        `ContactName`,
+                        `ContactPhone`,
+                        `ContactMail`
+                    ) LIKE @SearchTerm 
+                    ORDER BY `CompanyName` ASC
+                    LIMIT 1000";
+        
+                // Add % wildcards for LIKE clause
+                string searchTerm = $"%{value}%";
+        
+                // Execute query and get results directly as strings
+                var results = await connection.QueryAsync<string>(query, new { SearchTerm = searchTerm });
+        
+                // Add results to the list
+                foreach (var result in results)
                 {
-                    connection.Open();
-        
-                    string query = $"SELECT * FROM `prostahl`.`lieferanschrift` WHERE CONCAT_WS(' ', `Firmenname`, `Straße`, `Hausnummer`, `PLZ`, `Stadt`, `Land`, `Ansprechpartner`, `Ansprechpartner_Telefon`, `Ansprechpartner_Mail`) LIKE '%{value}%' ORDER BY `Firmenname` ASC LIMIT 1000;\r\n";
-                    MySql.Data.MySqlClient.MySqlCommand command = new MySql.Data.MySqlClient.MySqlCommand(query, connection);
-        
-                    using (MySql.Data.MySqlClient.MySqlDataReader reader = command.ExecuteReader())
-                    {
-                        while (reader.Read())
-                        {
-                            // Read values from columns
-                            string readout = reader.GetString(1); // Assuming the searched value is at index 1
-        
-                            // Do something with the values...
-                            DeliveryAdressList.Add(readout);
-                        }
-                    }
+                    DeliveryAdressList.Add(result);
                 }
             }
             catch (Exception ex)
             {
-                var box = MessageBoxManager
-                  .GetMessageBoxStandard("Error", ex.Message,
-                      ButtonEnum.YesNo);
+                var box = MessageBoxManager.GetMessageBoxStandard(
+                    "Error", 
+                    ex.Message,
+                    ButtonEnum.YesNo
+                );
         
-                var result = await box.ShowAsync();
+                await box.ShowAsync();
             }
         }
+        else
+        {
+            CustomersDeliveryAdressCompany = "";
+            CustomersDeliveryAdressStreet = "";
+            CustomersDeliveryAdressHouseNo = "";
+            CustomersDeliveryAdressPostCode = "";
+            CustomersDeliveryAdressCity = "";
+            CustomersDeliveryAdressCountry = "";
+            CustomersDeliveryAdressContactName = "";
+            CustomersDeliveryAdressContactPhone = "";
+            CustomersDeliveryAdressContactMail = "";
+            CustomersDeliveryAdressNumber = "";
+            DeliveryAdressSearch = "";
+            DeliveryAdressList.Clear();        }
     }
     
     
@@ -178,1126 +116,712 @@ public partial class CustomersViewModel : ObservableObject
         DeliveryAdressSearch = "";
         DeliveryAdressList.Clear();
     }
+    
+    
+    
+    
+    
+    
+    
+    
+    //Following is to load Details once Delivery Adress company has been selected
+    private string _selectedDeliveryAdress;
+    public string SelectedDeliveryAdress
+    {
+        get => _selectedDeliveryAdress;
+        set
+        {
+            if (SetProperty(ref _selectedDeliveryAdress, value)) // This returns true if the value actually changed
+            {
+                // This code runs whenever SelectedCustomer changes
+                OnSelectedDeliveryAdressChanged();
+            }
+        }
+    }
+    
+    private async void OnSelectedDeliveryAdressChanged()
+    {
+        // Create a connection
+        using var connection = new MySqlConnection(ConnectionString);
+        await connection.OpenAsync();
 
+        // Query to get all delivery address data at once
+        var deliveryAddress = await connection.QueryFirstOrDefaultAsync<dynamic>(
+            @"SELECT 
+        Street, 
+        HouseNo, 
+        Postcode, 
+        City, 
+        Country, 
+        ContactName, 
+        ContactPhone, 
+        ContactMail, 
+        deliveryadressNo 
+        FROM deliveryadress 
+        WHERE CompanyName = @CompanyName",
+            new { CompanyName = SelectedDeliveryAdress }
+        );
+
+        // If delivery address exists, assign all properties
+        if (deliveryAddress != null)
+        {
+            CustomersDeliveryAdressCompany = SelectedDeliveryAdress;
+            CustomersDeliveryAdressStreet = deliveryAddress.Street;
+            CustomersDeliveryAdressHouseNo = deliveryAddress.HouseNo;
+            CustomersDeliveryAdressPostCode = deliveryAddress.Postcode;
+            CustomersDeliveryAdressCity = deliveryAddress.City;
+            CustomersDeliveryAdressCountry = deliveryAddress.Country;
+            CustomersDeliveryAdressContactName = deliveryAddress.ContactName;
+            CustomersDeliveryAdressContactPhone = deliveryAddress.ContactPhone;
+            CustomersDeliveryAdressContactMail = deliveryAddress.ContactMail;
+            CustomersDeliveryAdressNumber = deliveryAddress.deliveryadressNo?.ToString();
+        }
+    }
+    
+    [ObservableProperty]
+    string customersDeliveryAdressCompany;
+    [ObservableProperty]
+    string customersDeliveryAdressStreet;
+    [ObservableProperty]
+    string customersDeliveryAdressNumber;
+    [ObservableProperty]
+    string customersDeliveryAdressHouseNo;
+    [ObservableProperty]
+    string customersDeliveryAdressPostCode;
+    [ObservableProperty]
+    string customersDeliveryAdressCity;
+    [ObservableProperty]
+    string customersDeliveryAdressCountry;
+    [ObservableProperty]
+    string customersDeliveryAdressContactName;
+    [ObservableProperty]
+    string customersDeliveryAdressContactPhone;
+    [ObservableProperty]
+    string customersDeliveryAdressContactMail;
+    
+    
+    //Following will update an existing Delivery Adress or add a new one: 
+    [RelayCommand]
+    private async void AddDeliveryAdress()
+    {
+        if (String.IsNullOrEmpty(deliveryAdressSearch))
+        {
+            {
+                var box = MessageBoxManager
+                    .GetMessageBoxStandard("Neue Lieferadresse Anlegen?",
+                    $"Firmenname: {customersDeliveryAdressCompany}{Environment.NewLine}" +
+                        $"Straße: {customersDeliveryAdressStreet}{Environment.NewLine}" +
+                        $"Hausnummer: {customersDeliveryAdressHouseNo}{Environment.NewLine}" +
+                        $"PLZ: {customersDeliveryAdressPostCode}{Environment.NewLine}" +
+                        $"Stadt: {customersDeliveryAdressCity}{Environment.NewLine}" +
+                        $"Land: {customersDeliveryAdressCountry}{Environment.NewLine}" +
+                        $"Kontakt Name: {customersDeliveryAdressContactName}{Environment.NewLine}" +
+                        $"Kontakt Telefon: {customersDeliveryAdressContactPhone}{Environment.NewLine}" +
+                        $"Kontakt E-Mail: {customersDeliveryAdressContactMail}{Environment.NewLine}",
+                    ButtonEnum.YesNo);
+            
+                var result = await box.ShowAsync();
+            
+                if (result == ButtonResult.Yes)
+                {
+                    const string sql = @"
+                    INSERT INTO deliveryadress (CompanyName, Street, HouseNo, Postcode, City, Country, ContactName, ContactPhone, ContactMail)
+                    VALUES (@CompanyName, @Street, @HouseNo, @Postcode, @City, @Country, @ContactName, @ContactPhone, @ContactMail);
+                    SELECT LAST_INSERT_ID();";
+            
+                    using var connection = new MySqlConnection(ConnectionString);
+                    await connection.OpenAsync();
+            
+                    // Using DynamicParameters for more flexibility
+                    var parameters = new DynamicParameters();
+                    parameters.Add("@CompanyName", customersDeliveryAdressCompany);
+                    parameters.Add("@Street", customersDeliveryAdressStreet);
+                    parameters.Add("@HouseNo", customersDeliveryAdressHouseNo);
+                    parameters.Add("@Postcode", customersDeliveryAdressPostCode);
+                    parameters.Add("@City", customersDeliveryAdressCity);
+                    parameters.Add("@Country", customersDeliveryAdressCountry);
+                    parameters.Add("@ContactName", customersDeliveryAdressContactName);
+                    parameters.Add("@ContactPhone", customersDeliveryAdressContactPhone);
+                    parameters.Add("@ContactMail", customersDeliveryAdressContactMail);
+                    
+                    var deliveryAddressId = await connection.ExecuteScalarAsync<int>(sql, parameters);
+                    
+                    var donebox = MessageBoxManager
+                        .GetMessageBoxStandard("Erfolgreich!", $"Lieferadresse-ID: {deliveryAddressId}", ButtonEnum.Ok);
+
+                    var tast = await donebox.ShowAsync();
+                }
+            }
+        }
+        else
+        {
+            var box = MessageBoxManager
+                    .GetMessageBoxStandard("Änderungen Bestätigen",
+                    $"Firmenname: {customersDeliveryAdressCompany}{Environment.NewLine}" +
+                        $"Adress-ID: {customersDeliveryAdressNumber}{Environment.NewLine}" +
+                        $"Straße: {customersDeliveryAdressStreet}{Environment.NewLine}" +
+                        $"Hausnummer: {customersDeliveryAdressHouseNo}{Environment.NewLine}" +
+                        $"PLZ: {customersDeliveryAdressPostCode}{Environment.NewLine}" +
+                        $"Stadt: {customersDeliveryAdressCity}{Environment.NewLine}" +
+                        $"Land: {customersDeliveryAdressCountry}{Environment.NewLine}" +
+                        $"Kontakt Name: {customersDeliveryAdressContactName}{Environment.NewLine}" +
+                        $"Kontakt Telefon: {customersDeliveryAdressContactPhone}{Environment.NewLine}" +
+                        $"Kontakt E-Mail: {customersDeliveryAdressContactMail}{Environment.NewLine}",
+                    ButtonEnum.YesNo);
+            
+                var result = await box.ShowAsync();
+                
+            if (result == ButtonResult.Yes)
+            {
+                // First, fetch the current delivery address data
+                using var connection = new MySqlConnection(ConnectionString);
+                await connection.OpenAsync();
+                
+                var currentDeliveryAddress = await connection.QueryFirstOrDefaultAsync<dynamic>(
+                    "SELECT * FROM deliveryadress WHERE deliveryadressNo = @deliveryadressNo", 
+                    new { deliveryadressNo = customersDeliveryAdressNumber }
+                );
+                
+                if (currentDeliveryAddress == null)
+                {
+                    var notFoundBox = MessageBoxManager.GetMessageBoxStandard(
+                        "Fehler!", 
+                        $"Lieferadresse mit ID {customersDeliveryAdressNumber} wurde nicht gefunden.", 
+                        ButtonEnum.Ok
+                    );
+                    await notFoundBox.ShowAsync();
+                    return;
+                }
+                
+                // Create a dictionary to store field-value pairs for fields that have changed
+                var updates = new Dictionary<string, object>();
+                var fieldMappings = new Dictionary<string, (object currentValue, object newValue)>
+                {
+                    { "CompanyName", (currentDeliveryAddress.CompanyName, customersDeliveryAdressCompany) },
+                    { "Street", (currentDeliveryAddress.Street, customersDeliveryAdressStreet) },
+                    { "HouseNo", (currentDeliveryAddress.HouseNo, customersDeliveryAdressHouseNo) },
+                    { "Postcode", (currentDeliveryAddress.Postcode, customersDeliveryAdressPostCode) },
+                    { "City", (currentDeliveryAddress.City, customersDeliveryAdressCity) },
+                    { "Country", (currentDeliveryAddress.Country, customersDeliveryAdressCountry) },
+                    { "ContactName", (currentDeliveryAddress.ContactName, customersDeliveryAdressContactName) },
+                    { "ContactPhone", (currentDeliveryAddress.ContactPhone, customersDeliveryAdressContactPhone) },
+                    { "ContactMail", (currentDeliveryAddress.ContactMail, customersDeliveryAdressContactMail) }
+                };
+                
+                // Add changed fields to the updates dictionary
+                foreach (var field in fieldMappings)
+                {
+                    var currentVal = field.Value.currentValue;
+                    var newVal = field.Value.newValue;
+
+                    // Convert both values to string, replace commas with dots, and trim spaces
+                    string currentValStr = currentVal?.ToString().Replace(",", ".").Trim() ?? "";
+                    string newValStr = newVal?.ToString().Replace(",", ".").Trim() ?? "";
+
+                    // Compare the processed strings
+                    if (!currentValStr.Equals(newValStr))
+                    {
+                        // Add the original newVal to updates (not the processed string)
+                        updates.Add(field.Key, field.Value.newValue);
+                    }
+                }
+                
+                // If no changes were detected, inform the user and exit
+                if (updates.Count == 0)
+                {
+                    var noChangesBox = MessageBoxManager.GetMessageBoxStandard(
+                        "Information", 
+                        "Es wurden keine Änderungen festgestellt.", 
+                        ButtonEnum.Ok
+                    );
+                    await noChangesBox.ShowAsync();
+                    return;
+                }
+                
+                // Build the SQL query with only the changed fields
+                var setClause = string.Join(", ", updates.Keys.Select(key => $"{key} = @{key}"));
+                string sql = $"UPDATE deliveryadress SET {setClause} WHERE deliveryadressNo = @deliveryadressNo";
+                
+                // Create parameters with only the changed fields plus the deliveryadressNo
+                var parameters = new DynamicParameters(updates);
+                parameters.Add("@deliveryadressNo", customersDeliveryAdressNumber);
+                
+                // Create a copy of the SQL for logging purposes
+                string logSql = sql;
+
+                // Replace each parameter with its value for logging
+                foreach (var param in updates)
+                {
+                    logSql = logSql.Replace($"@{param.Key}", param.Value?.ToString() ?? "NULL");
+                }
+
+                // Replace the deliveryadressNo parameter
+                logSql = logSql.Replace("@deliveryadressNo", customersDeliveryAdressNumber);
+
+                Console.WriteLine(logSql);                
+                // Execute the update
+                int rowsAffected = await connection.ExecuteAsync(sql, parameters);
+                
+                // Show result message
+                if (rowsAffected > 0)
+                {
+                    var ResultQuery = MessageBoxManager.GetMessageBoxStandard(
+                        "Erfolgreich",
+                        $"Lieferadresse: {customersDeliveryAdressCompany} wurde bearbeitet! ({updates.Count} Felder aktualisiert)",
+                        ButtonEnum.Ok
+                    );
+                    await ResultQuery.ShowAsync();
+                }
+                else
+                {
+                    var ResultQuery = MessageBoxManager.GetMessageBoxStandard(
+                        "Fehler!",
+                        $"Lieferadresse: {customersDeliveryAdressCompany} wurde nicht bearbeitet!",
+                        ButtonEnum.Ok
+                    );
+                    await ResultQuery.ShowAsync();
+                }
+            }
+        }
+
+    }
+    
+    
+    
+    //Following is to search the Company Details
+    [ObservableProperty] 
+    private string customerNameSearch;
+    
+    public ObservableCollection<string> CustomersList { get; private set; } = new ObservableCollection<string>();
+
+    [RelayCommand]
+    private async Task SearchCustomers(string value)
+    {
+        if (value != "")
+        {
+            CustomersList.Clear();
+
+            try
+            {
+                using (MySql.Data.MySqlClient.MySqlConnection connection = new MySql.Data.MySqlClient.MySqlConnection(ConnectionString))
+                {
+                    connection.Open();
+
+                    // Change the query to use proper parameter placement
+                    string query = "SELECT * FROM prostahl.Customers WHERE CONCAT_WS(' ', Customernick, Companyname, InvoiceStreet, InvoiceHouseNo, InvoiceCity, InvoicePostcode, InvoiceCountry, PurchaserName, PurchaserPhone, PurchaserMail, BookkeeperName, BookkeeperPhone, BookkeeperMail, CertificateMail, InvoiceMail, OCMail, Skonto, SkontoTerm, NettoTerm, InsuranceLimit) LIKE @SearchTerm ORDER BY Companyname ASC LIMIT 1000";
+                    
+                    MySql.Data.MySqlClient.MySqlCommand command = new MySql.Data.MySqlClient.MySqlCommand(query, connection);
+                    
+                    // Properly add the parameter with wildcard characters
+                    command.Parameters.AddWithValue("@SearchTerm", "%" + value + "%");
+                    
+                    using (MySql.Data.MySqlClient.MySqlDataReader reader = command.ExecuteReader())
+                    {
+                        while (reader.Read())
+                        {
+                            // Read values from columns
+                            string readout = reader.GetString(2); // Assuming the company name is at index 2
+                            
+                            // Add to list
+                            CustomersList.Add(readout);
+                        }
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                var box = MessageBoxManager
+                    .GetMessageBoxStandard("Error", ex.Message,
+                        ButtonEnum.YesNo);
+
+                var result = await box.ShowAsync();
+            }
+        }
+        else
+        {
+            CustomersList.Clear();
+        }
+    }
+    
+    
+    partial void OnCustomerNameSearchChanged(string value)
+    {
+        SearchCustomers(value);
+    }
+    
+
+    
+    
+    
+    
+    
+    //Following is to load Details once Customer Company has been selected
+    [ObservableProperty]
+    string customersPurchaserName;
+    [ObservableProperty]
+    string customersPurchaserPhone;
+    [ObservableProperty]
+    string customersPurchaserMail;
+    [ObservableProperty]
+    string customersBookkeeperName;
+    [ObservableProperty]
+    string customersBookkeeperPhone;
+    [ObservableProperty]
+    string customersBookkeeperMail;
+    [ObservableProperty]
+    string customersCertificateMail;
+    [ObservableProperty]
+    string customersInvoiceMail;
+    [ObservableProperty]
+    string customersOCMail;
+    [ObservableProperty]
+    string customersNumber;
+    [ObservableProperty]
+    string customersName;
+    [ObservableProperty]
+    string customershortName;
+    [ObservableProperty]
+    string customerStreet;
+    [ObservableProperty]
+    string customersHouseNo;
+    [ObservableProperty]
+    string customersCity;
+    [ObservableProperty]
+    string customersPostCode;
+    [ObservableProperty]
+    string customersCountry;
+    [ObservableProperty]
+    string customerSkonto;
+    [ObservableProperty]
+    string customerSkontoTerm;
+    [ObservableProperty]
+    string customersNettoTerm;
+    [ObservableProperty]
+    string customersNotes;
+    [ObservableProperty]
+    string customersInsurance;
+
+    
+    //Following is to load Details once Customer company has been selected
+    private string _selectedCustomer;
+    public string SelectedCustomer
+    {
+        get => _selectedCustomer;
+        set
+        {
+            if (SetProperty(ref _selectedCustomer, value)) // This returns true if the value actually changed
+            {
+                // This code runs whenever SelectedCustomer changes
+                OnSelectedCustomerChanged();
+            }
+        }
+    }
+    
+    private async void OnSelectedCustomerChanged()
+    {
+        // Create a connection
+        using var connection = new MySqlConnection(ConnectionString);
+        await connection.OpenAsync();
+
+        // Query to get all customer data at once
+        var customer = await connection.QueryFirstOrDefaultAsync<dynamic>(
+            @"SELECT 
+                Customernick, 
+                PurchaserName, 
+                PurchaserPhone, 
+                PurchaserMail, 
+                BookkeeperName, 
+                BookkeeperPhone, 
+                BookkeeperMail, 
+                CertificateMail, 
+                InvoiceMail, 
+                OCMail, 
+                Customernumber, 
+                InvoiceStreet, 
+                InvoiceHouseNo, 
+                InvoiceCity, 
+                InvoicePostcode, 
+                InvoiceCountry, 
+                Skonto, 
+                SkontoTerm, 
+                NettoTerm, 
+                Notes, 
+                InsuranceLimit 
+            FROM Customers 
+            WHERE Companyname = @CompanyName",
+            new { CompanyName = SelectedCustomer }
+        );
+
+        // If customer exists, assign all properties
+        if (customer != null)
+        {
+            CustomersName = SelectedCustomer;
+            CustomershortName = customer.Customernick;
+            CustomersPurchaserName = customer.PurchaserName;
+            CustomersPurchaserPhone = customer.PurchaserPhone;
+            CustomersPurchaserMail = customer.PurchaserMail;
+            CustomersBookkeeperName = customer.BookkeeperName;
+            CustomersBookkeeperPhone = customer.BookkeeperPhone;
+            CustomersBookkeeperMail = customer.BookkeeperMail;
+            CustomersCertificateMail = customer.CertificateMail;
+            CustomersInvoiceMail = customer.InvoiceMail;
+            CustomersOCMail = customer.OCMail;
+            CustomersNumber = customer.Customernumber?.ToString();
+            CustomerStreet = customer.InvoiceStreet;
+            CustomersHouseNo = customer.InvoiceHouseNo;
+            CustomersCity = customer.InvoiceCity;
+            CustomersPostCode = customer.InvoicePostcode;
+            CustomersCountry = customer.InvoiceCountry;
+            CustomerSkonto = customer.Skonto?.ToString();
+            CustomerSkontoTerm = customer.SkontoTerm?.ToString();
+            CustomersNettoTerm = customer.NettoTerm?.ToString();
+            CustomersNotes = customer.Notes;
+            CustomersInsurance = customer.InsuranceLimit?.ToString();
+        }
+        else
+        {
+            // Handle case where customer was not found
+            var notFoundBox = MessageBoxManager.GetMessageBoxStandard(
+                "Fehler!", 
+                $"Kunde '{SelectedCustomer}' wurde nicht gefunden.", 
+                ButtonEnum.Ok
+            );
+            await notFoundBox.ShowAsync();
+        }
+    }
+    
     [RelayCommand]
     private async void AddCustomer()
     {
-        var box = MessageBoxManager
-        .GetMessageBoxStandard("Best�tigung",
-            "Lieferanschri",
-        ButtonEnum.YesNo);
-        
-        var result = await box.ShowAsync();
-    }
-
-    string ConnectionString = PS3000.Properties.Resources.ConnectionString;
-    
-    
-    private async Task<string> GetFieldValueAsync(string returnColumn, string keyphrase, string table, string searchColumn)
-    {
-        string query = $"SELECT `{returnColumn}` FROM `prostahl`.`{table}` WHERE `{searchColumn}` LIKE @keyphrase ORDER BY `{searchColumn}` ASC LIMIT 1";
-
-        try
+        if (String.IsNullOrEmpty(SelectedCustomer))
         {
-            using var connection = new MySqlConnection(ConnectionString);
-            await connection.OpenAsync();
+            {
+                var box = MessageBoxManager
+                    .GetMessageBoxStandard("Neuen Kunden Anlegen?",
+                    $"Firmenname: {customersName}{Environment.NewLine}" +
+                        $"Kürzel: {customershortName}{Environment.NewLine}" +
+                        $"Straße: {customerStreet}{Environment.NewLine}" +
+                        $"Hausnummer: {customersHouseNo}{Environment.NewLine}" +
+                        $"PLZ: {customersPostCode}{Environment.NewLine}" +
+                        $"Stadt: {customersCity}{Environment.NewLine}" +
+                        $"Land: {customersCountry}{Environment.NewLine}" +
+                        $"Einkäufer Name: {customersPurchaserName}{Environment.NewLine}" +
+                        $"Einkäufer Telefon: {customersPurchaserPhone}{Environment.NewLine}" +
+                        $"Einkäufer E-Mail: {customersPurchaserMail}{Environment.NewLine}" +
+                        $"Buchhaltung Name: {customersBookkeeperName}{Environment.NewLine}" +
+                        $"Buchhalung Telefon: {customersBookkeeperPhone}{Environment.NewLine}" +
+                        $"Buchhalung E-Mail: {customersBookkeeperMail}{Environment.NewLine}" +
+                        $"Werkszeugnis E-Mail: {customersCertificateMail}{Environment.NewLine}" +
+                        $"Rechung E-Mail: {customersInvoiceMail}{Environment.NewLine}" +
+                        $"AB E-Mail: {customersOCMail}{Environment.NewLine}" +
+                        $"Notizen: {customersNotes}{Environment.NewLine}" +
+                        $"Skonto: {customerSkonto}{Environment.NewLine}" +
+                        $"Skontofrist: {customerSkontoTerm}{Environment.NewLine}" +
+                        $"Nettofrist: {customersNettoTerm}{Environment.NewLine}" +
+                        $"Versicherungslimit: {customersInsurance}{Environment.NewLine}",
+                    ButtonEnum.YesNo);
+            
+                var result = await box.ShowAsync();
+            
+                if (result == ButtonResult.Yes)
+                {
+                    const string sql = @"
+                    INSERT INTO Customers (Customernick, Companyname, InvoiceStreet, InvoiceHouseNo, InvoiceCity, InvoicePostcode, InvoiceCountry, PurchaserName, PurchaserPhone, PurchaserMail, BookkeeperName, BookkeeperPhone, BookkeeperMail, CertificateMail, InvoiceMail, OCMail, Notes, Skonto, SkontoTerm, NettoTerm, InsuranceLimit)
+                    VALUES (@Customernick, @Companyname, @InvoiceStreet, @InvoiceHouseNo, @InvoiceCity, @InvoicePostcode, @InvoiceCountry, @PurchaserName, @PurchaserPhone, @PurchaserMail, @BookkeeperName, @BookkeeperPhone, @BookkeeperMail, @CertificateMail, @InvoiceMail, @OCMail, @Notes, @Skonto, @SkontoTerm, @NettoTerm, @InsuranceLimit);
+                    SELECT LAST_INSERT_ID();";
+            
+                    using var connection = new MySqlConnection(ConnectionString);
+                    await connection.OpenAsync();
+            
+                    // Using DynamicParameters for more flexibility
+                    var parameters = new DynamicParameters();
+                    parameters.Add("@Customernick", customershortName);
+                    parameters.Add("@Companyname", customersName);
+                    parameters.Add("@InvoiceStreet", customerStreet);
+                    parameters.Add("@InvoiceHouseNo", customersHouseNo);
+                    parameters.Add("@InvoiceCity", customersCity);
+                    parameters.Add("@InvoicePostcode", customersPostCode);
+                    parameters.Add("@InvoiceCountry", customersCountry);
+                    parameters.Add("@PurchaserName", customersPurchaserName);
+                    parameters.Add("@PurchaserPhone", customersPurchaserPhone);
+                    parameters.Add("@PurchaserMail", customersPurchaserMail);
+                    parameters.Add("@BookkeeperName", customersBookkeeperName);
+                    parameters.Add("@BookkeeperPhone", customersBookkeeperPhone);
+                    parameters.Add("@BookkeeperMail", customersBookkeeperMail);
+                    parameters.Add("@CertificateMail", customersCertificateMail);
+                    parameters.Add("@InvoiceMail", customersInvoiceMail);
+                    parameters.Add("@OCMail", customersOCMail);
+                    parameters.Add("@Notes", customersNotes);
+                    parameters.Add("@Skonto", customerSkonto);
+                    parameters.Add("@SkontoTerm", customerSkontoTerm);
+                    parameters.Add("@NettoTerm", customersNettoTerm);
+                    parameters.Add("@InsuranceLimit", customersInsurance);
+                    
+                    var customerId = await connection.ExecuteScalarAsync<int>(sql, parameters);
+                    
+                    var donebox = MessageBoxManager
+                        .GetMessageBoxStandard("Erfolgreich!", $"Kundennummer: {customerId}",ButtonEnum.Ok);
 
-            using var command = new MySqlCommand(query, connection);
-            command.Parameters.AddWithValue("@keyphrase", keyphrase);
-            string formattedQuery = query.Replace("@keyphrase", $"'{keyphrase}'");
-            Console.WriteLine($"Query: {formattedQuery}");
+                    var tast = await donebox.ShowAsync();
+                }
+            }
+        }
+        else
+        {
+            var box = MessageBoxManager
+                    .GetMessageBoxStandard("Änderungen Bestätigen",
+                    $"Firmenname: {customersName}{Environment.NewLine}" +
+                        $"Kürzel: {customershortName}{Environment.NewLine}" +
+                        $"Kundennummer: {customersNumber}{Environment.NewLine}" +
+                        $"Straße: {customerStreet}{Environment.NewLine}" +
+                        $"Hausnummer: {customersHouseNo}{Environment.NewLine}" +
+                        $"PLZ: {customersPostCode}{Environment.NewLine}" +
+                        $"Stadt: {customersCity}{Environment.NewLine}" +
+                        $"Land: {customersCountry}{Environment.NewLine}" +
+                        $"Einkäufer Name: {customersPurchaserName}{Environment.NewLine}" +
+                        $"Einkäufer Telefon: {customersPurchaserPhone}{Environment.NewLine}" +
+                        $"Einkäufer E-Mail: {customersPurchaserMail}{Environment.NewLine}" +
+                        $"Buchhaltung Name: {customersBookkeeperName}{Environment.NewLine}" +
+                        $"Buchhalung Telefon: {customersBookkeeperPhone}{Environment.NewLine}" +
+                        $"Buchhalung E-Mail: {customersBookkeeperMail}{Environment.NewLine}" +
+                        $"Werkszeugnis E-Mail: {customersCertificateMail}{Environment.NewLine}" +
+                        $"Rechung E-Mail: {customersInvoiceMail}{Environment.NewLine}" +
+                        $"AB E-Mail: {customersOCMail}{Environment.NewLine}" +
+                        $"Notizen: {customersNotes}{Environment.NewLine}" +
+                        $"Skonto: {customerSkonto}{Environment.NewLine}" +
+                        $"Skontofrist: {customerSkontoTerm}{Environment.NewLine}" +
+                        $"Nettofrist: {customersNettoTerm}{Environment.NewLine}" +
+                        $"Versicherungslimit: {customersInsurance}{Environment.NewLine}",
+                    ButtonEnum.YesNo);
+            
+                var result = await box.ShowAsync();
                 
-            object result = await command.ExecuteScalarAsync();
-            return result?.ToString() ?? string.Empty;
-        }
-        catch (Exception ex)
-        {
-            // Log the error (use a logging framework or similar, depending on your environment)
-            Console.WriteLine($"Error: {ex.Message}");
-            return string.Empty;
+            if (result == ButtonResult.Yes)
+            {
+                // First, fetch the current customer data
+                using var connection = new MySqlConnection(ConnectionString);
+                await connection.OpenAsync();
+                
+                var currentCustomer = await connection.QueryFirstOrDefaultAsync<dynamic>(
+                    "SELECT * FROM Customers WHERE Customernumber = @Customernumber", 
+                    new { Customernumber = customersNumber }
+                );
+                
+                if (currentCustomer == null)
+                {
+                    var notFoundBox = MessageBoxManager.GetMessageBoxStandard(
+                        "Fehler!", 
+                        $"Kunde mit Nummer {customersNumber} wurde nicht gefunden.", 
+                        ButtonEnum.Ok
+                    );
+                    await notFoundBox.ShowAsync();
+                    return;
+                }
+                
+                // Create a dictionary to store field-value pairs for fields that have changed
+                var updates = new Dictionary<string, object>();
+                var fieldMappings = new Dictionary<string, (object currentValue, object newValue)>
+                {
+                    { "Companyname", (currentCustomer.Companyname, customersName) },
+                    { "Customernick", (currentCustomer.Customernick, customershortName) },
+                    { "InvoiceStreet", (currentCustomer.InvoiceStreet, customerStreet) },
+                    { "InvoiceHouseNo", (currentCustomer.InvoiceHouseNo, customersHouseNo) },
+                    { "InvoiceCity", (currentCustomer.InvoiceCity, customersCity) },
+                    { "InvoicePostcode", (currentCustomer.InvoicePostcode, customersPostCode) },
+                    { "InvoiceCountry", (currentCustomer.InvoiceCountry, customersCountry) },
+                    { "PurchaserName", (currentCustomer.PurchaserName, customersPurchaserName) },
+                    { "PurchaserPhone", (currentCustomer.PurchaserPhone, customersPurchaserPhone) },
+                    { "PurchaserMail", (currentCustomer.PurchaserMail, customersPurchaserMail) },
+                    { "BookkeeperName", (currentCustomer.BookkeeperName, customersBookkeeperName) },
+                    { "BookkeeperPhone", (currentCustomer.BookkeeperPhone, customersBookkeeperPhone) },
+                    { "BookkeeperMail", (currentCustomer.BookkeeperMail, customersBookkeeperMail) },
+                    { "CertificateMail", (currentCustomer.CertificateMail, customersCertificateMail) },
+                    { "InvoiceMail", (currentCustomer.InvoiceMail, customersInvoiceMail) },
+                    { "OCMail", (currentCustomer.OCMail, customersOCMail) },
+                    { "Notes", (currentCustomer.Notes, customersNotes) },
+                    { "Skonto", (currentCustomer.Skonto, customerSkonto) },
+                    { "SkontoTerm", (currentCustomer.SkontoTerm, customerSkontoTerm) },
+                    { "NettoTerm", (currentCustomer.NettoTerm, customersNettoTerm) },
+                    { "InsuranceLimit", (currentCustomer.InsuranceLimit, customersInsurance) }
+                };
+                
+                // Add changed fields to the updates dictionary
+                foreach (var field in fieldMappings)
+                {
+                    var currentVal = field.Value.currentValue;
+                    var newVal = field.Value.newValue;
+    
+                    // Convert both values to string, replace commas with dots, and trim spaces
+                    string currentValStr = currentVal?.ToString().Replace(",", ".").Trim() ?? "";
+                    string newValStr = newVal?.ToString().Replace(",", ".").Trim() ?? "";
+    
+                    // Compare the processed strings
+                    if (!currentValStr.Equals(newValStr))
+                    {
+                        // Add the original newVal to updates (not the processed string)
+                        updates.Add(field.Key, field.Value.newValue);
+                    }
+                }
+                
+                // If no changes were detected, inform the user and exit
+                if (updates.Count == 0)
+                {
+                    var noChangesBox = MessageBoxManager.GetMessageBoxStandard(
+                        "Information", 
+                        "Es wurden keine Änderungen festgestellt.", 
+                        ButtonEnum.Ok
+                    );
+                    await noChangesBox.ShowAsync();
+                    return;
+                }
+                
+                // Build the SQL query with only the changed fields
+                var setClause = string.Join(", ", updates.Keys.Select(key => $"{key} = @{key}"));
+                string sql = $"UPDATE Customers SET {setClause} WHERE Customernumber = @Customernumber";
+                
+                // Create parameters with only the changed fields plus the customernumber
+                var parameters = new DynamicParameters(updates);
+                parameters.Add("@Customernumber", customersNumber);
+                
+                // Create a copy of the SQL for logging purposes
+                string logSql = sql;
+
+                // Replace each parameter with its value for logging
+                foreach (var param in updates)
+                {
+                    logSql = logSql.Replace($"@{param.Key}", param.Value?.ToString() ?? "NULL");
+                }
+
+                // Replace the Customernumber parameter
+                logSql = logSql.Replace("@Customernumber", customersNumber);
+
+                Console.WriteLine(logSql);                
+                // Execute the update
+                int rowsAffected = await connection.ExecuteAsync(sql, parameters);
+                
+                // Show result message
+                if (rowsAffected > 0)
+                {
+                    var ResultQuery = MessageBoxManager.GetMessageBoxStandard(
+                        "Erfolgreich",
+                        $"Kunde: {customersName} wurde bearbeitet! ({updates.Count} Felder aktualisiert)",
+                        ButtonEnum.Ok
+                    );
+                    await ResultQuery.ShowAsync();
+                }
+                else
+                {
+                    var ResultQuery = MessageBoxManager.GetMessageBoxStandard(
+                        "Fehler!",
+                        $"Kunde: {customersName} wurde nicht bearbeitet!",
+                        ButtonEnum.Ok
+                    );
+                    await ResultQuery.ShowAsync();
+                }
+            }
         }
     }
-    //
-    //
-    // //Following is all for Delivery Adress Information on Customer Tab
-    //
-    // private async void btnCustomersSaveDeliveryAdress_Click(object? sender, Avalonia.Interactivity.RoutedEventArgs e)
-    // {
-    //     if (ListCustomersDeliveryAdressList.SelectedItem != null)
-    //     {
-    //         var box = MessageBoxManager
-    //     .GetMessageBoxStandard("Best�tigung",
-    //         $"Lieferanschrift Nr.: {textCustomersDeliveryAdressNumber.Text}{Environment.NewLine}" + 
-    //         $"Firmenname: {textCustomersDeliveryAdressCompany.Text}{Environment.NewLine}" +
-    //         $"Stra�e: {textCustomersDeliveryAdressStreet.Text}{Environment.NewLine}" +
-    //         $"Hausnummer: {textCustomersDeliveryAdressHouseNo.Text}{Environment.NewLine}" +
-    //         $"PLZ: {textCustomersDeliveryAdressPostCode.Text}{Environment.NewLine}" +
-    //         $"Stadt: {textCustomersDeliveryAdressCity.Text}{Environment.NewLine}" +
-    //         $"Land: {textCustomersDeliveryAdressCountry.Text}{Environment.NewLine}" +
-    //         $"Ansprechpartner: {textCustomersDeliveryAdressContactName.Text}{Environment.NewLine}" +
-    //         $"Ansprechpartner Telefon: {textCustomersDeliveryAdressContactPhone.Text}{Environment.NewLine}" +
-    //         $"Ansprechpartner Mail: {textCustomersDeliveryAdressContactMail.Text}",
-    //     ButtonEnum.YesNo);
-    //
-    //     var result = await box.ShowAsync();
-    //
-    //         if (result == ButtonResult.Yes)
-    //         {
-    //
-    //             string tablerow = "Firmenname";
-    //             string txtfield = textCustomersDeliveryAdressCompany.Text;
-    //             string updateQuery = $"UPDATE lieferanschrift SET {tablerow} = '{txtfield}' WHERE Lieferanschrift_Nummer = '{textCustomersDeliveryAdressNumber.Text}'";
-    //
-    //             try
-    //             {
-    //                 using (MySql.Data.MySqlClient.MySqlConnection connection = new MySql.Data.MySqlClient.MySqlConnection(connectionString))
-    //                 {
-    //                     connection.Open();
-    //                     MySql.Data.MySqlClient.MySqlCommand command = new MySql.Data.MySqlClient.MySqlCommand(updateQuery, connection);
-    //
-    //                     command.ExecuteNonQuery();
-    //                 }
-    //             }
-    //             catch (Exception ex)
-    //             {
-    //                 var error = MessageBoxManager
-    //                     .GetMessageBoxStandard("Fehler",
-    //                         $"Ein Fehler ist aufgetreten:{Environment.NewLine}{Environment.NewLine}{ex.Message}",
-    //                         ButtonEnum.Ok,
-    //                         Icon.Error);
-    //
-    //                 await error.ShowAsync();
-    //             }
-    //
-    //             tablerow = "Stra�e";
-    //             txtfield = textCustomersDeliveryAdressStreet.Text;
-    //             updateQuery = $"UPDATE lieferanschrift SET {tablerow} = '{txtfield}' WHERE Lieferanschrift_Nummer = '{textCustomersDeliveryAdressNumber.Text}'";
-    //
-    //             try
-    //             {
-    //                 using (MySql.Data.MySqlClient.MySqlConnection connection = new MySql.Data.MySqlClient.MySqlConnection(connectionString))
-    //                 {
-    //                     connection.Open();
-    //                     MySql.Data.MySqlClient.MySqlCommand command = new MySql.Data.MySqlClient.MySqlCommand(updateQuery, connection);
-    //
-    //                     command.ExecuteNonQuery();
-    //                 }
-    //             }
-    //             catch (Exception ex)
-    //             {
-    //                 var error = MessageBoxManager
-    //                     .GetMessageBoxStandard("Fehler",
-    //                         $"Ein Fehler ist aufgetreten:{Environment.NewLine}{Environment.NewLine}{ex.Message}",
-    //                         ButtonEnum.Ok,
-    //                         Icon.Error);
-    //
-    //                 await error.ShowAsync();                }
-    //
-    //             tablerow = "Hausnummer";
-    //             txtfield = textCustomersDeliveryAdressHouseNo.Text;
-    //             updateQuery = $"UPDATE lieferanschrift SET {tablerow} = '{txtfield}' WHERE Lieferanschrift_Nummer = '{textCustomersDeliveryAdressNumber.Text}'";
-    //
-    //             try
-    //             {
-    //                 using (MySql.Data.MySqlClient.MySqlConnection connection = new MySql.Data.MySqlClient.MySqlConnection(connectionString))
-    //                 {
-    //                     connection.Open();
-    //                     MySql.Data.MySqlClient.MySqlCommand command = new MySql.Data.MySqlClient.MySqlCommand(updateQuery, connection);
-    //
-    //                     command.ExecuteNonQuery();
-    //                 }
-    //             }
-    //             catch (Exception ex)
-    //             {
-    //                 var error = MessageBoxManager
-    //                     .GetMessageBoxStandard("Fehler",
-    //                         $"Ein Fehler ist aufgetreten:{Environment.NewLine}{Environment.NewLine}{ex.Message}",
-    //                         ButtonEnum.Ok,
-    //                         Icon.Error);
-    //
-    //                 await error.ShowAsync();
-    //             }
-    //
-    //             tablerow = "PLZ";
-    //             txtfield = textCustomersDeliveryAdressPostCode.Text;
-    //             updateQuery = $"UPDATE lieferanschrift SET {tablerow} = '{txtfield}' WHERE Lieferanschrift_Nummer = '{textCustomersDeliveryAdressNumber.Text}'";
-    //
-    //             try
-    //             {
-    //                 using (MySql.Data.MySqlClient.MySqlConnection connection = new MySql.Data.MySqlClient.MySqlConnection(connectionString))
-    //                 {
-    //                     connection.Open();
-    //                     MySql.Data.MySqlClient.MySqlCommand command = new MySql.Data.MySqlClient.MySqlCommand(updateQuery, connection);
-    //
-    //                     command.ExecuteNonQuery();
-    //                 }
-    //             }
-    //             catch (Exception ex)
-    //             {
-    //                 var error = MessageBoxManager
-    //                     .GetMessageBoxStandard("Fehler",
-    //                         $"Ein Fehler ist aufgetreten:{Environment.NewLine}{Environment.NewLine}{ex.Message}",
-    //                         ButtonEnum.Ok,
-    //                         Icon.Error);
-    //
-    //                 await error.ShowAsync();
-    //             }
-    //
-    //             tablerow = "Stadt";
-    //             txtfield = textCustomersDeliveryAdressCity.Text;
-    //             updateQuery = $"UPDATE lieferanschrift SET {tablerow} = '{txtfield}' WHERE Lieferanschrift_Nummer = '{textCustomersDeliveryAdressNumber.Text}'";
-    //
-    //             try
-    //             {
-    //                 using (MySql.Data.MySqlClient.MySqlConnection connection = new MySql.Data.MySqlClient.MySqlConnection(connectionString))
-    //                 {
-    //                     connection.Open();
-    //                     MySql.Data.MySqlClient.MySqlCommand command = new MySql.Data.MySqlClient.MySqlCommand(updateQuery, connection);
-    //
-    //                     command.ExecuteNonQuery();
-    //                 }
-    //             }
-    //             catch (Exception ex)
-    //             {
-    //                 var error = MessageBoxManager
-    //                     .GetMessageBoxStandard("Fehler",
-    //                         $"Ein Fehler ist aufgetreten:{Environment.NewLine}{Environment.NewLine}{ex.Message}",
-    //                         ButtonEnum.Ok,
-    //                         Icon.Error);
-    //
-    //                 await error.ShowAsync();
-    //             }
-    //
-    //             tablerow = "Land";
-    //             txtfield = textCustomersDeliveryAdressCountry.Text;
-    //             updateQuery = $"UPDATE lieferanschrift SET {tablerow} = '{txtfield}' WHERE Lieferanschrift_Nummer = '{textCustomersDeliveryAdressNumber.Text}'";
-    //
-    //             try
-    //             {
-    //                 using (MySql.Data.MySqlClient.MySqlConnection connection = new MySql.Data.MySqlClient.MySqlConnection(connectionString))
-    //                 {
-    //                     connection.Open();
-    //                     MySql.Data.MySqlClient.MySqlCommand command = new MySql.Data.MySqlClient.MySqlCommand(updateQuery, connection);
-    //
-    //                     command.ExecuteNonQuery();
-    //                 }
-    //             }
-    //             catch (Exception ex)
-    //             {
-    //                 var error = MessageBoxManager
-    //                     .GetMessageBoxStandard("Fehler",
-    //                         $"Ein Fehler ist aufgetreten:{Environment.NewLine}{Environment.NewLine}{ex.Message}",
-    //                         ButtonEnum.Ok,
-    //                         Icon.Error);
-    //
-    //                 await error.ShowAsync();
-    //             }
-    //
-    //             tablerow = "Ansprechpartner";
-    //             txtfield = textCustomersDeliveryAdressContactName.Text;
-    //             updateQuery = $"UPDATE lieferanschrift SET {tablerow} = '{txtfield}' WHERE Lieferanschrift_Nummer = '{textCustomersDeliveryAdressNumber.Text}'";
-    //
-    //             try
-    //             {
-    //                 using (MySql.Data.MySqlClient.MySqlConnection connection = new MySql.Data.MySqlClient.MySqlConnection(connectionString))
-    //                 {
-    //                     connection.Open();
-    //                     MySql.Data.MySqlClient.MySqlCommand command = new MySql.Data.MySqlClient.MySqlCommand(updateQuery, connection);
-    //
-    //                     command.ExecuteNonQuery();
-    //                 }
-    //             }
-    //             catch (Exception ex)
-    //             {
-    //                 var error = MessageBoxManager
-    //                     .GetMessageBoxStandard("Fehler",
-    //                         $"Ein Fehler ist aufgetreten:{Environment.NewLine}{Environment.NewLine}{ex.Message}",
-    //                         ButtonEnum.Ok,
-    //                         Icon.Error);
-    //
-    //                 await error.ShowAsync();
-    //             }
-    //
-    //             tablerow = "Ansprechpartner_Telefon";
-    //             txtfield = textCustomersDeliveryAdressContactPhone.Text;
-    //             updateQuery = $"UPDATE lieferanschrift SET {tablerow} = '{txtfield}' WHERE Lieferanschrift_Nummer = '{textCustomersDeliveryAdressNumber.Text}'";
-    //
-    //             try
-    //             {
-    //                 using (MySql.Data.MySqlClient.MySqlConnection connection = new MySql.Data.MySqlClient.MySqlConnection(connectionString))
-    //                 {
-    //                     connection.Open();
-    //                     MySql.Data.MySqlClient.MySqlCommand command = new MySql.Data.MySqlClient.MySqlCommand(updateQuery, connection);
-    //
-    //                     command.ExecuteNonQuery();
-    //                 }
-    //             }
-    //             catch (Exception ex)
-    //             {
-    //                 var error = MessageBoxManager
-    //                     .GetMessageBoxStandard("Fehler",
-    //                         $"Ein Fehler ist aufgetreten:{Environment.NewLine}{Environment.NewLine}{ex.Message}",
-    //                         ButtonEnum.Ok,
-    //                         Icon.Error);
-    //
-    //                 await error.ShowAsync();
-    //             }
-    //
-    //             tablerow = "Ansprechpartner_Mail";
-    //             txtfield = textCustomersDeliveryAdressContactMail.Text;
-    //             updateQuery = $"UPDATE lieferanschrift SET {tablerow} = '{txtfield}' WHERE Lieferanschrift_Nummer = '{textCustomersDeliveryAdressNumber.Text}'";
-    //
-    //             try
-    //             {
-    //                 using (MySql.Data.MySqlClient.MySqlConnection connection = new MySql.Data.MySqlClient.MySqlConnection(connectionString))
-    //                 {
-    //                     connection.Open();
-    //                     MySql.Data.MySqlClient.MySqlCommand command = new MySql.Data.MySqlClient.MySqlCommand(updateQuery, connection);
-    //
-    //                     command.ExecuteNonQuery();
-    //                 }
-    //             }
-    //             catch (Exception ex)
-    //             {
-    //                 var error = MessageBoxManager
-    //                     .GetMessageBoxStandard("Fehler",
-    //                         $"Ein Fehler ist aufgetreten:{Environment.NewLine}{Environment.NewLine}{ex.Message}",
-    //                         ButtonEnum.Ok,
-    //                         Icon.Error);
-    //
-    //                 await error.ShowAsync();
-    //             }
-    //
-    //             CustomerDeliveryAdressInformationClear();
-    //             CustomerDeliveryAdressSearchList();
-    //         }
-    //     }
-    //     else
-    //     {
-    //         var box = MessageBoxManager
-    //             .GetMessageBoxStandard("Best�tigung",
-    //             $"Lieferanschrift Nr.: {textCustomersDeliveryAdressNumber.Text}{Environment.NewLine}" +
-    //             $"Firmenname: {textCustomersDeliveryAdressCompany.Text}{Environment.NewLine}" +
-    //             $"Stra�e: {textCustomersDeliveryAdressStreet.Text}{Environment.NewLine}" +
-    //             $"Hausnummer: {textCustomersDeliveryAdressHouseNo.Text}{Environment.NewLine}" +
-    //             $"PLZ: {textCustomersDeliveryAdressPostCode.Text}{Environment.NewLine}" +
-    //             $"Stadt: {textCustomersDeliveryAdressCity.Text}{Environment.NewLine}" +
-    //             $"Land: {textCustomersDeliveryAdressCountry.Text}{Environment.NewLine}" +
-    //             $"Ansprechpartner: {textCustomersDeliveryAdressContactName.Text}{Environment.NewLine}" +
-    //             $"Ansprechpartner Telefon: {textCustomersDeliveryAdressContactPhone.Text}{Environment.NewLine}" +
-    //             $"Ansprechpartner Mail: {textCustomersDeliveryAdressContactMail.Text}",
-    //             ButtonEnum.YesNo);
-    //
-    //         var result = await box.ShowAsync();
-    //
-    //         if (result == ButtonResult.Yes)
-    //         {
-    //             string query = @"INSERT INTO lieferanschrift 
-    //             (`Firmenname`, `Stra�e`, `Hausnummer`, `PLZ`, `Stadt`, `Land`, `Ansprechpartner`, `Ansprechpartner_Telefon`, `Ansprechpartner_Mail`) 
-    //             VALUES 
-    //             (@Firmenname, @Stra�e, @Hausnummer, @PLZ, @Stadt, @Land, @Ansprechpartner, @Ansprechpartner_Telefon, @Ansprechpartner_Mail)";
-    //
-    //             // Create MySqlConnection object
-    //             using (MySqlConnection connection = new MySqlConnection(connectionString))
-    //             {
-    //                 // Open the connection
-    //                 connection.Open();
-    //
-    //                 // Create MySqlCommand object
-    //                 using (MySqlCommand command = new MySqlCommand(query, connection))
-    //                 {
-    //                     // Add parameters
-    //                     command.Parameters.AddWithValue("@Firmenname", textCustomersDeliveryAdressCompany.Text);
-    //                     command.Parameters.AddWithValue("@Stra�e", textCustomersDeliveryAdressStreet.Text);
-    //                     command.Parameters.AddWithValue("@Hausnummer", textCustomersDeliveryAdressHouseNo.Text);
-    //                     command.Parameters.AddWithValue("@PLZ", textCustomersDeliveryAdressPostCode.Text);
-    //                     command.Parameters.AddWithValue("@Stadt", textCustomersDeliveryAdressCity.Text);
-    //                     command.Parameters.AddWithValue("@Land", textCustomersDeliveryAdressCountry.Text);
-    //                     command.Parameters.AddWithValue("@Ansprechpartner", textCustomersDeliveryAdressContactName.Text);
-    //                     command.Parameters.AddWithValue("@Ansprechpartner_Telefon", textCustomersDeliveryAdressContactPhone.Text);
-    //                     command.Parameters.AddWithValue("@Ansprechpartner_Mail", textCustomersDeliveryAdressContactMail.Text);
-    //
-    //                     // Execute the query
-    //                     command.ExecuteNonQuery();
-    //                 }
-    //             }
-    //         }
-    //
-    //      }
-    // }
     
-    
-    //
-    // private void DeliveryAdressSearchBox_TextChanged(object? sender, Avalonia.Interactivity.RoutedEventArgs e)
-    // {
-    //     if (ListCustomersDeliveryAdressList.SelectedItem != null)
-    //     {
-    //         string ID = ListCustomersDeliveryAdressList.SelectedItem.ToString();
-    //         textCustomersDeliveryAdressCompany.Text = GetFieldValue("Firmenname", ID, "lieferanschrift", "Firmenname");
-    //         textCustomersDeliveryAdressStreet.Text = GetFieldValue("Stra�e", ID, "lieferanschrift", "Firmenname");
-    //         textCustomersDeliveryAdressHouseNo.Text = GetFieldValue("Hausnummer", ID, "lieferanschrift", "Firmenname");
-    //         textCustomersDeliveryAdressPostCode.Text = GetFieldValue("PLZ", ID, "lieferanschrift", "Firmenname");
-    //         textCustomersDeliveryAdressCity.Text = GetFieldValue("Stadt", ID, "lieferanschrift", "Firmenname");
-    //         textCustomersDeliveryAdressCountry.Text = GetFieldValue("Land", ID, "lieferanschrift", "Firmenname");
-    //         textCustomersDeliveryAdressContactName.Text = GetFieldValue("Ansprechpartner", ID, "lieferanschrift", "Firmenname");
-    //         textCustomersDeliveryAdressContactPhone.Text = GetFieldValue("Ansprechpartner_Telefon", ID, "lieferanschrift", "Firmenname");
-    //         textCustomersDeliveryAdressContactMail.Text = GetFieldValue("Ansprechpartner_Mail", ID, "lieferanschrift", "Firmenname");
-    //         textCustomersDeliveryAdressNumber.Text = GetFieldValue("Lieferanschrift_Nummer", ID, "lieferanschrift", "Firmenname");
-    //     }
-    // }
-    //
-
-    //
-    // private void CustomerDeliveryAdressInformationClear()
-    // {
-    //     textCustomersDeliveryAdressCompany.Text = "";
-    //     textCustomersDeliveryAdressStreet.Text = "";
-    //     textCustomersDeliveryAdressHouseNo.Text = "";
-    //     textCustomersDeliveryAdressPostCode.Text = "";
-    //     textCustomersDeliveryAdressCity.Text = "";
-    //     textCustomersDeliveryAdressCountry.Text = "";
-    //     textCustomersDeliveryAdressContactName.Text = "";
-    //     textCustomersDeliveryAdressContactPhone.Text = "";
-    //     textCustomersDeliveryAdressContactMail.Text = "";
-    //     textCustomersDeliveryAdressNumber.Text = "";
-    // }
-    //
-    
-    //
-    // private void btnDeliveryInfoClear_Click(object? sender, Avalonia.Interactivity.RoutedEventArgs e)
-    // {
-    //     CustomerDeliveryAdressInformationClear();
-    //     textCustomersDeliveryAdressSearch.Text = "";
-    //     ListCustomersDeliveryAdressList.Items.Clear();
-    // }
-    //
-    //
-    //
-    // //Following is all for Customer Information on Customer Tab
-    //
-    // private async void btnNewCustomer_Click(object? sender, Avalonia.Interactivity.RoutedEventArgs e)
-    // {
-    //     if (ListCustomersCustomerList.SelectedItem != null)
-    //     {
-    //         var box = MessageBoxManager
-    //             .GetMessageBoxStandard("Best�tigung",
-    //                 $"Kundennummer: {textCustomerNumber.Text}{Environment.NewLine}" +
-    //                 $"Firmenname: {textCustomerName.Text}{Environment.NewLine}" +
-    //                 $"K�rzel: {textCustomerShortName.Text}{Environment.NewLine}" +
-    //                 $"Stra�e: {textCustomerStreet.Text}{Environment.NewLine}" +
-    //                 $"Hausnummer: {textCustomerHouseNo.Text}{Environment.NewLine}" +
-    //                 $"PLZ: {textCustomerPostCode.Text}{Environment.NewLine}" +
-    //                 $"Stadt: {textCustomerCity.Text}{Environment.NewLine}" +
-    //                 $"Land: {textCustomerCountry.Text}{Environment.NewLine}" +
-    //                 $"Eink�ufer: {textCustomersPurchaserName.Text}{Environment.NewLine}" +
-    //                 $"Eink�ufer Telefon: {textCustomersPurchaserPhone.Text}{Environment.NewLine}" +
-    //                 $"Eink�ufer E-Mail: {textCustomersPurchaserMail.Text}{Environment.NewLine}" +
-    //                 $"Buchhaltung Name: {textCustomersBookkeeperName.Text}{Environment.NewLine}" +
-    //                 $"Buchhalung Telefon: {textCustomersBookkeeperPhone.Text}{Environment.NewLine}" +
-    //                 $"Buchhalung E-Mail: {textCustomersBookkeeperMail.Text}{Environment.NewLine}" +
-    //                 $"Werkszeugnis E-Mail: {textCustomersCertificateMail.Text}{Environment.NewLine}" +
-    //                 $"Rechung E-Mail: {textCustomersInvoiceMail.Text}{Environment.NewLine}" +
-    //                 $"Skonto: {textCustomerSkonto.Text}{Environment.NewLine}" +
-    //                 $"Skontofrist: {textCustomerSkontoTerm.Text}{Environment.NewLine}" +
-    //                 $"Nettofrist: {textCustomerNettoTerm.Text}",
-    //             ButtonEnum.YesNo);
-    //
-    //         var result = await box.ShowAsync();
-    //
-    //         if (result == ButtonResult.Yes)
-    //         {
-    //             string table = "kunden";
-    //
-    //             string row = "K�rzel";
-    //             string textbox = textCustomerShortName.Text;
-    //             string updateQuery = $"UPDATE {table} SET {row} = '{textbox}' WHERE Kundennummer = '{textCustomerNumber.Text}'";
-    //
-    //             try
-    //             {
-    //                 using (MySql.Data.MySqlClient.MySqlConnection connection = new MySql.Data.MySqlClient.MySqlConnection(connectionString))
-    //                 {
-    //                     connection.Open();
-    //                     MySql.Data.MySqlClient.MySqlCommand command = new MySql.Data.MySqlClient.MySqlCommand(updateQuery, connection);
-    //
-    //                     command.ExecuteNonQuery();
-    //                 }
-    //             }
-    //             catch (Exception ex)
-    //             {
-    //                 var error = MessageBoxManager
-    //                     .GetMessageBoxStandard("Fehler",
-    //                         $"Ein Fehler ist aufgetreten:{Environment.NewLine}{Environment.NewLine}{ex.Message}",
-    //                         ButtonEnum.Ok,
-    //                         Icon.Error);
-    //
-    //                 await error.ShowAsync();
-    //             }
-    //
-    //             row = "Firmenname";
-    //             textbox = textCustomerName.Text;
-    //             updateQuery = $"UPDATE {table} SET {row} = '{textbox}' WHERE Kundennummer = '{textCustomerNumber.Text}'";
-    //
-    //             try
-    //             {
-    //                 using (MySql.Data.MySqlClient.MySqlConnection connection = new MySql.Data.MySqlClient.MySqlConnection(connectionString))
-    //                 {
-    //                     connection.Open();
-    //                     MySql.Data.MySqlClient.MySqlCommand command = new MySql.Data.MySqlClient.MySqlCommand(updateQuery, connection);
-    //
-    //                     command.ExecuteNonQuery();
-    //                 }
-    //             }
-    //             catch (Exception ex)
-    //             {
-    //                 var error = MessageBoxManager
-    //                     .GetMessageBoxStandard("Fehler",
-    //                         $"Ein Fehler ist aufgetreten:{Environment.NewLine}{Environment.NewLine}{ex.Message}",
-    //                         ButtonEnum.Ok,
-    //                         Icon.Error);
-    //
-    //                 await error.ShowAsync();
-    //             }
-    //
-    //             row = "Rechnung_Stra�e";
-    //             textbox = textCustomerStreet.Text;
-    //             updateQuery = $"UPDATE {table} SET {row} = '{textbox}' WHERE Kundennummer = '{textCustomerNumber.Text}'";
-    //
-    //             try
-    //             {
-    //                 using (MySql.Data.MySqlClient.MySqlConnection connection = new MySql.Data.MySqlClient.MySqlConnection(connectionString))
-    //                 {
-    //                     connection.Open();
-    //                     MySql.Data.MySqlClient.MySqlCommand command = new MySql.Data.MySqlClient.MySqlCommand(updateQuery, connection);
-    //
-    //                     command.ExecuteNonQuery();
-    //                 }
-    //             }
-    //             catch (Exception ex)
-    //             {
-    //                 var error = MessageBoxManager
-    //                     .GetMessageBoxStandard("Fehler",
-    //                         $"Ein Fehler ist aufgetreten:{Environment.NewLine}{Environment.NewLine}{ex.Message}",
-    //                         ButtonEnum.Ok,
-    //                         Icon.Error);
-    //
-    //                 await error.ShowAsync();
-    //             }
-    //
-    //             row = "Rechnung_Hausnummer";
-    //             textbox = textCustomerHouseNo.Text;
-    //             updateQuery = $"UPDATE {table} SET {row} = '{textbox}' WHERE Kundennummer = '{textCustomerNumber.Text}'";
-    //
-    //             try
-    //             {
-    //                 using (MySql.Data.MySqlClient.MySqlConnection connection = new MySql.Data.MySqlClient.MySqlConnection(connectionString))
-    //                 {
-    //                     connection.Open();
-    //                     MySql.Data.MySqlClient.MySqlCommand command = new MySql.Data.MySqlClient.MySqlCommand(updateQuery, connection);
-    //
-    //                     command.ExecuteNonQuery();
-    //                 }
-    //             }
-    //             catch (Exception ex)
-    //             {
-    //                 var error = MessageBoxManager
-    //                     .GetMessageBoxStandard("Fehler",
-    //                         $"Ein Fehler ist aufgetreten:{Environment.NewLine}{Environment.NewLine}{ex.Message}",
-    //                         ButtonEnum.Ok,
-    //                         Icon.Error);
-    //
-    //                 await error.ShowAsync();
-    //             }
-    //
-    //             row = "Rechnung_Stadt";
-    //             textbox = textCustomerCity.Text;
-    //             updateQuery = $"UPDATE {table} SET {row} = '{textbox}' WHERE Kundennummer = '{textCustomerNumber.Text}'";
-    //
-    //             try
-    //             {
-    //                 using (MySql.Data.MySqlClient.MySqlConnection connection = new MySql.Data.MySqlClient.MySqlConnection(connectionString))
-    //                 {
-    //                     connection.Open();
-    //                     MySql.Data.MySqlClient.MySqlCommand command = new MySql.Data.MySqlClient.MySqlCommand(updateQuery, connection);
-    //
-    //                     command.ExecuteNonQuery();
-    //                 }
-    //             }
-    //             catch (Exception ex)
-    //             {
-    //                 var error = MessageBoxManager
-    //                     .GetMessageBoxStandard("Fehler",
-    //                         $"Ein Fehler ist aufgetreten:{Environment.NewLine}{Environment.NewLine}{ex.Message}",
-    //                         ButtonEnum.Ok,
-    //                         Icon.Error);
-    //
-    //                 await error.ShowAsync();
-    //             }
-    //
-    //             row = "Rechnung_PLZ";
-    //             textbox = textCustomerPostCode.Text;
-    //             updateQuery = $"UPDATE {table} SET {row} = '{textbox}' WHERE Kundennummer = '{textCustomerNumber.Text}'";
-    //
-    //             try
-    //             {
-    //                 using (MySql.Data.MySqlClient.MySqlConnection connection = new MySql.Data.MySqlClient.MySqlConnection(connectionString))
-    //                 {
-    //                     connection.Open();
-    //                     MySql.Data.MySqlClient.MySqlCommand command = new MySql.Data.MySqlClient.MySqlCommand(updateQuery, connection);
-    //
-    //                     command.ExecuteNonQuery();
-    //                 }
-    //             }
-    //             catch (Exception ex)
-    //             {
-    //                 var error = MessageBoxManager
-    //                     .GetMessageBoxStandard("Fehler",
-    //                         $"Ein Fehler ist aufgetreten:{Environment.NewLine}{Environment.NewLine}{ex.Message}",
-    //                         ButtonEnum.Ok,
-    //                         Icon.Error);
-    //
-    //                 await error.ShowAsync();
-    //             }
-    //
-    //             row = "Rechnung_Land";
-    //             textbox = textCustomerCountry.Text;
-    //             updateQuery = $"UPDATE {table} SET {row} = '{textbox}' WHERE Kundennummer = '{textCustomerNumber.Text}'";
-    //
-    //             try
-    //             {
-    //                 using (MySql.Data.MySqlClient.MySqlConnection connection = new MySql.Data.MySqlClient.MySqlConnection(connectionString))
-    //                 {
-    //                     connection.Open();
-    //                     MySql.Data.MySqlClient.MySqlCommand command = new MySql.Data.MySqlClient.MySqlCommand(updateQuery, connection);
-    //
-    //                     command.ExecuteNonQuery();
-    //                 }
-    //             }
-    //             catch (Exception ex)
-    //             {
-    //                 var error = MessageBoxManager
-    //                     .GetMessageBoxStandard("Fehler",
-    //                         $"Ein Fehler ist aufgetreten:{Environment.NewLine}{Environment.NewLine}{ex.Message}",
-    //                         ButtonEnum.Ok,
-    //                         Icon.Error);
-    //
-    //                 await error.ShowAsync();
-    //             }
-    //
-    //             row = "Eink�ufer_Name";
-    //             textbox = textCustomersPurchaserName.Text;
-    //             updateQuery = $"UPDATE {table} SET {row} = '{textbox}' WHERE Kundennummer = '{textCustomerNumber.Text}'";
-    //
-    //             try
-    //             {
-    //                 using (MySql.Data.MySqlClient.MySqlConnection connection = new MySql.Data.MySqlClient.MySqlConnection(connectionString))
-    //                 {
-    //                     connection.Open();
-    //                     MySql.Data.MySqlClient.MySqlCommand command = new MySql.Data.MySqlClient.MySqlCommand(updateQuery, connection);
-    //
-    //                     command.ExecuteNonQuery();
-    //                 }
-    //             }
-    //             catch (Exception ex)
-    //             {
-    //                 var error = MessageBoxManager
-    //                     .GetMessageBoxStandard("Fehler",
-    //                         $"Ein Fehler ist aufgetreten:{Environment.NewLine}{Environment.NewLine}{ex.Message}",
-    //                         ButtonEnum.Ok,
-    //                         Icon.Error);
-    //
-    //                 await error.ShowAsync();
-    //             }
-    //
-    //             row = "Eink�ufer_Telefonnummer";
-    //             textbox = textCustomersPurchaserPhone.Text;
-    //             updateQuery = $"UPDATE {table} SET {row} = '{textbox}' WHERE Kundennummer = '{textCustomerNumber.Text}'";
-    //
-    //             try
-    //             {
-    //                 using (MySql.Data.MySqlClient.MySqlConnection connection = new MySql.Data.MySqlClient.MySqlConnection(connectionString))
-    //                 {
-    //                     connection.Open();
-    //                     MySql.Data.MySqlClient.MySqlCommand command = new MySql.Data.MySqlClient.MySqlCommand(updateQuery, connection);
-    //
-    //                     command.ExecuteNonQuery();
-    //                 }
-    //             }
-    //             catch (Exception ex)
-    //             {
-    //                 var error = MessageBoxManager
-    //                     .GetMessageBoxStandard("Fehler",
-    //                         $"Ein Fehler ist aufgetreten:{Environment.NewLine}{Environment.NewLine}{ex.Message}",
-    //                         ButtonEnum.Ok,
-    //                         Icon.Error);
-    //
-    //                 await error.ShowAsync();
-    //             }
-    //
-    //             row = "Eink�ufer_Email";
-    //             textbox = textCustomersPurchaserMail.Text;
-    //             updateQuery = $"UPDATE {table} SET {row} = '{textbox}' WHERE Kundennummer = '{textCustomerNumber.Text}'";
-    //
-    //             try
-    //             {
-    //                 using (MySql.Data.MySqlClient.MySqlConnection connection = new MySql.Data.MySqlClient.MySqlConnection(connectionString))
-    //                 {
-    //                     connection.Open();
-    //                     MySql.Data.MySqlClient.MySqlCommand command = new MySql.Data.MySqlClient.MySqlCommand(updateQuery, connection);
-    //
-    //                     command.ExecuteNonQuery();
-    //                 }
-    //             }
-    //             catch (Exception ex)
-    //             {
-    //                 var error = MessageBoxManager
-    //                     .GetMessageBoxStandard("Fehler",
-    //                         $"Ein Fehler ist aufgetreten:{Environment.NewLine}{Environment.NewLine}{ex.Message}",
-    //                         ButtonEnum.Ok,
-    //                         Icon.Error);
-    //
-    //                 await error.ShowAsync();
-    //             }
-    //
-    //             row = "Buchhaltung_Name";
-    //             textbox = textCustomersBookkeeperName.Text;
-    //             updateQuery = $"UPDATE {table} SET {row} = '{textbox}' WHERE Kundennummer = '{textCustomerNumber.Text}'";
-    //
-    //             try
-    //             {
-    //                 using (MySql.Data.MySqlClient.MySqlConnection connection = new MySql.Data.MySqlClient.MySqlConnection(connectionString))
-    //                 {
-    //                     connection.Open();
-    //                     MySql.Data.MySqlClient.MySqlCommand command = new MySql.Data.MySqlClient.MySqlCommand(updateQuery, connection);
-    //
-    //                     command.ExecuteNonQuery();
-    //                 }
-    //             }
-    //             catch (Exception ex)
-    //             {
-    //                 var error = MessageBoxManager
-    //                     .GetMessageBoxStandard("Fehler",
-    //                         $"Ein Fehler ist aufgetreten:{Environment.NewLine}{Environment.NewLine}{ex.Message}",
-    //                         ButtonEnum.Ok,
-    //                         Icon.Error);
-    //
-    //                 await error.ShowAsync();
-    //             }
-    //
-    //             row = "Buchhaltung_Telefonnummer";
-    //             textbox = textCustomersBookkeeperPhone.Text;
-    //             updateQuery = $"UPDATE {table} SET {row} = '{textbox}' WHERE Kundennummer = '{textCustomerNumber.Text}'";
-    //
-    //             try
-    //             {
-    //                 using (MySql.Data.MySqlClient.MySqlConnection connection = new MySql.Data.MySqlClient.MySqlConnection(connectionString))
-    //                 {
-    //                     connection.Open();
-    //                     MySql.Data.MySqlClient.MySqlCommand command = new MySql.Data.MySqlClient.MySqlCommand(updateQuery, connection);
-    //
-    //                     command.ExecuteNonQuery();
-    //                 }
-    //             }
-    //             catch (Exception ex)
-    //             {
-    //                 var error = MessageBoxManager
-    //                     .GetMessageBoxStandard("Fehler",
-    //                         $"Ein Fehler ist aufgetreten:{Environment.NewLine}{Environment.NewLine}{ex.Message}",
-    //                         ButtonEnum.Ok,
-    //                         Icon.Error);
-    //
-    //                 await error.ShowAsync();
-    //             }
-    //
-    //             row = "Buchhaltung_Email";
-    //             textbox = textCustomersBookkeeperMail.Text;
-    //             updateQuery = $"UPDATE {table} SET {row} = '{textbox}' WHERE Kundennummer = '{textCustomerNumber.Text}'";
-    //
-    //             try
-    //             {
-    //                 using (MySql.Data.MySqlClient.MySqlConnection connection = new MySql.Data.MySqlClient.MySqlConnection(connectionString))
-    //                 {
-    //                     connection.Open();
-    //                     MySql.Data.MySqlClient.MySqlCommand command = new MySql.Data.MySqlClient.MySqlCommand(updateQuery, connection);
-    //
-    //                     command.ExecuteNonQuery();
-    //                 }
-    //             }
-    //             catch (Exception ex)
-    //             {
-    //                 var error = MessageBoxManager
-    //                     .GetMessageBoxStandard("Fehler",
-    //                         $"Ein Fehler ist aufgetreten:{Environment.NewLine}{Environment.NewLine}{ex.Message}",
-    //                         ButtonEnum.Ok,
-    //                         Icon.Error);
-    //
-    //                 await error.ShowAsync();
-    //             }
-    //
-    //             row = "Werkszeugnis_Email";
-    //             textbox = textCustomersCertificateMail.Text;
-    //             updateQuery = $"UPDATE {table} SET {row} = '{textbox}' WHERE Kundennummer = '{textCustomerNumber.Text}'";
-    //
-    //             try
-    //             {
-    //                 using (MySql.Data.MySqlClient.MySqlConnection connection = new MySql.Data.MySqlClient.MySqlConnection(connectionString))
-    //                 {
-    //                     connection.Open();
-    //                     MySql.Data.MySqlClient.MySqlCommand command = new MySql.Data.MySqlClient.MySqlCommand(updateQuery, connection);
-    //
-    //                     command.ExecuteNonQuery();
-    //                 }
-    //             }
-    //             catch (Exception ex)
-    //             {
-    //                 var error = MessageBoxManager
-    //                     .GetMessageBoxStandard("Fehler",
-    //                         $"Ein Fehler ist aufgetreten:{Environment.NewLine}{Environment.NewLine}{ex.Message}",
-    //                         ButtonEnum.Ok,
-    //                         Icon.Error);
-    //
-    //                 await error.ShowAsync();
-    //             }
-    //
-    //             row = "Rechnung_Email";
-    //             textbox = textCustomersInvoiceMail.Text;
-    //             updateQuery = $"UPDATE {table} SET {row} = '{textbox}' WHERE Kundennummer = '{textCustomerNumber.Text}'";
-    //
-    //             try
-    //             {
-    //                 using (MySql.Data.MySqlClient.MySqlConnection connection = new MySql.Data.MySqlClient.MySqlConnection(connectionString))
-    //                 {
-    //                     connection.Open();
-    //                     MySql.Data.MySqlClient.MySqlCommand command = new MySql.Data.MySqlClient.MySqlCommand(updateQuery, connection);
-    //
-    //                     command.ExecuteNonQuery();
-    //                 }
-    //             }
-    //             catch (Exception ex)
-    //             {
-    //                 var error = MessageBoxManager
-    //                     .GetMessageBoxStandard("Fehler",
-    //                         $"Ein Fehler ist aufgetreten:{Environment.NewLine}{Environment.NewLine}{ex.Message}",
-    //                         ButtonEnum.Ok,
-    //                         Icon.Error);
-    //
-    //                 await error.ShowAsync();
-    //             }
-    //
-    //             row = "Skonto";
-    //             textbox = textCustomerSkonto.Text.Replace(',', '.');
-    //             updateQuery = $"UPDATE {table} SET {row} = '{textbox}' WHERE Kundennummer = '{textCustomerNumber.Text}'";
-    //
-    //             try
-    //             {
-    //                 using (MySql.Data.MySqlClient.MySqlConnection connection = new MySql.Data.MySqlClient.MySqlConnection(connectionString))
-    //                 {
-    //                     connection.Open();
-    //                     MySql.Data.MySqlClient.MySqlCommand command = new MySql.Data.MySqlClient.MySqlCommand(updateQuery, connection);
-    //
-    //                     command.ExecuteNonQuery();
-    //                 }
-    //             }
-    //             catch (Exception ex)
-    //             {
-    //                 var error = MessageBoxManager
-    //                     .GetMessageBoxStandard("Fehler",
-    //                         $"Ein Fehler ist aufgetreten:{Environment.NewLine}{Environment.NewLine}{ex.Message}",
-    //                         ButtonEnum.Ok,
-    //                         Icon.Error);
-    //
-    //                 await error.ShowAsync();
-    //             }
-    //
-    //             row = "Skontofrist";
-    //             textbox = textCustomerSkontoTerm.Text;
-    //             updateQuery = $"UPDATE {table} SET {row} = '{textbox}' WHERE Kundennummer = '{textCustomerNumber.Text}'";
-    //
-    //             try
-    //             {
-    //                 using (MySql.Data.MySqlClient.MySqlConnection connection = new MySql.Data.MySqlClient.MySqlConnection(connectionString))
-    //                 {
-    //                     connection.Open();
-    //                     MySql.Data.MySqlClient.MySqlCommand command = new MySql.Data.MySqlClient.MySqlCommand(updateQuery, connection);
-    //
-    //                     command.ExecuteNonQuery();
-    //                 }
-    //             }
-    //             catch (Exception ex)
-    //             {
-    //                 var error = MessageBoxManager
-    //                     .GetMessageBoxStandard("Fehler",
-    //                         $"Ein Fehler ist aufgetreten:{Environment.NewLine}{Environment.NewLine}{ex.Message}",
-    //                         ButtonEnum.Ok,
-    //                         Icon.Error);
-    //
-    //                 await error.ShowAsync();
-    //             }
-    //
-    //             row = "Nettofrist";
-    //             textbox = textCustomerNettoTerm.Text;
-    //             updateQuery = $"UPDATE {table} SET {row} = '{textbox}' WHERE Kundennummer = '{textCustomerNumber.Text}'";
-    //
-    //             try
-    //             {
-    //                 using (MySql.Data.MySqlClient.MySqlConnection connection = new MySql.Data.MySqlClient.MySqlConnection(connectionString))
-    //                 {
-    //                     connection.Open();
-    //                     MySql.Data.MySqlClient.MySqlCommand command = new MySql.Data.MySqlClient.MySqlCommand(updateQuery, connection);
-    //
-    //                     command.ExecuteNonQuery();
-    //                 }
-    //             }
-    //             catch (Exception ex)
-    //             {
-    //                 var error = MessageBoxManager
-    //                     .GetMessageBoxStandard("Fehler",
-    //                         $"Ein Fehler ist aufgetreten:{Environment.NewLine}{Environment.NewLine}{ex.Message}",
-    //                         ButtonEnum.Ok,
-    //                         Icon.Error);
-    //
-    //                 await error.ShowAsync();
-    //             }
-    //
-    //             CustomerCustomerInformationClear();
-    //             CustomerCustomerCreationSearchList();
-    //         }
-    //     }
-    //     else
-    //     {
-    //         var box = MessageBoxManager
-    //             .GetMessageBoxStandard("Best�tigung",
-    //                 $"Kundennummer: {textCustomerNumber.Text}{Environment.NewLine}" +
-    //                 $"Firmenname: {textCustomerName.Text}{Environment.NewLine}" +
-    //                 $"K�rzel: {textCustomerShortName.Text}{Environment.NewLine}" +
-    //                 $"Stra�e: {textCustomerStreet.Text}{Environment.NewLine}" +
-    //                 $"Hausnummer: {textCustomerHouseNo.Text}{Environment.NewLine}" +
-    //                 $"PLZ: {textCustomerPostCode.Text}{Environment.NewLine}" +
-    //                 $"Stadt: {textCustomerCity.Text}{Environment.NewLine}" +
-    //                 $"Land: {textCustomerCountry.Text}{Environment.NewLine}" +
-    //                 $"Eink�ufer: {textCustomersPurchaserName.Text}{Environment.NewLine}" +
-    //                 $"Eink�ufer Telefon: {textCustomersPurchaserPhone.Text}{Environment.NewLine}" +
-    //                 $"Eink�ufer E-Mail: {textCustomersPurchaserMail.Text}{Environment.NewLine}" +
-    //                 $"Buchhaltung Name: {textCustomersBookkeeperName.Text}{Environment.NewLine}" +
-    //                 $"Buchhalung Telefon: {textCustomersBookkeeperPhone.Text}{Environment.NewLine}" +
-    //                 $"Buchhalung E-Mail: {textCustomersBookkeeperMail.Text}{Environment.NewLine}" +
-    //                 $"Werkszeugnis E-Mail: {textCustomersCertificateMail.Text}{Environment.NewLine}" +
-    //                 $"Rechung E-Mail: {textCustomersInvoiceMail.Text}{Environment.NewLine}" +
-    //                 $"Skonto: {textCustomerSkonto.Text}{Environment.NewLine}" +
-    //                 $"Skontofrist: {textCustomerSkontoTerm.Text}{Environment.NewLine}" +
-    //                 $"Nettofrist: {textCustomerNettoTerm.Text}",
-    //             ButtonEnum.YesNo);
-    //
-    //         var result = await box.ShowAsync();
-    //
-    //         if (result == ButtonResult.Yes)
-    //         {
-    //
-    //             // SQL query
-    //             string query = @"INSERT INTO kunden 
-    //                 (K�rzel, Firmenname, `Rechnung_Stra�e`, `Rechnung_Hausnummer`, `Rechnung_Stadt`, `Rechnung_PLZ`, `Rechnung_Land`, 
-    //                 `Eink�ufer_Name`, `Eink�ufer_Telefonnummer`, `Eink�ufer_EMail`, `Buchhaltung_Name`, `Buchhaltung_Telefonnummer`, 
-    //                 `Buchhaltung_EMail`, `Werkszeugnis_EMail`, `Rechnung_EMail`, `Skonto`, `Skontofrist`, `Nettofrist`) 
-    //                 VALUES 
-    //                 (@K�rzel, @Firmenname, @Rechnung_Stra�e, @Rechnung_Hausnummer, @Rechnung_Stadt, @Rechnung_PLZ, @Rechnung_Land, 
-    //                 @Eink�ufer_Name, @Eink�ufer_Telefon, @Eink�ufer_Email, @Buchhaltung_Name, @Buchhaltung_Telefon, 
-    //                 @Buchhaltung_Email, @Werkszeugnis_Email, @Rechnung_Email, @Skonto, @Skontofrist, @Nettofrist)";
-    //
-    //             // Create MySql.Data.MySqlClient.MySqlConnection object
-    //             using (MySql.Data.MySqlClient.MySqlConnection connection = new MySql.Data.MySqlClient.MySqlConnection(connectionString))
-    //             {
-    //                 // Open the connection
-    //                 connection.Open();
-    //
-    //                 // Create MySql.Data.MySqlClient.MySqlCommand object
-    //                 using (MySql.Data.MySqlClient.MySqlCommand command = new MySql.Data.MySqlClient.MySqlCommand(query, connection))
-    //                 {
-    //                     // Add parameters
-    //                     command.Parameters.AddWithValue("@Firmenname", textCustomerName.Text);
-    //                     command.Parameters.AddWithValue("@K�rzel", textCustomerShortName.Text);
-    //                     command.Parameters.AddWithValue("@Rechnung_Stra�e", textCustomerStreet.Text);
-    //                     command.Parameters.AddWithValue("@Rechnung_Hausnummer", textCustomerHouseNo.Text);
-    //                     command.Parameters.AddWithValue("@Rechnung_PLZ", textCustomerPostCode.Text);
-    //                     command.Parameters.AddWithValue("@Rechnung_Stadt", textCustomerCity.Text);
-    //                     command.Parameters.AddWithValue("@Rechnung_Land", textCustomerCountry.Text);
-    //                     command.Parameters.AddWithValue("@Eink�ufer_Name", textCustomersPurchaserName.Text);
-    //                     command.Parameters.AddWithValue("@Eink�ufer_Telefon", textCustomersPurchaserPhone.Text);
-    //                     command.Parameters.AddWithValue("@Eink�ufer_Email", textCustomersPurchaserMail.Text);
-    //                     command.Parameters.AddWithValue("@Buchhaltung_Name", textCustomersBookkeeperName.Text);
-    //                     command.Parameters.AddWithValue("@Buchhaltung_Telefon", textCustomersBookkeeperPhone.Text);
-    //                     command.Parameters.AddWithValue("@Buchhaltung_Email", textCustomersBookkeeperMail.Text);
-    //                     command.Parameters.AddWithValue("@Werkszeugnis_Email", textCustomersCertificateMail.Text);
-    //                     command.Parameters.AddWithValue("@Rechnung_Email", textCustomersInvoiceMail.Text);
-    //                     command.Parameters.AddWithValue("@Skonto", textCustomerSkonto.Text);
-    //                     command.Parameters.AddWithValue("@Skontofrist", textCustomerSkontoTerm.Text);
-    //                     command.Parameters.AddWithValue("@Nettofrist", textCustomerNettoTerm.Text);
-    //
-    //
-    //                     // Execute the query
-    //                     command.ExecuteNonQuery();
-    //                 }
-    //             }
-    //             CustomerCustomerInformationClear();
-    //             CustomerCustomerCreationSearchList();
-    //         }
-    //     }
-    // }
-    //
-    // private void textCustomerNameSearch_TextChanged(object? sender, Avalonia.Interactivity.RoutedEventArgs e)
-    // {
-    //     CustomerCustomerCreationSearchList();
-    // }
-    //
-    // private void ListCustomersCustomerList_SelectedIndexChanged(object? sender, Avalonia.Interactivity.RoutedEventArgs e)
-    // {
-    //     if (ListCustomersCustomerList.SelectedItem != null)
-    //     {
-    //         string firmenname = ListCustomersCustomerList.SelectedItem.ToString();
-    //
-    //         textCustomerNumber.Text = GetFieldValue("Kundennummer", firmenname, "kunden", "Firmenname");
-    //         textCustomerStreet.Text = GetFieldValue("Rechnung_Stra�e", firmenname, "kunden", "Firmenname");
-    //         textCustomerHouseNo.Text = GetFieldValue("Rechnung_Hausnummer", firmenname, "kunden", "Firmenname");
-    //         textCustomerShortName.Text = GetFieldValue("K�rzel", firmenname, "kunden", "Firmenname");
-    //         textCustomerCity.Text = GetFieldValue("Rechnung_Stadt", firmenname, "kunden", "Firmenname");
-    //         textCustomerPostCode.Text = GetFieldValue("Rechnung_PLZ", firmenname, "kunden", "Firmenname");
-    //         textCustomerCountry.Text = GetFieldValue("Rechnung_Land", firmenname, "kunden", "Firmenname");
-    //         textCustomersPurchaserName.Text = GetFieldValue("Eink�ufer_Name", firmenname, "kunden", "Firmenname");
-    //         textCustomersPurchaserPhone.Text = GetFieldValue("Eink�ufer_Telefonnummer", firmenname, "kunden", "Firmenname");
-    //         textCustomersPurchaserMail.Text = GetFieldValue("Eink�ufer_EMail", firmenname, "kunden", "Firmenname");
-    //         textCustomersBookkeeperName.Text = GetFieldValue("Buchhaltung_Name", firmenname, "kunden", "Firmenname");
-    //         textCustomersBookkeeperPhone.Text = GetFieldValue("Buchhaltung_Telefonnummer", firmenname, "kunden", "Firmenname");
-    //         textCustomersBookkeeperMail.Text = GetFieldValue("Buchhaltung_EMail", firmenname, "kunden", "Firmenname");
-    //         textCustomersCertificateMail.Text = GetFieldValue("Werkszeugnis_EMail", firmenname, "kunden", "Firmenname");
-    //         textCustomersInvoiceMail.Text = GetFieldValue("Rechnung_EMail", firmenname, "kunden", "Firmenname");
-    //         textCustomerName.Text = GetFieldValue("Firmenname", firmenname, "kunden", "Firmenname");
-    //         textCustomerNotes.Text = GetFieldValue("Notizen", firmenname, "kunden", "Firmenname");
-    //         textCustomerSkonto.Text = GetFieldValue("Skonto", firmenname, "kunden", "Firmenname");
-    //         textCustomerSkontoTerm.Text = GetFieldValue("Skontofrist", firmenname, "kunden", "Firmenname");
-    //         textCustomerNettoTerm.Text = GetFieldValue("Nettofrist", firmenname, "kunden", "Firmenname");
-    //     }
-    // }
-    //
-    // private async void textCustomerNotes_LostFocus(object? sender, Avalonia.Interactivity.RoutedEventArgs e)
-    // {
-    //     if (ListCustomersCustomerList.SelectedItem != null)
-    //     {
-    //         // Customer Selected -> offer Change
-    //         string table = "kunden";
-    //
-    //         string row = "Notizen";
-    //         string textbox = textCustomerNotes.Text;
-    //         string updateQuery = $"UPDATE {table} SET {row} = '{textbox}' WHERE Firmenname = '{ListCustomersCustomerList.SelectedItem.ToString()}'";
-    //
-    //         try
-    //         {
-    //             using (MySql.Data.MySqlClient.MySqlConnection connection = new MySql.Data.MySqlClient.MySqlConnection(connectionString))
-    //             {
-    //                 connection.Open();
-    //                 MySql.Data.MySqlClient.MySqlCommand command = new MySql.Data.MySqlClient.MySqlCommand(updateQuery, connection);
-    //
-    //                 command.ExecuteNonQuery();
-    //             }
-    //         }
-    //         catch (Exception ex)
-    //         {
-    //             var error = MessageBoxManager
-    //                 .GetMessageBoxStandard("Fehler",
-    //                     $"Ein Fehler ist aufgetreten:{Environment.NewLine}{Environment.NewLine}{ex.Message}",
-    //                     ButtonEnum.Ok,
-    //                     Icon.Error);
-    //
-    //             await error.ShowAsync();
-    //         }
-    //     }
-    //     CustomerCustomerInformationClear();
-    //     CustomerCustomerCreationSearchList();
-    // }
-    //
-    // private void CustomerCustomerInformationClear()
-    // {
-    //     textCustomerNumber.Text = "";
-    //     textCustomerStreet.Text = "";
-    //     textCustomerHouseNo.Text = "";
-    //     textCustomerShortName.Text = "";
-    //     textCustomerCity.Text = "";
-    //     textCustomerPostCode.Text = "";
-    //     textCustomerCountry.Text = "";
-    //     textCustomersPurchaserName.Text = "";
-    //     textCustomersPurchaserPhone.Text = "";
-    //     textCustomersPurchaserMail.Text = "";
-    //     textCustomersBookkeeperName.Text = "";
-    //     textCustomersBookkeeperPhone.Text = "";
-    //     textCustomersBookkeeperMail.Text = "";
-    //     textCustomersCertificateMail.Text = "";
-    //     textCustomersInvoiceMail.Text = "";
-    //     textCustomerName.Text = "";
-    //     textCustomerNotes.Text = "";
-    //     textCustomerSkonto.Text = "";
-    //     textCustomerSkontoTerm.Text = "";
-    //     textCustomerNettoTerm.Text = "";
-    // }
-    //
-    // private async void CustomerCustomerCreationSearchList()
-    // {
-    //     if (textCustomerNameSearch.Text != null)
-    //     {
-    //         ListCustomersCustomerList.Items.Clear();
-    //
-    //         try
-    //         {
-    //             string query = $"SELECT * FROM prostahl.kunden WHERE CONCAT_WS(' ', K�rzel, Firmenname, Rechnung_Stra�e, Rechnung_Hausnummer, Rechnung_Stadt, Rechnung_PLZ, Rechnung_Land, Eink�ufer_Name, Eink�ufer_Telefonnummer, Eink�ufer_EMail, Buchhaltung_Name, Buchhaltung_Telefonnummer, Buchhaltung_EMail, Werkszeugnis_EMail, Rechnung_EMail, Skonto, Skontofrist, Nettofrist) LIKE @SearchTerm ORDER BY Firmenname ASC LIMIT 1000";
-    //
-    //             using (MySql.Data.MySqlClient.MySqlConnection connection = new MySql.Data.MySqlClient.MySqlConnection(connectionString))
-    //             {
-    //                 using (MySql.Data.MySqlClient.MySqlCommand command = new MySql.Data.MySqlClient.MySqlCommand(query, connection))
-    //                 {
-    //                     command.Parameters.AddWithValue("@SearchTerm", $"%{textCustomerNameSearch.Text}%");
-    //
-    //                     try
-    //                     {
-    //                         connection.Open();
-    //                         using (MySql.Data.MySqlClient.MySqlDataReader reader = command.ExecuteReader())
-    //                         {
-    //                             while (reader.Read())
-    //                             {
-    //                                 // Read values from columns
-    //                                 string firmenname = reader.GetString(2); // Assuming `Firmenname` is at index 2
-    //
-    //                                 // Do something with the values...
-    //                                 ListCustomersCustomerList.Items.Add(firmenname);
-    //                             }
-    //                         }
-    //                     }
-    //                     catch (Exception ex)
-    //                     {
-    //                         var error = MessageBoxManager
-    //                         .GetMessageBoxStandard("Fehler",
-    //                             $"Ein Fehler ist aufgetreten:{Environment.NewLine}{Environment.NewLine}{ex.Message}",
-    //                             ButtonEnum.Ok,
-    //                             Icon.Error);
-    //
-    //                         await error.ShowAsync();
-    //                     }
-    //                 }
-    //             }
-    //         }
-    //         catch (Exception ex)
-    //         {
-    //             var error = MessageBoxManager
-    //             .GetMessageBoxStandard("Fehler",
-    //                 $"Ein Fehler ist aufgetreten:{Environment.NewLine}{Environment.NewLine}{ex.Message}",
-    //                 ButtonEnum.Ok,
-    //                 Icon.Error);
-    //
-    //             await error.ShowAsync();
-    //         }
-    //     }
-    // }
-    //
-    // private void btnCustomerInfoClear_Click(object? sender, Avalonia.Interactivity.RoutedEventArgs e)
-    // {
-    //     CustomerCustomerInformationClear();
-    //     textCustomerNameSearch.Text = "";
-    //     ListCustomersCustomerList.Items.Clear();
-    // }
+    string ConnectionString = PS3000.Properties.Resources.ConnectionString;
 }
 

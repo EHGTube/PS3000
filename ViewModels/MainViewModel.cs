@@ -5,12 +5,18 @@ using CommunityToolkit.Mvvm.ComponentModel;
 
 namespace PS3000.ViewModels;
 
-public class MainViewModel : ObservableObject
+public partial class MainViewModel : ObservableObject
 {
     public MainViewModel()
     {
         // Example data
+        _inquiriesViewModel = new InquiriesViewModel();
+
     }
+    
+    [ObservableProperty]
+    private InquiriesViewModel _inquiriesViewModel;
+    
     
     public ObservableCollection<CustomersViewModel> Customers { get; set; } = new()
     {

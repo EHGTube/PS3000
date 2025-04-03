@@ -3,290 +3,439 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
              xmlns:Control="clr-namespace:PS3000.Controls"
-             mc:Ignorable="d" d:DesignWidth="1920" d:DesignHeight="1080"
+             mc:Ignorable="d"
+             d:DesignWidth="1920"
+             d:DesignHeight="1080"
              x:Class="PS3000.Inquiries"
-             x:DataType="Control:InquiriesViewModel"
-             x:CompileBindings="True">
+             x:DataType="Control:InquiriesViewModel">
 
-	<Grid>
-		<Grid.ColumnDefinitions>
-			<ColumnDefinition Width="Auto"></ColumnDefinition>
-			<ColumnDefinition Width="Auto"></ColumnDefinition>
-			<ColumnDefinition Width="Auto"></ColumnDefinition>
-			<ColumnDefinition Width="Auto"></ColumnDefinition>
-			<ColumnDefinition Width="Auto"></ColumnDefinition>
-			<ColumnDefinition Width="Auto"></ColumnDefinition>
-			<ColumnDefinition Width="Auto"></ColumnDefinition>
-			<ColumnDefinition Width="Auto"></ColumnDefinition>
-			<ColumnDefinition Width="Auto"></ColumnDefinition>
-			<ColumnDefinition Width="Auto"></ColumnDefinition>
-			<ColumnDefinition Width="Auto"></ColumnDefinition>
-			<ColumnDefinition Width="Auto"></ColumnDefinition>
-			<ColumnDefinition Width="*"></ColumnDefinition>
-		</Grid.ColumnDefinitions>
-		<Grid.RowDefinitions>
-			<RowDefinition Height="Auto"></RowDefinition>
-			<RowDefinition Height="Auto"></RowDefinition>
-			<RowDefinition Height="Auto"></RowDefinition>
-			<RowDefinition Height="Auto"></RowDefinition>
-			<RowDefinition Height="Auto"></RowDefinition>
-			<RowDefinition Height="Auto"></RowDefinition>
-			<RowDefinition Height="Auto"></RowDefinition>
-			<RowDefinition Height="Auto"></RowDefinition>
-			<RowDefinition Height="Auto"></RowDefinition>
-			<RowDefinition Height="Auto"></RowDefinition>
-			<RowDefinition Height="Auto"></RowDefinition>
-			<RowDefinition Height="Auto"></RowDefinition>
-			<RowDefinition Height="Auto"></RowDefinition>
-			<RowDefinition Height="Auto"></RowDefinition>
-			<RowDefinition Height="Auto"></RowDefinition>
-			<RowDefinition Height="Auto"></RowDefinition>
-			<RowDefinition Height="Auto"></RowDefinition>
-			<RowDefinition Height="Auto"></RowDefinition>
-			<RowDefinition Height="Auto"></RowDefinition>
-			<RowDefinition Height="Auto"></RowDefinition>
-			<RowDefinition Height="Auto"></RowDefinition>
-			<RowDefinition Height="Auto"></RowDefinition>
-			<RowDefinition Height="Auto"></RowDefinition>
-			<RowDefinition Height="Auto"></RowDefinition>
-			<RowDefinition Height="Auto"></RowDefinition>
-			<RowDefinition Height="Auto"></RowDefinition>
-			<RowDefinition Height="Auto"></RowDefinition>
-			<RowDefinition Height="Auto"></RowDefinition>
-			<RowDefinition Height="Auto"></RowDefinition>
-			<RowDefinition Height="Auto"></RowDefinition>
-		</Grid.RowDefinitions>
-		<TextBlock Text="Kunde:" TextAlignment="End" Grid.Row="0" Grid.Column="0" Margin="0 0 10 5" VerticalAlignment="Center"/>
-		<TextBox  Watermark="Kunde" Grid.Row="0" Grid.Column="1" Margin="0 0 0 10"/>
-		<TextBlock Text="Anfragennummer:" TextAlignment="End" Grid.Row="0" Grid.Column="2" Margin="0 0 10 5" VerticalAlignment="Center"/>
-		<TextBox  Watermark="Anfragennummer" Grid.Row="0" Grid.Column="3" Margin="0 0 0 10"/>
-		<ListBox x:Name="ListOrderCustomerList" Grid.Row="1" Grid.RowSpan="6" Grid.Column="0" Grid.ColumnSpan="2" Margin="0 0 0 10"/>
+    <ScrollViewer>
+        <Grid Margin="10">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="*"/>
+            </Grid.ColumnDefinitions>
 
-		<TextBlock Text="Kontakt:" TextAlignment="End" Grid.Row="1" Grid.Column="2" Margin="0 0 10 5" VerticalAlignment="Center"/>
-		<TextBox  Watermark="Kontakt" Grid.Row="1" Grid.Column="3" Margin="0 0 0 5"/>
-		<TextBlock Text="Straße:" TextAlignment="End" Grid.Row="2" Grid.Column="2" Margin="0 0 10 5" VerticalAlignment="Center"/>
-		<TextBox  Watermark="Straße" Grid.Row="2" Grid.Column="3" Margin="0 0 0 10"/>
-		<TextBlock Text="Hausnummer:" TextAlignment="End" Grid.Row="3" Grid.Column="2" Margin="0 0 10 5" VerticalAlignment="Center"/>
-		<TextBox  Watermark="Hausnummer" Grid.Row="3" Grid.Column="3" Margin="0 0 0 10"/>
-		<TextBlock Text="PLZ:" TextAlignment="End" Grid.Row="4" Grid.Column="2" Margin="0 0 10 5" VerticalAlignment="Center"/>
-		<TextBox  Watermark="PLZ" Grid.Row="4" Grid.Column="3" Margin="0 0 0 10"/>
-		<TextBlock Text="Stadt:" TextAlignment="End" Grid.Row="5" Grid.Column="2" Margin="0 0 10 5" VerticalAlignment="Center"/>
-		<TextBox  Watermark="Stadt" Grid.Row="5" Grid.Column="3" Margin="0 0 0 10"/>
-		<TextBlock Text="Land:" TextAlignment="End" Grid.Row="6" Grid.Column="2" Margin="0 0 10 5" VerticalAlignment="Center"/>
-		<TextBox  Watermark="Land" Grid.Row="6" Grid.Column="3" Margin="0 0 0 10"/>
+            <!-- Left Section: Customer Information -->
+            <StackPanel Grid.Column="0" Spacing="10">
+                <!-- NEW SECTION: Additional Field Above Customer Info -->
+                <Grid>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="Auto"/>
+                        <ColumnDefinition Width="*"/>
+                    </Grid.ColumnDefinitions>
+                    <TextBlock Text="Anfragennummer:" TextAlignment="End" Grid.Column="0" Margin="0 0 10 0" VerticalAlignment="Center"/>
+                    <TextBox Watermark="Anfragennummer" Grid.Column="1" Text="{Binding InquiryNumber}"/>
+                </Grid>
+                
+                <!-- Customer Info Section -->
+                <Grid>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="Auto"/>
+                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="Auto"/>
+                        <ColumnDefinition Width="*"/>
+                    </Grid.ColumnDefinitions>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto"/>
+                    </Grid.RowDefinitions>
+                    
+                    <TextBlock Text="Kunde:" TextAlignment="End" Grid.Column="0" Margin="0 0 10 0" VerticalAlignment="Center"/>
+                    <TextBox Watermark="Kunde" Grid.Column="1" Text="{Binding CustomerNameSearch}"/>
+                </Grid>
 
-		<TextBlock Text="Lieferanschrift:" TextAlignment="End" Grid.Row="7" Grid.Column="0" Margin="0 0 10 5" VerticalAlignment="Center"/>
-		<TextBox  Watermark="Lieferanschrift" Grid.Row="7" Grid.Column="1" Margin="0 0 0 10"/>
-		<CheckBox Grid.Row="7" Grid.Column="3" Margin="0 0 0 10" >Ab Werk?</CheckBox>
+                <!-- Customer Details Section -->
+                <Grid>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="*"/>
+                    </Grid.ColumnDefinitions>
+                    
+                    <!-- Customer List on Left -->
+                    <ListBox Grid.Column="0" 
+                             ItemsSource="{Binding CustomersList}" 
+                             SelectedItem="{Binding SelectedCustomer, Mode=TwoWay}" 
+                             Height="250" 
+                             Margin="0 0 5 0"/>
+                    
+                    <!-- Customer Details on Right -->
+                    <StackPanel Grid.Column="1" Margin="5 0 0 0">
+                        <Grid>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="Auto"/>
+                                <ColumnDefinition Width="*"/>
+                            </Grid.ColumnDefinitions>
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="Auto"/>
+                                <RowDefinition Height="Auto"/>
+                                <RowDefinition Height="Auto"/>
+                                <RowDefinition Height="Auto"/>
+                                <RowDefinition Height="Auto"/>
+                                <RowDefinition Height="Auto"/>
+                            </Grid.RowDefinitions>
+                            
+                            <TextBlock Text="Kontakt:" Grid.Row="0" Grid.Column="0" TextAlignment="End" Margin="0 0 10 5" VerticalAlignment="Center"/>
+                            <TextBox Watermark="Kontakt" Grid.Row="0" Grid.Column="1" Text="{Binding Path=CustomersPurchaserName}"/>
+                            
+                            <TextBlock Text="Straße:" Grid.Row="1" Grid.Column="0" TextAlignment="End" Margin="0 0 10 5" VerticalAlignment="Center"/>
+                            <TextBox Watermark="Straße" Grid.Row="1" Grid.Column="1" Text="{Binding CustomerStreet}"/>
+                            
+                            <TextBlock Text="Hausnummer:" Grid.Row="2" Grid.Column="0" TextAlignment="End" Margin="0 0 10 5" VerticalAlignment="Center"/>
+                            <TextBox Watermark="Hausnummer" Grid.Row="2" Grid.Column="1" Text="{Binding CustomersHouseNo}"/>
+                            
+                            <TextBlock Text="PLZ:" Grid.Row="3" Grid.Column="0" TextAlignment="End" Margin="0 0 10 5" VerticalAlignment="Center"/>
+                            <TextBox Watermark="PLZ" Grid.Row="3" Grid.Column="1" Text="{Binding CustomersPostCode}"/>
+                            
+                            <TextBlock Text="Stadt:" Grid.Row="4" Grid.Column="0" TextAlignment="End" Margin="0 0 10 5" VerticalAlignment="Center"/>
+                            <TextBox Watermark="Stadt" Grid.Row="4" Grid.Column="1" Text="{Binding CustomersCity}"/>
+                            
+                            <TextBlock Text="Land:" Grid.Row="5" Grid.Column="0" TextAlignment="End" Margin="0 0 10 5" VerticalAlignment="Center"/>
+                            <TextBox Watermark="Land" Grid.Row="5" Grid.Column="1" Text="{Binding CustomersCountry}"/>
+                        </Grid>
+                    </StackPanel>
+                </Grid>
 
-		<ListBox x:Name="ListOrderDeliveryAdressList" Grid.Row="8" Grid.RowSpan="6" Grid.Column="0" Grid.ColumnSpan="2" Margin="0 0 0 10"/>
+                <!-- Delivery Address Section -->
+                <Grid>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="Auto"/>
+                    </Grid.RowDefinitions>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="Auto"/>
+                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="Auto"/>
+                    </Grid.ColumnDefinitions>
+                    
+                    <TextBlock Text="Lieferanschrift:" Grid.Row="0" Grid.Column="0" TextAlignment="End" Margin="0 0 10 5" VerticalAlignment="Center"/>
+                    <TextBox Watermark="Lieferanschrift" Grid.Row="0" Grid.Column="1" Text="{Binding DeliveryAdressSearch}" IsEnabled="{Binding IsDeliveryEnabled}"/>
+                    <CheckBox Grid.Row="0" Grid.Column="2" Content="Ab Werk?" Margin="10 0 0 0" IsChecked="{Binding DeliveryEXW}"/>
+                </Grid>
 
-		<TextBlock Text="Kontakt:" TextAlignment="End" Grid.Row="8" Grid.Column="2" Margin="0 0 10 5" VerticalAlignment="Center"/>
-		<TextBox  Watermark="Kontakt" Grid.Row="8" Grid.Column="3" Margin="0 0 0 10"/>
-		<TextBlock Text="Straße:" TextAlignment="End" Grid.Row="9" Grid.Column="2" Margin="0 0 10 5" VerticalAlignment="Center"/>
-		<TextBox  Watermark="Straße" Grid.Row="9" Grid.Column="3" Margin="0 0 0 10"/>
-		<TextBlock Text="Hausnummer:" TextAlignment="End" Grid.Row="10" Grid.Column="2" Margin="0 0 10 5" VerticalAlignment="Center"/>
-		<TextBox  Watermark="Hausnummer" Grid.Row="10" Grid.Column="3" Margin="0 0 0 10"/>
-		<TextBlock Text="PLZ:" TextAlignment="End" Grid.Row="11" Grid.Column="2" Margin="0 0 10 5" VerticalAlignment="Center"/>
-		<TextBox  Watermark="PLZ" Grid.Row="11" Grid.Column="3" Margin="0 0 0 10"/>
-		<TextBlock Text="Stadt:" TextAlignment="End" Grid.Row="12" Grid.Column="2" Margin="0 0 10 5" VerticalAlignment="Center"/>
-		<TextBox  Watermark="Stadt" Grid.Row="12" Grid.Column="3" Margin="0 0 0 10"/>
-		<TextBlock Text="Land:" TextAlignment="End" Grid.Row="13" Grid.Column="2" Margin="0 0 10 5" VerticalAlignment="Center"/>
-		<TextBox  Watermark="Land" Grid.Row="13" Grid.Column="3" Margin="0 0 0 10"/>
-		<TextBlock Margin="0 0 0 0" Grid.Row="14" Grid.Column="0" >Bemerkungen:</TextBlock>
-		<TextBox Margin="0 00 0 00" AcceptsReturn="True" Height="200" Grid.RowSpan="5" Grid.Row="15" Grid.Column="0" Grid.ColumnSpan="3" TextWrapping="Wrap"/>
-		<CheckBox Grid.Row="14" Grid.Column="3" Margin="0 0 0 10" >Englisch?</CheckBox>
-		<Button Grid.Row="15" Grid.Column="3" Height="60" VerticalAlignment="Center" HorizontalAlignment="Center">
-			<TextBlock TextWrapping="Wrap" TextAlignment="Center" >
-				Auftrag<LineBreak/>Speichern
-			</TextBlock>
-		</Button>
-		<Button Grid.Row="16" Grid.Column="3" Height="60" VerticalAlignment="Center" HorizontalAlignment="Center">
-			<TextBlock TextWrapping="Wrap" TextAlignment="Center">
-				PDF<LineBreak/>Speichern
-			</TextBlock>
-		</Button>
+                <!-- Delivery Address Details -->
+                <Grid>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="*"/>
+                    </Grid.ColumnDefinitions>
+                    
+                    <!-- Delivery Address List -->
+                    <ListBox Grid.Column="0" 
+                             ItemsSource="{Binding DeliveryAdressList}" 
+                             SelectedItem="{Binding SelectedDeliveryAdress, Mode=TwoWay}" 
+                             IsEnabled="{Binding IsDeliveryEnabled}"
+                             Height="250" 
+                             Margin="0 0 5 0"/>
+                    
+                    <!-- Delivery Address Details -->
+                    <StackPanel Grid.Column="1" Margin="5 0 0 0">
+                        <Grid>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="Auto"/>
+                                <ColumnDefinition Width="*"/>
+                            </Grid.ColumnDefinitions>
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="Auto"/>
+                                <RowDefinition Height="Auto"/>
+                                <RowDefinition Height="Auto"/>
+                                <RowDefinition Height="Auto"/>
+                                <RowDefinition Height="Auto"/>
+                                <RowDefinition Height="Auto"/>
+                            </Grid.RowDefinitions>
+                            
+                            <TextBlock Text="Kontakt:" Grid.Row="0" Grid.Column="0" TextAlignment="End" Margin="0 0 10 5" VerticalAlignment="Center"/>
+                            <TextBox Watermark="Kontakt" Grid.Row="0" Grid.Column="1" Text="{Binding CustomersDeliveryAdressContactName}" IsEnabled="{Binding IsDeliveryEnabled}"/>
+                            
+                            <TextBlock Text="Straße:" Grid.Row="1" Grid.Column="0" TextAlignment="End" Margin="0 0 10 5" VerticalAlignment="Center"/>
+                            <TextBox Watermark="Straße" Grid.Row="1" Grid.Column="1" Text="{Binding CustomersDeliveryAdressStreet}" IsEnabled="{Binding IsDeliveryEnabled}"/>
+                            
+                            <TextBlock Text="Hausnummer:" Grid.Row="2" Grid.Column="0" TextAlignment="End" Margin="0 0 10 5" VerticalAlignment="Center"/>
+                            <TextBox Watermark="Hausnummer" Grid.Row="2" Grid.Column="1" Text="{Binding CustomersDeliveryAdressHouseNo}" IsEnabled="{Binding IsDeliveryEnabled}"/>
+                            
+                            <TextBlock Text="PLZ:" Grid.Row="3" Grid.Column="0" TextAlignment="End" Margin="0 0 10 5" VerticalAlignment="Center"/>
+                            <TextBox Watermark="PLZ" Grid.Row="3" Grid.Column="1" Text="{Binding CustomersDeliveryAdressPostCode}" IsEnabled="{Binding IsDeliveryEnabled}"/>
+                            
+                            <TextBlock Text="Stadt:" Grid.Row="4" Grid.Column="0" TextAlignment="End" Margin="0 0 10 5" VerticalAlignment="Center"/>
+                            <TextBox Watermark="Stadt" Grid.Row="4" Grid.Column="1" Text="{Binding CustomersDeliveryAdressCity}" IsEnabled="{Binding IsDeliveryEnabled}"/>
+                            
+                            <TextBlock Text="Land:" Grid.Row="5" Grid.Column="0" TextAlignment="End" Margin="0 0 10 5" VerticalAlignment="Center"/>
+                            <TextBox Watermark="Land" Grid.Row="5" Grid.Column="1" Text="{Binding CustomersDeliveryAdressCountry}" IsEnabled="{Binding IsDeliveryEnabled}"/>
+                        </Grid>
+                    </StackPanel>
+                </Grid>
 
-		<TextBlock Margin="0 0 0 0" Grid.Row="0" Grid.Column="5" Grid.ColumnSpan="2" TextAlignment="Center" >Zuschläge:</TextBlock>
-		<DataGrid Margin="20 0 0 50" Grid.Row="1" Grid.Column="5" Grid.ColumnSpan="2" Grid.RowSpan="5" Height="160"
-			AutoGenerateColumns="True"
-			GridLinesVisibility="All"
-			BorderThickness="1" BorderBrush="Gray">
-		</DataGrid>
+                <!-- Comments and Action Buttons -->
+                <StackPanel Spacing="10">
+                    <Grid>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*"/>
+                            <ColumnDefinition Width="Auto"/>
+                        </Grid.ColumnDefinitions>
+                        <CheckBox Grid.Column="1" Content="Englisch?" IsChecked="{Binding EnglishCustomer}"/>
+                    </Grid>
+                    
+                    <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" Spacing="10">
+                        <Button Height="40">
+                            <TextBlock TextWrapping="Wrap" TextAlignment="Center">
+                                Auftrag Speichern
+                            </TextBlock>
+                        </Button>
+                        <Button Height="40">
+                            <TextBlock TextWrapping="Wrap" TextAlignment="Center">
+                                PDF Speichern
+                            </TextBlock>
+                        </Button>
+                    </StackPanel>
+                    
+                    <TextBox Margin="5"
+                             Grid.Row="3"
+                             TextWrapping="Wrap" 
+                             AcceptsReturn="True" 
+                             MinHeight="150"
+                             Watermark="Allgemeine Notizen" Text="{Binding InquiryNotes}"/>
+                </StackPanel>
+            </StackPanel>
 
-		<TextBlock Text="Zuschläge Hinzufügen:      " Grid.Row="6" Grid.Column="5" Grid.ColumnSpan="2" TextAlignment="Right" VerticalAlignment="Center"/>
+            <!-- Middle Section: Surcharges and Positions -->
+            <StackPanel Grid.Column="1" Spacing="20" Margin="20 0">
+                <!-- Surcharges Section -->
+                <StackPanel Spacing="5">
+                    <TextBlock Text="Zuschläge:" TextAlignment="Center" FontWeight="Bold"/>
+                    <DataGrid Height="160"
+                              ItemsSource="{Binding SurchargeList}" 
+                              SelectedItem="{Binding SelectedSurcharge, Mode=TwoWay}" 
+                              AutoGenerateColumns="True"
+                              GridLinesVisibility="All"
+                              BorderThickness="1" BorderBrush="Gray">
+                    </DataGrid>
+                        
+                    <Grid>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="Auto"/>
+                            <ColumnDefinition Width="Auto"/>
+                        </Grid.ColumnDefinitions>
+                        <Button Grid.Column="0" Height="40" Width="150" >
+                            <TextBlock TextAlignment="Center">
+                                Zuschlag Speichern
+                            </TextBlock>
+                        </Button>
+                        
+                        <Button Grid.Column="1" Height="40" Width="150">
+                            <TextBlock TextAlignment="Center">
+                                Zuschlag Löschen
+                            </TextBlock>
+                        </Button>
 
-		<ComboBox SelectedIndex="0" Margin="20 0 0 0" Grid.Row="7" Grid.Column="6" MaxDropDownHeight="100" PlaceholderText="Zuschlagsart">
-			<ComboBoxItem>Pro Auftrag</ComboBoxItem>
-			<ComboBoxItem>Pro Stück</ComboBoxItem>
-			<ComboBoxItem>Pro Position</ComboBoxItem>
-			<ComboBoxItem>Pro Lieferung</ComboBoxItem>
-		</ComboBox>
+                    </Grid>
+                    
+                    <StackPanel Grid.Column="1" Orientation="Horizontal" VerticalAlignment="Center">
+                        <TextBlock Text="Zuschläge Hinzufügen:" VerticalAlignment="Center" Margin="10 0"/>
+                        <ComboBox SelectedIndex="0" Width="150">
+                            <ComboBoxItem>Pro Auftrag</ComboBoxItem>
+                            <ComboBoxItem>Pro Stück</ComboBoxItem>
+                            <ComboBoxItem>Pro Position</ComboBoxItem>
+                            <ComboBoxItem>Pro Lieferung</ComboBoxItem>
+                        </ComboBox>
+                    </StackPanel>
+                    
+                    <Grid ColumnDefinitions="Auto,*">
+                        <TextBlock Text="Beschreibung:" Grid.Column="0" VerticalAlignment="Center" Margin="0 0 10 0"/>
+                        <TextBox Watermark="Beschreibung" Grid.Column="1"/>
+                    </Grid>
+                    
+                    <Grid ColumnDefinitions="Auto,*">
+                        <TextBlock Text="Wert:" Grid.Column="0" VerticalAlignment="Center" Margin="0 0 10 0"/>
+                        <TextBox Watermark="Wert" Grid.Column="1"/>
+                    </Grid>
+                </StackPanel>
+                
+                <!-- Order Position Section -->
+                <StackPanel Spacing="5" Margin="0 100 0 0">
+                    <Grid ColumnDefinitions="Auto,*">
+                        <TextBlock Text="Auftragsposition:" Grid.Column="0" VerticalAlignment="Center" Margin="0 0 10 0"/>
+                        <TextBox Watermark="Position" Grid.Column="1"/>
+                    </Grid>
+                    
+                    <Grid>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="Auto"/>
+                            <ColumnDefinition Width="*"/>
+                        </Grid.ColumnDefinitions>
+                        <DataGrid Grid.Column="0" Width="50" Height="160" HeadersVisibility="None"
+                            HorizontalScrollBarVisibility="Hidden"
+                            AutoGenerateColumns="True"
+                            GridLinesVisibility="All"
+                            BorderThickness="1" BorderBrush="Gray"/>
+                        <Button Grid.Column="1" Height="60" Width="120" HorizontalAlignment="Center" VerticalAlignment="Top" Margin="10 0">
+                            <TextBlock TextWrapping="Wrap" TextAlignment="Center">
+                                Position<LineBreak/>Speichern
+                            </TextBlock>
+                        </Button>
+                    </Grid>
+                </StackPanel>
+            </StackPanel>
 
-		<TextBlock Text="Beschreibung:" Grid.Row="8" Grid.Column="5" TextAlignment="End" Margin="20 0 0 5" VerticalAlignment="Center"/>
-		<TextBox  Watermark="Beschreibung" Grid.Row="8" Grid.Column="6" Margin="20 0 0 10"/>
-
-		<TextBlock Text="Menge:" TextAlignment="End" Grid.Row="9" Grid.Column="5" Margin="20 0 0 5" VerticalAlignment="Center"/>
-		<TextBox  Watermark="Menge" Grid.Row="9" Grid.Column="6" Margin="20 0 0 10"/>
-
-		<Button Grid.Row="6" Grid.Column="5" Height="60" VerticalAlignment="Center" HorizontalAlignment="Center">
-			<TextBlock TextWrapping="Wrap" TextAlignment="Center">
-				Zuschlag<LineBreak/>Speichern
-			</TextBlock>
-		</Button>
-
-		<TextBlock Text="Auftragsposition:" TextAlignment="End" Grid.Row="11" Grid.Column="5" Margin="20 0 0 5" VerticalAlignment="Center"/>
-		<TextBox  Watermark="Position" Grid.Row="11" Grid.Column="6" Margin="20 0 0 10"/>
-
-		<DataGrid Margin="0 0 0 100" HeadersVisibility="None" Width="50" Grid.Row="12" ColumnWidth="50" HorizontalScrollBarVisibility="Hidden" Grid.Column="5"  Grid.RowSpan="5" Height="160"
-			AutoGenerateColumns="True"
-			GridLinesVisibility="All"
-			BorderThickness="1" BorderBrush="Gray">
-		</DataGrid>
-
-		<Button Grid.Row="12" Grid.Column="6" Grid.RowSpan="3" Height="60" VerticalAlignment="Center" HorizontalAlignment="Center">
-			<TextBlock TextWrapping="Wrap" TextAlignment="Center">
-				Position<LineBreak/>Speichern
-			</TextBlock>
-		</Button>
-
-
-
-
-
-
-		<TextBlock Text="Außendurchmesser:" TextAlignment="Left" Grid.Row="0" Grid.Column="7" Grid.ColumnSpan="2" Margin="20 0 0 5" VerticalAlignment="Center"/>
-
-		<ComboBox SelectedIndex="0" Margin="20 0 0 0" Grid.Row="1" Grid.Column="7" Grid.ColumnSpan="2" MaxDropDownHeight="200" PlaceholderText="Zuschlagsart">
-			<ComboBoxItem>42,4</ComboBoxItem>
-			<ComboBoxItem>33,7</ComboBoxItem>
-			<ComboBoxItem>168,3</ComboBoxItem>
-			<ComboBoxItem>42,77</ComboBoxItem>
-		</ComboBox>
-
-		<TextBlock Text="Wandstärke:" TextAlignment="Center" Grid.Row="0" Grid.Column="9" HorizontalAlignment="Center" Margin="20 0 0 5" VerticalAlignment="Center"/>
-
-		<ComboBox SelectedIndex="0" Margin="20 0 0 0" Grid.Row="1" Grid.Column="9" MaxDropDownHeight="200" HorizontalAlignment="Center" PlaceholderText="Zuschlagsart">
-			<ComboBoxItem>1,00</ComboBoxItem>
-			<ComboBoxItem>1,5</ComboBoxItem>
-			<ComboBoxItem>2,0</ComboBoxItem>
-			<ComboBoxItem>2,5</ComboBoxItem>
-		</ComboBox>
-
-		<TextBlock Text="Werkstoff:" TextAlignment="Center" Grid.Row="0" Grid.Column="10" Margin="20 0 0 5" VerticalAlignment="Center"/>
-
-		<ComboBox SelectedIndex="0" Margin="20 0 0 0" Grid.Row="1" Grid.Column="10" HorizontalAlignment="Center" MaxDropDownHeight="200" PlaceholderText="Zuschlagsart">
-			<ComboBoxItem>1.4301</ComboBoxItem>
-			<ComboBoxItem>1.4541</ComboBoxItem>
-			<ComboBoxItem>1.4571</ComboBoxItem>
-			<ComboBoxItem>1.4845</ComboBoxItem>
-		</ComboBox>
-
-		<TextBlock Text="Menge:" TextAlignment="End" Grid.Row="2" Grid.Column="7" Margin="20 0 0 5" VerticalAlignment="Center"/>
-		<TextBox  Watermark="Menge" Grid.Row="3" Grid.Column="7" Margin="20 0 0 10"/>
-
-		<ComboBox SelectedIndex="0" Margin="20 0 0 0" Grid.Row="3" Grid.Column="8" PlaceholderText="Zuschlagsart">
-			<ComboBoxItem>m</ComboBoxItem>
-			<ComboBoxItem>Stk.</ComboBoxItem>
-		</ComboBox>
-
-		<TextBlock Text="Mengentoleranz -:" TextAlignment="End" Grid.Row="2" Grid.Column="9" Margin="20 0 0 5" VerticalAlignment="Center"/>
-		<TextBox  Watermark="Mengentoleranz -" Grid.Row="3" Grid.Column="9" Margin="20 0 0 10"/>
-
-		<TextBlock Text="Mengentoleranz +:" TextAlignment="End" Grid.Row="2" Grid.Column="10" Margin="20 0 0 5" VerticalAlignment="Center"/>
-		<TextBox  Watermark="Mengentoleranz +" Grid.Row="3" Grid.Column="10" Margin="20 0 0 10"/>
-
-		<ComboBox SelectedIndex="0" Margin="20 0 0 0" Grid.Row="3" Grid.Column="11" PlaceholderText="Zuschlagsart">
-			<ComboBoxItem>m</ComboBoxItem>
-			<ComboBoxItem>Stk.</ComboBoxItem>
-			<ComboBoxItem>%</ComboBoxItem>
-		</ComboBox>
-
-		<TextBlock Text="Länge:" TextAlignment="Center" Grid.Row="4" Grid.Column="7" Grid.ColumnSpan="2" Margin="20 0 0 5" VerticalAlignment="Center"/>
-		<TextBox  Watermark="Länge" Grid.Row="5" Grid.Column="7" Grid.ColumnSpan="2" Margin="20 0 0 10"/>
-
-		<TextBlock Text="Längentoleranz -:" TextAlignment="End" Grid.Row="4" Grid.Column="9" Margin="20 0 0 5" VerticalAlignment="Center"/>
-		<TextBox  Watermark="Längentoleranz -" Grid.Row="5" Grid.Column="9" Margin="20 0 0 10"/>
-
-		<TextBlock Text="Längentoleranz +:" TextAlignment="End" Grid.Row="4" Grid.Column="10" Margin="20 0 0 5" VerticalAlignment="Center"/>
-		<TextBox  Watermark="Längentoleranz +" Grid.Row="5" Grid.Column="10" Margin="20 0 0 10"/>
-
-		<ComboBox SelectedIndex="0" Margin="20 0 0 0" Grid.Row="6" Grid.Column="7" PlaceholderText="Zuschlagsart">
-			<ComboBoxItem>EN10217-7</ComboBoxItem>
-			<ComboBoxItem>EN10296-2</ComboBoxItem>
-			<ComboBoxItem>SEW470</ComboBoxItem>
-			<ComboBoxItem>ASME SA-249</ComboBoxItem>
-			<ComboBoxItem>ASME SA-312</ComboBoxItem>
-		</ComboBox>
-
-		<ComboBox SelectedIndex="0" Margin="20 0 0 0" Grid.Row="6" Grid.Column="8" PlaceholderText="Zuschlagsart">
-			<ComboBoxItem>W0</ComboBoxItem>
-			<ComboBoxItem>W1</ComboBoxItem>
-			<ComboBoxItem>W2</ComboBoxItem>
-			<ComboBoxItem>W1R</ComboBoxItem>
-			<ComboBoxItem>W2R</ComboBoxItem>
-			<ComboBoxItem>W1R/W2R</ComboBoxItem>
-		</ComboBox>
-
-		<ComboBox SelectedIndex="0" Margin="20 0 0 0" Grid.Row="6" Grid.Column="9" PlaceholderText="Zuschlagsart">
-			<ComboBoxItem>EN10204/3.1</ComboBoxItem>
-			<ComboBoxItem>EN10204/3.2</ComboBoxItem>
-			<ComboBoxItem>EN10204/3.1 + AD2000-W2</ComboBoxItem>
-			<ComboBoxItem>EN10204/3.1 + AD2000-W10</ComboBoxItem>
-			<ComboBoxItem>EN10204/3.1 + AD2000-W2/W10</ComboBoxItem>
-			<ComboBoxItem>EN10204/3.2 + AD2000-W2</ComboBoxItem>
-			<ComboBoxItem>EN10204/3.2 + AD2000-W10</ComboBoxItem>
-			<ComboBoxItem>EN10204/3.2 + AD2000-W2/W10</ComboBoxItem>
-		</ComboBox>
-
-		<ComboBox SelectedIndex="0" Margin="20 0 0 0" Grid.Row="6" Grid.Column="10" PlaceholderText="Zuschlagsart">
-			<ComboBoxItem>D1</ComboBoxItem>
-			<ComboBoxItem>D2</ComboBoxItem>
-			<ComboBoxItem>D3</ComboBoxItem>
-			<ComboBoxItem>D4</ComboBoxItem>
-		</ComboBox>
-
-		<ComboBox SelectedIndex="0" Margin="20 0 0 0" Grid.Row="6" Grid.Column="11" PlaceholderText="Zuschlagsart">
-			<ComboBoxItem>T1</ComboBoxItem>
-			<ComboBoxItem>T2</ComboBoxItem>
-			<ComboBoxItem>T3</ComboBoxItem>
-			<ComboBoxItem>T4</ComboBoxItem>
-			<ComboBoxItem>T5</ComboBoxItem>
-		</ComboBox>
-
-		<TextBlock Text="KL max.:" TextAlignment="Center" Grid.Row="7" Grid.Column="7" Margin="20 0 0 5" VerticalAlignment="Center"/>
-		<TextBox  Watermark="KL max." Grid.Row="8" Grid.Column="7" Margin="20 0 0 10"/>
-
-		<CheckBox Grid.Row="7" Grid.Column="8" Margin="10 0 0 00" >Vorrat?</CheckBox>
-		<CheckBox Grid.Row="8" Grid.Column="8" Margin="10 0 0 00" >Bürsten?</CheckBox>
-
-		<TextBlock Text="Preis:" TextAlignment="Center" Grid.Row="7" Grid.Column="9" Margin="20 0 0 5" VerticalAlignment="Center"/>
-		<TextBox  Watermark="Preis" Grid.Row="8" Grid.Column="9" Margin="20 0 0 10"/>
-
-		<ComboBox SelectedIndex="0" Margin="20 0 0 0" Grid.Row="8" Grid.Column="10" PlaceholderText="Zuschlagsart">
-			<ComboBoxItem>€/m</ComboBoxItem>
-			<ComboBoxItem>€/Stk.</ComboBoxItem>
-			<ComboBoxItem>€/kg</ComboBoxItem>
-		</ComboBox>
-
-		<TextBlock Text="Lieferzeit:" TextAlignment="Center" Grid.Row="7" Grid.Column="11" Margin="20 0 0 5" VerticalAlignment="Center"/>
-		<TextBox  Watermark="Lieferzeit" Grid.Row="8" Grid.Column="11" Margin="20 0 0 10"/>
-
-		<StackPanel Margin="10" HorizontalAlignment="Stretch" Grid.RowSpan="30" Grid.Column="12" Grid.Row="0">
-			<Expander VerticalAlignment="Top" HorizontalAlignment="Stretch">
-				<Expander.Header>
-					Notizen für Extern
-				</Expander.Header>
-				<TextBox Height="300" Watermark="Beschreibung"/>
-			</Expander>
-
-			<Expander VerticalAlignment="Top" HorizontalAlignment="Stretch">
-				<Expander.Header>
-					Notizen für Intern
-				</Expander.Header>
-				<TextBox Height="300" Watermark="Beschreibung"/>
-			</Expander>
-		</StackPanel>
-	</Grid>
-
+            <!-- Right Section: Technical Details and Notes -->
+            <StackPanel Grid.Column="2" Spacing="15">
+                <!-- Technical Specifications -->
+                <Grid>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="Auto"/>
+                    </Grid.RowDefinitions>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="*"/>
+                    </Grid.ColumnDefinitions>
+                    
+                    <!-- Dimensions -->
+                    <TextBlock Text="Außendurchmesser:" Grid.Row="0" Grid.Column="0" Grid.ColumnSpan="2" Margin="0 0 0 5"/>
+                    <ComboBox Grid.Row="1" Grid.Column="0" Grid.ColumnSpan="2" SelectedIndex="0">
+                        <ComboBoxItem>42,4</ComboBoxItem>
+                        <ComboBoxItem>33,7</ComboBoxItem>
+                        <ComboBoxItem>168,3</ComboBoxItem>
+                        <ComboBoxItem>42,77</ComboBoxItem>
+                    </ComboBox>
+                    
+                    <TextBlock Text="Wandstärke:" Grid.Row="0" Grid.Column="2" Grid.ColumnSpan="1" Margin="10 0 0 5"/>
+                    <ComboBox Grid.Row="1" Grid.Column="2" SelectedIndex="0" Margin="10 0 0 0">
+                        <ComboBoxItem>1,00</ComboBoxItem>
+                        <ComboBoxItem>1,5</ComboBoxItem>
+                        <ComboBoxItem>2,0</ComboBoxItem>
+                        <ComboBoxItem>2,5</ComboBoxItem>
+                    </ComboBox>
+                    
+                    <TextBlock Text="Werkstoff:" Grid.Row="0" Grid.Column="3" Margin="10 0 0 5"/>
+                    <ComboBox Grid.Row="1" Grid.Column="3" SelectedIndex="0" Margin="10 0 0 0">
+                        <ComboBoxItem>1.4301</ComboBoxItem>
+                        <ComboBoxItem>1.4541</ComboBoxItem>
+                        <ComboBoxItem>1.4571</ComboBoxItem>
+                        <ComboBoxItem>1.4845</ComboBoxItem>
+                    </ComboBox>
+                    
+                    <!-- Quantity -->
+                    <TextBlock Text="Menge:" Grid.Row="2" Grid.Column="0" Margin="0 10 0 5"/>
+                    <TextBox Grid.Row="3" Grid.Column="0" Watermark="Menge"/>
+                    <ComboBox Grid.Row="3" Grid.Column="1" SelectedIndex="0" Margin="5 0 0 0">
+                        <ComboBoxItem>m</ComboBoxItem>
+                        <ComboBoxItem>Stk.</ComboBoxItem>
+                    </ComboBox>
+                    
+                    <TextBlock Text="Mengentoleranz -:" Grid.Row="2" Grid.Column="2" Margin="10 10 0 5"/>
+                    <TextBox Grid.Row="3" Grid.Column="2" Watermark="Mengentoleranz -" Margin="10 0 0 0"/>
+                    
+                    <TextBlock Text="Mengentoleranz +:" Grid.Row="2" Grid.Column="3" Margin="10 10 0 5"/>
+                    <TextBox Grid.Row="3" Grid.Column="3" Watermark="Mengentoleranz +" Margin="10 0 0 0"/>
+                    
+                    <!-- Length -->
+                    <TextBlock Text="Länge:" Grid.Row="4" Grid.Column="0" Grid.ColumnSpan="2" Margin="0 10 0 5"/>
+                    <TextBox Grid.Row="5" Grid.Column="0" Grid.ColumnSpan="2" Watermark="Länge"/>
+                    
+                    <TextBlock Text="Längentoleranz -:" Grid.Row="4" Grid.Column="2" Margin="10 10 0 5"/>
+                    <TextBox Grid.Row="5" Grid.Column="2" Watermark="Längentoleranz -" Margin="10 0 0 0"/>
+                    
+                    <TextBlock Text="Längentoleranz +:" Grid.Row="4" Grid.Column="3" Margin="10 10 0 5"/>
+                    <TextBox Grid.Row="5" Grid.Column="3" Watermark="Längentoleranz +" Margin="10 0 0 0"/>
+                    
+                    <!-- Standards -->
+                    <ComboBox Grid.Row="6" Grid.Column="0" SelectedIndex="0" Margin="0 10 0 0">
+                        <ComboBoxItem>EN10217-7</ComboBoxItem>
+                        <ComboBoxItem>EN10296-2</ComboBoxItem>
+                        <ComboBoxItem>SEW470</ComboBoxItem>
+                        <ComboBoxItem>ASME SA-249</ComboBoxItem>
+                        <ComboBoxItem>ASME SA-312</ComboBoxItem>
+                    </ComboBox>
+                    
+                    <ComboBox Grid.Row="6" Grid.Column="1" SelectedIndex="0" Margin="5 10 0 0">
+                        <ComboBoxItem>W0</ComboBoxItem>
+                        <ComboBoxItem>W1</ComboBoxItem>
+                        <ComboBoxItem>W2</ComboBoxItem>
+                        <ComboBoxItem>W1R</ComboBoxItem>
+                        <ComboBoxItem>W2R</ComboBoxItem>
+                        <ComboBoxItem>W1R/W2R</ComboBoxItem>
+                    </ComboBox>
+                    
+                    <ComboBox Grid.Row="6" Grid.Column="2" SelectedIndex="0" Margin="10 10 0 0">
+                        <ComboBoxItem>EN10204/3.1</ComboBoxItem>
+                        <ComboBoxItem>EN10204/3.2</ComboBoxItem>
+                        <ComboBoxItem>EN10204/3.1 + AD2000-W2</ComboBoxItem>
+                        <ComboBoxItem>EN10204/3.1 + AD2000-W10</ComboBoxItem>
+                        <ComboBoxItem>EN10204/3.1 + AD2000-W2/W10</ComboBoxItem>
+                        <ComboBoxItem>EN10204/3.2 + AD2000-W2</ComboBoxItem>
+                        <ComboBoxItem>EN10204/3.2 + AD2000-W10</ComboBoxItem>
+                        <ComboBoxItem>EN10204/3.2 + AD2000-W2/W10</ComboBoxItem>
+                    </ComboBox>
+                    
+                    <ComboBox Grid.Row="6" Grid.Column="3" SelectedIndex="0" Margin="10 10 0 0">
+                        <ComboBoxItem>D1</ComboBoxItem>
+                        <ComboBoxItem>D2</ComboBoxItem>
+                        <ComboBoxItem>D3</ComboBoxItem>
+                        <ComboBoxItem>D4</ComboBoxItem>
+                    </ComboBox>
+                    
+                    <!-- Additional Settings -->
+                    <TextBlock Text="KL max.:" Grid.Row="7" Grid.Column="0" Margin="0 10 0 5"/>
+                    <TextBox Grid.Row="8" Grid.Column="0" Watermark="KL max."/>
+                    
+                    <StackPanel Grid.Row="7" Grid.Column="1" Grid.RowSpan="2">
+                        <CheckBox Margin="5 10 0 5">Vorrat?</CheckBox>
+                        <CheckBox Margin="5 5 0 0">Bürsten?</CheckBox>
+                    </StackPanel>
+                    
+                    <TextBlock Text="Preis:" Grid.Row="7" Grid.Column="2" Margin="10 10 0 5"/>
+                    <TextBox Grid.Row="8" Grid.Column="2" Watermark="Preis" Margin="10 0 0 0"/>
+                    
+                    <ComboBox Grid.Row="8" Grid.Column="3" SelectedIndex="0" Margin="10 0 0 0">
+                        <ComboBoxItem>€/m</ComboBoxItem>
+                        <ComboBoxItem>€/Stk.</ComboBoxItem>
+                        <ComboBoxItem>€/kg</ComboBoxItem>
+                    </ComboBox>
+                </Grid>
+                
+                <!-- Delivery Time -->
+                <Grid ColumnDefinitions="Auto,*">
+                    <TextBlock Text="Lieferzeit:" Grid.Column="0" VerticalAlignment="Center" Margin="0 0 10 0"/>
+                    <TextBox Watermark="Lieferzeit" Grid.Column="1"/>
+                </Grid>
+                
+                <Grid RowDefinitions="Auto,*,Auto,*" VerticalAlignment="Stretch" HorizontalAlignment="Stretch">
+                    <!-- First Expander -->
+                    <Expander Grid.Row="0" Grid.RowSpan="2" HorizontalAlignment="Stretch">
+                        <Expander.Header>
+                            Notizen für Extern
+                        </Expander.Header>
+                        <TextBox Margin="5"
+                                 Grid.Row="1"
+                                 TextWrapping="Wrap"
+                                 AcceptsReturn="True" 
+                                 MinHeight="150"
+                                 Watermark="Beschreibung"/>
+                    </Expander>
+    
+                    <!-- Second Expander -->
+                    <Expander Grid.Row="2" Grid.RowSpan="2" HorizontalAlignment="Stretch">
+                        <Expander.Header>
+                            Notizen für Intern
+                        </Expander.Header>
+                        <TextBox Margin="5"
+                                 Grid.Row="3"
+                                 TextWrapping="Wrap" 
+                                 AcceptsReturn="True" 
+                                 MinHeight="150"
+                                 Watermark="Beschreibung"/>
+                    </Expander>
+                </Grid>
+            </StackPanel>
+        </Grid>
+    </ScrollViewer>
 </UserControl>

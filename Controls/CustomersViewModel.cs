@@ -397,52 +397,44 @@ public partial class CustomersViewModel : ObservableObject
     [RelayCommand]
     private async Task SearchCustomers(string value)
     {
-        if (value != "")
+        CustomersList.Clear();
+
+        if (string.IsNullOrEmpty(value))
         {
-            CustomersList.Clear();
+            return;
+        }
 
-            try
+        try
+        {
+            using (var connection = new MySqlConnection(ConnectionString))
             {
-                using (MySql.Data.MySqlClient.MySqlConnection connection = new MySql.Data.MySqlClient.MySqlConnection(ConnectionString))
-                {
-                    connection.Open();
+                await connection.OpenAsync();
 
-                    // Change the query to use proper parameter placement
-                    string query = "SELECT * FROM prostahl.Customers WHERE CONCAT_WS(' ', Customernick, Companyname, InvoiceStreet, InvoiceHouseNo, InvoiceCity, InvoicePostcode, InvoiceCountry, PurchaserName, PurchaserPhone, PurchaserMail, BookkeeperName, BookkeeperPhone, BookkeeperMail, CertificateMail, InvoiceMail, OCMail, Skonto, SkontoTerm, NettoTerm, InsuranceLimit) LIKE @SearchTerm ORDER BY Companyname ASC LIMIT 1000";
-                    
-                    MySql.Data.MySqlClient.MySqlCommand command = new MySql.Data.MySqlClient.MySqlCommand(query, connection);
-                    
-                    // Properly add the parameter with wildcard characters
-                    command.Parameters.AddWithValue("@SearchTerm", "%" + value + "%");
-                    
-                    using (MySql.Data.MySqlClient.MySqlDataReader reader = command.ExecuteReader())
-                    {
-                        while (reader.Read())
-                        {
-                            // Read values from columns
-                            string readout = reader.GetString(2); // Assuming the company name is at index 2
-                            
-                            // Add to list
-                            CustomersList.Add(readout);
-                        }
-                    }
+                string query = @"
+                SELECT Companyname FROM prostahl.Customers 
+                WHERE CONCAT_WS(' ', Customernick, Companyname, InvoiceStreet, InvoiceHouseNo, 
+                                 InvoiceCity, InvoicePostcode, InvoiceCountry, PurchaserName, 
+                                 PurchaserPhone, PurchaserMail, BookkeeperName, BookkeeperPhone, 
+                                 BookkeeperMail, CertificateMail, InvoiceMail, OCMail, Skonto, 
+                                 SkontoTerm, NettoTerm, InsuranceLimit) LIKE @SearchTerm 
+                ORDER BY Companyname ASC LIMIT 1000";
+
+                var companies = await connection.QueryAsync<string>(query, new { SearchTerm = $"%{value}%" });
+            
+                foreach (var company in companies)
+                {
+                    CustomersList.Add(company);
                 }
             }
-            catch (Exception ex)
-            {
-                var box = MessageBoxManager
-                    .GetMessageBoxStandard("Error", ex.Message,
-                        ButtonEnum.YesNo);
-
-                var result = await box.ShowAsync();
-            }
         }
-        else
+        catch (Exception ex)
         {
-            CustomersList.Clear();
+            var box = MessageBoxManager
+                .GetMessageBoxStandard("Error", ex.Message, ButtonEnum.YesNo);
+
+            await box.ShowAsync();
         }
-    }
-    
+    }    
     
     partial void OnCustomerNameSearchChanged(string value)
     {

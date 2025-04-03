@@ -15,11 +15,11 @@
 		<TabItem Header="Aufträge">
 			<ScrollViewer HorizontalScrollBarVisibility="Visible" VerticalScrollBarVisibility="Visible">
 				<TabControl Margin="5">
+					<TabItem Header="Angebote">
+						<controls:Inquiries DataContext="{Binding InquiriesViewModel}"/>			
+					</TabItem>
 					<TabItem Header="Aufträge">
 						<controls:Orders/>
-					</TabItem>
-					<TabItem Header="Angebote">
-						<controls:Inquiries/>				
 					</TabItem>
 					<TabItem Header="Rechnungen">
 						<controls:Invoices/>

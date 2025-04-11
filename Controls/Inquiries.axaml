@@ -110,7 +110,7 @@
                     
                     <TextBlock Text="Lieferanschrift:" Grid.Row="0" Grid.Column="0" TextAlignment="End" Margin="0 0 10 5" VerticalAlignment="Center"/>
                     <TextBox Watermark="Lieferanschrift" Grid.Row="0" Grid.Column="1" Text="{Binding DeliveryAdressSearch}" IsEnabled="{Binding IsDeliveryEnabled}"/>
-                    <CheckBox Grid.Row="0" Grid.Column="2" Content="Ab Werk?" Margin="10 0 0 0" IsChecked="{Binding DeliveryEXW}"/>
+                    <CheckBox Grid.Row="0" Grid.Column="2" Content="Ab Werk?" Margin="10 0 0 0" IsChecked="{Binding CheckEXW}"/>
                 </Grid>
 
                 <!-- Delivery Address Details -->
@@ -166,30 +166,25 @@
                 </Grid>
 
                 <!-- Comments and Action Buttons -->
-                <StackPanel Spacing="10">
-                    <Grid>
-                        <Grid.ColumnDefinitions>
-                            <ColumnDefinition Width="*"/>
-                            <ColumnDefinition Width="Auto"/>
-                        </Grid.ColumnDefinitions>
-                        <CheckBox Grid.Column="1" Content="Englisch?" IsChecked="{Binding EnglishCustomer}"/>
-                    </Grid>
+                <StackPanel>
                     
                     <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" Spacing="10">
-                        <Button Height="40">
+                        
+                        <CheckBox Grid.Column="1" Content="Englisch?" IsChecked="{Binding EnglishCustomer}" HorizontalAlignment="Left"/>
+
+                        <Button Height="40" Command="{Binding InquirySaveCommand}">
                             <TextBlock TextWrapping="Wrap" TextAlignment="Center">
                                 Auftrag Speichern
                             </TextBlock>
                         </Button>
-                        <Button Height="40">
+                        <Button Height="40" Command="{Binding InquirySavetoPDFCommand}">
                             <TextBlock TextWrapping="Wrap" TextAlignment="Center">
                                 PDF Speichern
                             </TextBlock>
                         </Button>
                     </StackPanel>
                     
-                    <TextBox Margin="5"
-                             Grid.Row="3"
+                    <TextBox 
                              TextWrapping="Wrap" 
                              AcceptsReturn="True" 
                              MinHeight="150"
@@ -202,12 +197,15 @@
                 <!-- Surcharges Section -->
                 <StackPanel Spacing="5">
                     <TextBlock Text="Zuschläge:" TextAlignment="Center" FontWeight="Bold"/>
+                    
                     <DataGrid Height="160"
                               ItemsSource="{Binding SurchargeList}" 
                               SelectedItem="{Binding SelectedSurcharge, Mode=TwoWay}" 
                               AutoGenerateColumns="True"
                               GridLinesVisibility="All"
-                              BorderThickness="1" BorderBrush="Gray">
+                              BorderThickness="1" BorderBrush="Gray"
+                              CanUserResizeColumns="True" 
+                              HorizontalScrollBarVisibility="Auto" >
                     </DataGrid>
                         
                     <Grid>
@@ -215,13 +213,13 @@
                             <ColumnDefinition Width="Auto"/>
                             <ColumnDefinition Width="Auto"/>
                         </Grid.ColumnDefinitions>
-                        <Button Grid.Column="0" Height="40" Width="150" >
+                        <Button Grid.Column="0" Height="40" Width="150" Command="{Binding SurchargeSaveCommand}">
                             <TextBlock TextAlignment="Center">
                                 Zuschlag Speichern
                             </TextBlock>
                         </Button>
                         
-                        <Button Grid.Column="1" Height="40" Width="150">
+                        <Button Grid.Column="1" Height="40" Width="150" Command="{Binding SurchargeDeleteCommand}">
                             <TextBlock TextAlignment="Center">
                                 Zuschlag Löschen
                             </TextBlock>
@@ -231,22 +229,24 @@
                     
                     <StackPanel Grid.Column="1" Orientation="Horizontal" VerticalAlignment="Center">
                         <TextBlock Text="Zuschläge Hinzufügen:" VerticalAlignment="Center" Margin="10 0"/>
-                        <ComboBox SelectedIndex="0" Width="150">
+                        <ComboBox Width="150" SelectedIndex="{Binding SurchargeItemSelector}" SelectedItem="{Binding SurchargeItemSelectorObject}">
                             <ComboBoxItem>Pro Auftrag</ComboBoxItem>
                             <ComboBoxItem>Pro Stück</ComboBoxItem>
                             <ComboBoxItem>Pro Position</ComboBoxItem>
                             <ComboBoxItem>Pro Lieferung</ComboBoxItem>
+                            <ComboBoxItem>Pro Charge</ComboBoxItem>
+                            <ComboBoxItem>Pro Rechnung</ComboBoxItem>
                         </ComboBox>
                     </StackPanel>
                     
                     <Grid ColumnDefinitions="Auto,*">
                         <TextBlock Text="Beschreibung:" Grid.Column="0" VerticalAlignment="Center" Margin="0 0 10 0"/>
-                        <TextBox Watermark="Beschreibung" Grid.Column="1"/>
+                        <TextBox Watermark="Beschreibung" Text="{Binding SurchargeDescription}" Grid.Column="1"/>
                     </Grid>
                     
                     <Grid ColumnDefinitions="Auto,*">
                         <TextBlock Text="Wert:" Grid.Column="0" VerticalAlignment="Center" Margin="0 0 10 0"/>
-                        <TextBox Watermark="Wert" Grid.Column="1"/>
+                        <TextBox Watermark="Wert" Text="{Binding SurchargeAmount}" Grid.Column="1"/>
                     </Grid>
                 </StackPanel>
                 

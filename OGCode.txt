@@ -2906,225 +2906,225 @@ namespace PPcN
         private void btnInquiryPositionSave_Click(object sender, EventArgs e)
         {
             try
-            {
-                // Ensure at least one item is selected
-                if (listInquiryPositionArticle.SelectedItems.Count > 0)
-                {
-                    // Access the first selected item
-
-                    // Display the selected item's information in a message box
-                    ListViewItem selectedItem = listInquiryPositionArticle.SelectedItems[0];
-                    ArticleNumber = "";
-                    string AD = selectedItem.SubItems[0].Text.Replace(',', '.');
-                    string WS = selectedItem.SubItems[1].Text.Replace(',', '.');
-                    string Werkstoff = selectedItem.SubItems[2].Text.Replace(',', '.');
-
-                    string query = $"SELECT Artikelnummer FROM `prostahl`.`artikelrohre` WHERE 1=1 AND `Außendurchmesser` = {AD} AND `Werkstoff` = '{Werkstoff}' AND `Wandstärke` = {WS} ORDER BY `Werkstoff` ASC LIMIT 1000\r\n";
-
-                    Debug.WriteLine(query);
-
-                    try
-                    {
-                        using (MySqlConnection connection = new MySqlConnection(connectionString))
-                        {
-                            connection.Open();
-
-                            using (MySqlCommand command = new MySqlCommand(query, connection))
-                            {
-
-                                using (MySqlDataReader reader = command.ExecuteReader())
-                                {
-                                    while (reader.Read())
-                                    {
-                                        ArticleNumber = reader.GetValue(0).ToString();
-                                    }
-                                }
-                            }
-                        }
-                    }
-                    catch (Exception ex)
-                    {
-                        Debug.WriteLine(ex.Message);
-                    }
-                }
-            }
-            catch (ArgumentOutOfRangeException ex)
-            {
-                // Log the exception or show a message to the user
-                MessageBox.Show("An error occurred while selecting an item: " + ex.Message);
-            }
-
-            string Glühen;
-            string Glätten;
-            string Vorrat;
-            string Bürsten;
-            string GlühenText;
-            string GlättenText;
-            string VorratText;
-            string BürstenText;
-
-            //Following will put Glühen to yes if it has been selected accordingly. 
-            if (cmInquiryPositionDIN.SelectedIndex < 2 && (cmInquiryPositionDinExec.SelectedIndex == 1 || cmInquiryPositionDinExec.SelectedIndex == 2 || cmInquiryPositionDinExec.SelectedIndex == 4 || cmInquiryPositionDinExec.SelectedIndex == 5 || cmInquiryPositionDinExec.SelectedIndex == 6 || cmInquiryPositionDinExec.SelectedIndex == 7))
-            {
-                Glühen = "1";
-                GlühenText = "Ja";
-            }
-            else if (cmInquiryPositionDIN.SelectedIndex == 2 && (cmInquiryPositionDinExec.SelectedIndex == 1 || cmInquiryPositionDinExec.SelectedIndex == 3))
-            {
-                Glühen = "1";
-                GlühenText = "Ja";
-            }
-            else if (cmInquiryPositionDIN.SelectedIndex == 3 && (cmInquiryPositionDinExec.SelectedIndex > 1))
-            {
-                Glühen = "1";
-                GlühenText = "Ja";
-            }
-            else if (cmInquiryPositionDIN.SelectedIndex == 4 && (cmInquiryPositionDinExec.SelectedIndex == 2 || cmInquiryPositionDinExec.SelectedIndex == 3 || cmInquiryPositionDinExec.SelectedIndex == 6 || cmInquiryPositionDinExec.SelectedIndex == 7))
-            {
-                Glühen = "1";
-                GlühenText = "Ja";
-            }
-            else
-            {
-                Glühen = "0";
-                GlühenText = "Nein";
-            }
-
-            if (cmInquiryPositionDIN.SelectedIndex < 2 && (cmInquiryPositionDinExec.SelectedIndex == 3 || cmInquiryPositionDinExec.SelectedIndex == 4 || cmInquiryPositionDinExec.SelectedIndex == 5 || cmInquiryPositionDinExec.SelectedIndex == 7 || cmInquiryPositionDinExec.SelectedIndex == 9 || cmInquiryPositionDinExec.SelectedIndex == 11 || cmInquiryPositionDinExec.SelectedIndex == 13 || cmInquiryPositionDinExec.SelectedIndex == 15))
-            {
-                Glätten = "1";
-                GlättenText = "Ja";
-            }
-            else if (cmInquiryPositionDIN.SelectedIndex == 2 && cmInquiryPositionDinExec.SelectedIndex > 1)
-            {
-                Glätten = "1";
-                GlättenText = "Ja";
-
-            }
-            else if (cmInquiryPositionDIN.SelectedIndex == 3 && (cmInquiryPositionDinExec.SelectedIndex == 1 || cmInquiryPositionDinExec.SelectedIndex == 3))
-            {
-                Glätten = "1";
-                GlättenText = "Ja";
-
-            }
-            else if (cmInquiryPositionDIN.SelectedIndex == 4)
-            {
-                Glätten = "1";
-                GlättenText = "Ja";
-
-            }
-            else
-            {
-                Glätten = "0";
-                GlättenText = "Nein";
-
-            }
-
-            if (chkInquiryPositionfromStock.Checked) { Vorrat = "1"; VorratText = "Ja"; } else { Vorrat = "0"; VorratText = "Nein"; };
-            if (chkInquiryPositionBrushing.Checked) { Bürsten = "1"; BürstenText = "Ja"; } else { Bürsten = "0"; BürstenText = "Nein"; };
-
-            string price = txtInquiryPositionPrice.Text.Replace(',', '.');
-
-            if (listInquiryPositionArticle.SelectedItems.ToString() == null || cmbInquiryPositionQuantityUnit.SelectedItem.ToString() == null || cmbInquiryPositionQuantityTolUnit.SelectedItem.ToString() == null || cmInquiryPositionD.SelectedItem.ToString() == null || cmInquiryPositionT.SelectedItem.ToString() == null || cmInquiryPositionDIN.SelectedItem.ToString() == null || cmInquiryPositionDinExec.SelectedItem.ToString() == null || cmInquiryPositionCert.SelectedItem.ToString() == null)
-            {
-                MessageBox.Show("One or More ComboBoxes not Setup Correctly!");
-                return;
-            };
-
-
-            DialogResult result = MessageBox.Show(
-                $"Außendurchmesser: {txtInquiryPositionOD.Text}{Environment.NewLine}" +
-                $"Wandstärke: {txtInquiryPositionWT.Text}{Environment.NewLine}" +
-                $"Werkstoff: {listInquiryPositionArticle.SelectedItems[0].SubItems[2].Text ?? ""}{Environment.NewLine}" +
-                $"Artikelnummer: {ArticleNumber}{Environment.NewLine}" +
-                $"Soll Länge: {txtInquiryPositionLength.Text ?? ""}{Environment.NewLine}" +
-                $"Längentoleranz: -{txtInquiryPositionMinLength.Text ?? ""}/+{txtInquiryPositionMaxLength.Text ?? ""}{Environment.NewLine}" +
-                $"Bestellmenge: {txtInquiryPositionQuantity.Text ?? ""} {cmbInquiryPositionQuantityUnit.SelectedItem.ToString()}{Environment.NewLine}" +
-                $"Mengentoleranz: {txtInquiryPositionMinQuantity.Text ?? ""}-{txtInquiryPositionMaxQuantity.Text ?? ""} {cmbInquiryPositionQuantityTolUnit.SelectedItem.ToString()} {Environment.NewLine}" +
-                $"Preis Einheit: {cmbInquiryPositionPriceUnit.SelectedItem.ToString()}{Environment.NewLine}" +
-                $"Preis: {price}{Environment.NewLine}" +
-                $"Liefertermin: {txtInquiryPositionDeliveryTime.Text}{Environment.NewLine}" +
-                $"KL Max. %: {txtInquiryPositionKLMax.Text}{Environment.NewLine}" +
-                $"D?: {cmInquiryPositionD.SelectedItem.ToString() ?? ""}{Environment.NewLine}" +
-                $"T?: {cmInquiryPositionT.SelectedItem.ToString() ?? ""}{Environment.NewLine}" +
-                $"Norm: {cmInquiryPositionDIN.SelectedItem.ToString()}{Environment.NewLine}" +
-                $"Ausführung: {cmInquiryPositionDinExec.SelectedItem.ToString()}{Environment.NewLine}" +
-                $"Glühen: {GlühenText}{Environment.NewLine}" +
-                $"Glätten?: {GlättenText}{Environment.NewLine}" +
-                $"Zeugnis: {cmInquiryPositionCert.SelectedItem.ToString()}{Environment.NewLine}" +
-                $"Vorrat?: {VorratText}{Environment.NewLine}" +
-                $"Bürsten: {BürstenText} {Environment.NewLine}" +
-                $"Körnung: {txtInquiryPositionBrushingQuality.Text ?? ""}{Environment.NewLine}" +
-                $"Anmerkungen: {txtInquiryPosText.Text ?? ""}{Environment.NewLine}",
-                "Confirm Details", // Title of the message box
-                MessageBoxButtons.YesNo // Buttons for the message box
-                );
-
-            // Check the Length of the MessageBox
-            if (result == DialogResult.Yes)
-            {
-                try
-                {
-                    using (MySqlConnection connection = new MySqlConnection(connectionString))
-                    {
-                        connection.Open();
-
-                        string query;
-
-                        query = @"INSERT INTO `anfragenposition` 
-                                (`Auftragsnummer`, `Positionsnummer`, `Artikelnummer`, `Lange`, `Langentoleranzmin`, `Langentoleranzmax`, `Menge`, `MengeEinheit`, `Mengentoleranzmin`, `Mengentoleranzmax`, `MengentoleranzEinheit`, `1127D`, `1127T`, `Norm`, `Ausfuhrung`, `WAZ`, `Bemerkung`, `Liefertermin`, `Preis`, `PreisEinheit`, `Gluhen`, `Glatten`, `Vorrat`, `Bursten`, `Kornung`, `KLMax`)
-                                VALUES
-                                (@Auftragsnummer, @Positionsnummer, @Artikelnummer, @Lange, @Langentoleranzmin, @Langentoleranzmax, @Menge, @MengeEinheit, @Mengentoleranzmin, @Mengentoleranzmax, @MengentoleranzEinheit, @1127D, @1127T, @Norm, @Ausfuhrung, @WAZ, @Bemerkung, @Liefertermin, @Preis, @PreisEinheit, @Gluhen, @Glatten, @Vorrat, @Bursten, @Kornung, @KlMax);";
-
-                        MySqlCommand command = new MySqlCommand(query, connection);
-
-                        // Add parameters
-                        command.Parameters.AddWithValue("@Auftragsnummer", txtInquiryNumber.Text);
-                        command.Parameters.AddWithValue("@Positionsnummer", txtInquiryPosition.Text);
-                        command.Parameters.AddWithValue("@Artikelnummer", ArticleNumber);
-                        command.Parameters.AddWithValue("@Lange", txtInquiryPositionLength.Text);
-                        command.Parameters.AddWithValue("@Langentoleranzmin", txtInquiryPositionMinLength.Text);
-                        command.Parameters.AddWithValue("@Langentoleranzmax", txtInquiryPositionMaxLength.Text);
-                        command.Parameters.AddWithValue("@Menge", txtInquiryPositionQuantity.Text);
-                        command.Parameters.AddWithValue("@KlMax", txtInquiryPositionKLMax.Text);
-                        command.Parameters.AddWithValue("@MengeEinheit", cmbInquiryPositionQuantityUnit.SelectedIndex);
-                        command.Parameters.AddWithValue("@Mengentoleranzmin", txtInquiryPositionMinQuantity.Text);
-                        command.Parameters.AddWithValue("@Mengentoleranzmax", txtInquiryPositionMaxQuantity.Text);
-                        command.Parameters.AddWithValue("@MengentoleranzEinheit", cmbInquiryPositionQuantityTolUnit.SelectedIndex);
-                        command.Parameters.AddWithValue("@1127D", cmInquiryPositionD.SelectedItem.ToString());
-                        command.Parameters.AddWithValue("@1127T", cmInquiryPositionT.SelectedItem.ToString());
-                        command.Parameters.AddWithValue("@Norm", cmInquiryPositionDIN.SelectedItem.ToString());
-                        command.Parameters.AddWithValue("@Ausfuhrung", cmInquiryPositionDinExec.SelectedItem.ToString());
-                        command.Parameters.AddWithValue("@WAZ", cmInquiryPositionCert.SelectedItem.ToString());
-                        command.Parameters.AddWithValue("@Bemerkung", txtInquiryPosText.Text ?? "");
-                        command.Parameters.AddWithValue("@Liefertermin", txtInquiryPositionDeliveryTime.Text);
-                        command.Parameters.AddWithValue("@Preis", price);
-                        command.Parameters.AddWithValue("@PreisEinheit", cmbInquiryPositionPriceUnit.SelectedIndex);
-                        command.Parameters.AddWithValue("@Gluhen", Glühen);
-                        command.Parameters.AddWithValue("@Glatten", Glätten);
-                        command.Parameters.AddWithValue("@Vorrat", Vorrat);
-                        command.Parameters.AddWithValue("@Bursten", Bürsten);
-                        command.Parameters.AddWithValue("@Kornung", string.IsNullOrEmpty(txtInquiryPositionBrushingQuality.Text) ? (object)DBNull.Value : txtInquiryPositionBrushingQuality.Text);
-
-                        // Execute the query
-                        int rowsAffected = command.ExecuteNonQuery();
-
-                        // Check if the insertion was successful
-                        if (rowsAffected > 0)
-                        {
-                            MessageBox.Show("Data inserted successfully.", "Success", MessageBoxButtons.OK, MessageBoxIcon.Information);
-                        }
-                        else
-                        {
-                            MessageBox.Show("Failed to insert data.", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
-                        }
-                    }
-                }
-                catch (Exception ex)
-                {
-                    MessageBox.Show("Error: " + ex.Message, "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
-                }
-            }
+                         {
+                             // Ensure at least one item is selected
+                             if (listInquiryPositionArticle.SelectedItems.Count > 0)
+                             {
+                                 // Access the first selected item
+             
+                                 // Display the selected item's information in a message box
+                                 ListViewItem selectedItem = listInquiryPositionArticle.SelectedItems[0];
+                                 ArticleNumber = "";
+                                 string AD = selectedItem.SubItems[0].Text.Replace(',', '.');
+                                 string WS = selectedItem.SubItems[1].Text.Replace(',', '.');
+                                 string Werkstoff = selectedItem.SubItems[2].Text.Replace(',', '.');
+             
+                                 string query = $"SELECT Artikelnummer FROM `prostahl`.`artikelrohre` WHERE 1=1 AND `Außendurchmesser` = {AD} AND `Werkstoff` = '{Werkstoff}' AND `Wandstärke` = {WS} ORDER BY `Werkstoff` ASC LIMIT 1000\r\n";
+             
+                                 Debug.WriteLine(query);
+             
+                                 try
+                                 {
+                                     using (MySqlConnection connection = new MySqlConnection(connectionString))
+                                     {
+                                         connection.Open();
+             
+                                         using (MySqlCommand command = new MySqlCommand(query, connection))
+                                         {
+             
+                                             using (MySqlDataReader reader = command.ExecuteReader())
+                                             {
+                                                 while (reader.Read())
+                                                 {
+                                                     ArticleNumber = reader.GetValue(0).ToString();
+                                                 }
+                                             }
+                                         }
+                                     }
+                                 }
+                                 catch (Exception ex)
+                                 {
+                                     Debug.WriteLine(ex.Message);
+                                 }
+                             }
+                         }
+                         catch (ArgumentOutOfRangeException ex)
+                         {
+                             // Log the exception or show a message to the user
+                             MessageBox.Show("An error occurred while selecting an item: " + ex.Message);
+                         }
+             
+                         string Glühen;
+                         string Glätten;
+                         string Vorrat;
+                         string Bürsten;
+                         string GlühenText;
+                         string GlättenText;
+                         string VorratText;
+                         string BürstenText;
+             
+                         //Following will put Glühen to yes if it has been selected accordingly. 
+                         if (cmInquiryPositionDIN.SelectedIndex < 2 && (cmInquiryPositionDinExec.SelectedIndex == 1 || cmInquiryPositionDinExec.SelectedIndex == 2 || cmInquiryPositionDinExec.SelectedIndex == 4 || cmInquiryPositionDinExec.SelectedIndex == 5 || cmInquiryPositionDinExec.SelectedIndex == 6 || cmInquiryPositionDinExec.SelectedIndex == 7))
+                         {
+                             Glühen = "1";
+                             GlühenText = "Ja";
+                         }
+                         else if (cmInquiryPositionDIN.SelectedIndex == 2 && (cmInquiryPositionDinExec.SelectedIndex == 1 || cmInquiryPositionDinExec.SelectedIndex == 3))
+                         {
+                             Glühen = "1";
+                             GlühenText = "Ja";
+                         }
+                         else if (cmInquiryPositionDIN.SelectedIndex == 3 && (cmInquiryPositionDinExec.SelectedIndex > 1))
+                         {
+                             Glühen = "1";
+                             GlühenText = "Ja";
+                         }
+                         else if (cmInquiryPositionDIN.SelectedIndex == 4 && (cmInquiryPositionDinExec.SelectedIndex == 2 || cmInquiryPositionDinExec.SelectedIndex == 3 || cmInquiryPositionDinExec.SelectedIndex == 6 || cmInquiryPositionDinExec.SelectedIndex == 7))
+                         {
+                             Glühen = "1";
+                             GlühenText = "Ja";
+                         }
+                         else
+                         {
+                             Glühen = "0";
+                             GlühenText = "Nein";
+                         }
+             
+                         if (cmInquiryPositionDIN.SelectedIndex < 2 && (cmInquiryPositionDinExec.SelectedIndex == 3 || cmInquiryPositionDinExec.SelectedIndex == 4 || cmInquiryPositionDinExec.SelectedIndex == 5 || cmInquiryPositionDinExec.SelectedIndex == 7 || cmInquiryPositionDinExec.SelectedIndex == 9 || cmInquiryPositionDinExec.SelectedIndex == 11 || cmInquiryPositionDinExec.SelectedIndex == 13 || cmInquiryPositionDinExec.SelectedIndex == 15))
+                         {
+                             Glätten = "1";
+                             GlättenText = "Ja";
+                         }
+                         else if (cmInquiryPositionDIN.SelectedIndex == 2 && cmInquiryPositionDinExec.SelectedIndex > 1)
+                         {
+                             Glätten = "1";
+                             GlättenText = "Ja";
+             
+                         }
+                         else if (cmInquiryPositionDIN.SelectedIndex == 3 && (cmInquiryPositionDinExec.SelectedIndex == 1 || cmInquiryPositionDinExec.SelectedIndex == 3))
+                         {
+                             Glätten = "1";
+                             GlättenText = "Ja";
+             
+                         }
+                         else if (cmInquiryPositionDIN.SelectedIndex == 4)
+                         {
+                             Glätten = "1";
+                             GlättenText = "Ja";
+             
+                         }
+                         else
+                         {
+                             Glätten = "0";
+                             GlättenText = "Nein";
+             
+                         }
+             
+                         if (chkInquiryPositionfromStock.Checked) { Vorrat = "1"; VorratText = "Ja"; } else { Vorrat = "0"; VorratText = "Nein"; };
+                         if (chkInquiryPositionBrushing.Checked) { Bürsten = "1"; BürstenText = "Ja"; } else { Bürsten = "0"; BürstenText = "Nein"; };
+             
+                         string price = txtInquiryPositionPrice.Text.Replace(',', '.');
+             
+                         if (listInquiryPositionArticle.SelectedItems.ToString() == null || cmbInquiryPositionQuantityUnit.SelectedItem.ToString() == null || cmbInquiryPositionQuantityTolUnit.SelectedItem.ToString() == null || cmInquiryPositionD.SelectedItem.ToString() == null || cmInquiryPositionT.SelectedItem.ToString() == null || cmInquiryPositionDIN.SelectedItem.ToString() == null || cmInquiryPositionDinExec.SelectedItem.ToString() == null || cmInquiryPositionCert.SelectedItem.ToString() == null)
+                         {
+                             MessageBox.Show("One or More ComboBoxes not Setup Correctly!");
+                             return;
+                         };
+             
+             
+                         DialogResult result = MessageBox.Show(
+                             $"Außendurchmesser: {txtInquiryPositionOD.Text}{Environment.NewLine}" +
+                             $"Wandstärke: {txtInquiryPositionWT.Text}{Environment.NewLine}" +
+                             $"Werkstoff: {listInquiryPositionArticle.SelectedItems[0].SubItems[2].Text ?? ""}{Environment.NewLine}" +
+                             $"Artikelnummer: {ArticleNumber}{Environment.NewLine}" +
+                             $"Soll Länge: {txtInquiryPositionLength.Text ?? ""}{Environment.NewLine}" +
+                             $"Längentoleranz: -{txtInquiryPositionMinLength.Text ?? ""}/+{txtInquiryPositionMaxLength.Text ?? ""}{Environment.NewLine}" +
+                             $"Bestellmenge: {txtInquiryPositionQuantity.Text ?? ""} {cmbInquiryPositionQuantityUnit.SelectedItem.ToString()}{Environment.NewLine}" +
+                             $"Mengentoleranz: {txtInquiryPositionMinQuantity.Text ?? ""}-{txtInquiryPositionMaxQuantity.Text ?? ""} {cmbInquiryPositionQuantityTolUnit.SelectedItem.ToString()} {Environment.NewLine}" +
+                             $"Preis Einheit: {cmbInquiryPositionPriceUnit.SelectedItem.ToString()}{Environment.NewLine}" +
+                             $"Preis: {price}{Environment.NewLine}" +
+                             $"Liefertermin: {txtInquiryPositionDeliveryTime.Text}{Environment.NewLine}" +
+                             $"KL Max. %: {txtInquiryPositionKLMax.Text}{Environment.NewLine}" +
+                             $"D?: {cmInquiryPositionD.SelectedItem.ToString() ?? ""}{Environment.NewLine}" +
+                             $"T?: {cmInquiryPositionT.SelectedItem.ToString() ?? ""}{Environment.NewLine}" +
+                             $"Norm: {cmInquiryPositionDIN.SelectedItem.ToString()}{Environment.NewLine}" +
+                             $"Ausführung: {cmInquiryPositionDinExec.SelectedItem.ToString()}{Environment.NewLine}" +
+                             $"Glühen: {GlühenText}{Environment.NewLine}" +
+                             $"Glätten?: {GlättenText}{Environment.NewLine}" +
+                             $"Zeugnis: {cmInquiryPositionCert.SelectedItem.ToString()}{Environment.NewLine}" +
+                             $"Vorrat?: {VorratText}{Environment.NewLine}" +
+                             $"Bürsten: {BürstenText} {Environment.NewLine}" +
+                             $"Körnung: {txtInquiryPositionBrushingQuality.Text ?? ""}{Environment.NewLine}" +
+                             $"Anmerkungen: {txtInquiryPosText.Text ?? ""}{Environment.NewLine}",
+                             "Confirm Details", // Title of the message box
+                             MessageBoxButtons.YesNo // Buttons for the message box
+                             );
+             
+                         // Check the Length of the MessageBox
+                         if (result == DialogResult.Yes)
+                         {
+                             try
+                             {
+                                 using (MySqlConnection connection = new MySqlConnection(connectionString))
+                                 {
+                                     connection.Open();
+             
+                                     string query;
+             
+                                     query = @"INSERT INTO `anfragenposition` 
+                                             (`Auftragsnummer`, `Positionsnummer`, `Artikelnummer`, `Lange`, `Langentoleranzmin`, `Langentoleranzmax`, `Menge`, `MengeEinheit`, `Mengentoleranzmin`, `Mengentoleranzmax`, `MengentoleranzEinheit`, `1127D`, `1127T`, `Norm`, `Ausfuhrung`, `WAZ`, `Bemerkung`, `Liefertermin`, `Preis`, `PreisEinheit`, `Gluhen`, `Glatten`, `Vorrat`, `Bursten`, `Kornung`, `KLMax`)
+                                             VALUES
+                                             (@Auftragsnummer, @Positionsnummer, @Artikelnummer, @Lange, @Langentoleranzmin, @Langentoleranzmax, @Menge, @MengeEinheit, @Mengentoleranzmin, @Mengentoleranzmax, @MengentoleranzEinheit, @1127D, @1127T, @Norm, @Ausfuhrung, @WAZ, @Bemerkung, @Liefertermin, @Preis, @PreisEinheit, @Gluhen, @Glatten, @Vorrat, @Bursten, @Kornung, @KlMax);";
+             
+                                     MySqlCommand command = new MySqlCommand(query, connection);
+             
+                                     // Add parameters
+                                     command.Parameters.AddWithValue("@Auftragsnummer", txtInquiryNumber.Text);
+                                     command.Parameters.AddWithValue("@Positionsnummer", txtInquiryPosition.Text);
+                                     command.Parameters.AddWithValue("@Artikelnummer", ArticleNumber);
+                                     command.Parameters.AddWithValue("@Lange", txtInquiryPositionLength.Text);
+                                     command.Parameters.AddWithValue("@Langentoleranzmin", txtInquiryPositionMinLength.Text);
+                                     command.Parameters.AddWithValue("@Langentoleranzmax", txtInquiryPositionMaxLength.Text);
+                                     command.Parameters.AddWithValue("@Menge", txtInquiryPositionQuantity.Text);
+                                     command.Parameters.AddWithValue("@KlMax", txtInquiryPositionKLMax.Text);
+                                     command.Parameters.AddWithValue("@MengeEinheit", cmbInquiryPositionQuantityUnit.SelectedIndex);
+                                     command.Parameters.AddWithValue("@Mengentoleranzmin", txtInquiryPositionMinQuantity.Text);
+                                     command.Parameters.AddWithValue("@Mengentoleranzmax", txtInquiryPositionMaxQuantity.Text);
+                                     command.Parameters.AddWithValue("@MengentoleranzEinheit", cmbInquiryPositionQuantityTolUnit.SelectedIndex);
+                                     command.Parameters.AddWithValue("@1127D", cmInquiryPositionD.SelectedItem.ToString());
+                                     command.Parameters.AddWithValue("@1127T", cmInquiryPositionT.SelectedItem.ToString());
+                                     command.Parameters.AddWithValue("@Norm", cmInquiryPositionDIN.SelectedItem.ToString());
+                                     command.Parameters.AddWithValue("@Ausfuhrung", cmInquiryPositionDinExec.SelectedItem.ToString());
+                                     command.Parameters.AddWithValue("@WAZ", cmInquiryPositionCert.SelectedItem.ToString());
+                                     command.Parameters.AddWithValue("@Bemerkung", txtInquiryPosText.Text ?? "");
+                                     command.Parameters.AddWithValue("@Liefertermin", txtInquiryPositionDeliveryTime.Text);
+                                     command.Parameters.AddWithValue("@Preis", price);
+                                     command.Parameters.AddWithValue("@PreisEinheit", cmbInquiryPositionPriceUnit.SelectedIndex);
+                                     command.Parameters.AddWithValue("@Gluhen", Glühen);
+                                     command.Parameters.AddWithValue("@Glatten", Glätten);
+                                     command.Parameters.AddWithValue("@Vorrat", Vorrat);
+                                     command.Parameters.AddWithValue("@Bursten", Bürsten);
+                                     command.Parameters.AddWithValue("@Kornung", string.IsNullOrEmpty(txtInquiryPositionBrushingQuality.Text) ? (object)DBNull.Value : txtInquiryPositionBrushingQuality.Text);
+             
+                                     // Execute the query
+                                     int rowsAffected = command.ExecuteNonQuery();
+             
+                                     // Check if the insertion was successful
+                                     if (rowsAffected > 0)
+                                     {
+                                         MessageBox.Show("Data inserted successfully.", "Success", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                                     }
+                                     else
+                                     {
+                                         MessageBox.Show("Failed to insert data.", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                                     }
+                                 }
+                             }
+                             catch (Exception ex)
+                             {
+                                 MessageBox.Show("Error: " + ex.Message, "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                             }
+                         }
 
             //txtInquiryPositionLength.Text
             //txtInquiryPositionMinLength

@@ -10,24 +10,29 @@ using MsBox.Avalonia;
 using MsBox.Avalonia.Enums;
 using MySql.Data.MySqlClient;
 using Dapper;
-
-
-
-
 using System.IO;
 using System.Net.Mail;
 using System.Diagnostics;
 using QuestPDF.Fluent;
 using QuestPDF.Helpers;
 using QuestPDF.Infrastructure;
+using System.Globalization;
+using Avalonia.Controls;
 
 namespace PS3000.Controls;
 
-public class SurchargeItem
+public class SurchargeListItem
 {
-    public string SurchargeType { get; set; }
+    public string SurchargeItem  { get; set; }
     public string Description { get; set; }
-    public string Amount { get; set; }
+    public float Amount { get; set; }
+}
+
+public class SurchargeListItemIndex
+{
+    public int SurchargeItemIndex  { get; set; }
+    public string Description { get; set; }
+    public float Amount { get; set; }
 }
 
 public partial class InquiriesViewModel : ObservableObject
@@ -40,7 +45,7 @@ public partial class InquiriesViewModel : ObservableObject
     
     public ObservableCollection<string> CustomersList { get; private set; } = new ObservableCollection<string>();
     
-    public ObservableCollection<SurchargeItem> SurchargeList { get; set; } = new ObservableCollection<SurchargeItem>();
+    public ObservableCollection<SurchargeListItem> SurchargeList { get; set; } = new ObservableCollection<SurchargeListItem>();
 
     [RelayCommand]
     private async Task SearchCustomers(string value)
@@ -112,18 +117,13 @@ public partial class InquiriesViewModel : ObservableObject
     
     //Following is to load Details once Customer company has been selected
     
-    [ObservableProperty]
-    string customerStreet;
-    [ObservableProperty]
-    string customersHouseNo;
-    [ObservableProperty]
-    string customersCity;
-    [ObservableProperty]
-    string customersPostCode;
-    [ObservableProperty]
-    string customersCountry;
-    [ObservableProperty]
-    string customersPurchaserName;
+    [ObservableProperty] string customerStreet;
+    [ObservableProperty] string customersHouseNo;
+    [ObservableProperty] string customersCity;
+    [ObservableProperty] string customersPostCode;
+    [ObservableProperty] string customersCountry;
+    [ObservableProperty] string customersPurchaserName;
+    [ObservableProperty] private string customerNumber;
     
     private bool _englishCustomer;
     public bool EnglishCustomer
@@ -163,6 +163,7 @@ public partial class InquiriesViewModel : ObservableObject
         // Query to get all customer data at once
         var customer = await connection.QueryFirstOrDefaultAsync<dynamic>(
             @"SELECT 
+                Customernumber,
                 Customernick, 
                 PurchaserName, 
                 PurchaserPhone, 
@@ -189,20 +190,18 @@ public partial class InquiriesViewModel : ObservableObject
             new { CompanyName = SelectedCustomer }
         );
 
-        // If customer exists, assign all properties
         if (customer == null)
         {
             return;
-        }    
-        else if (customer != "")    
-        {
-            CustomersPurchaserName = customer.PurchaserName;
-            CustomerStreet = customer.InvoiceStreet;
-            CustomersHouseNo = customer.InvoiceHouseNo;
-            CustomersCity = customer.InvoiceCity;
-            CustomersPostCode = customer.InvoicePostcode;
-            CustomersCountry = customer.InvoiceCountry;
         }
+
+        CustomersPurchaserName = customer.PurchaserName;
+        CustomerStreet = customer.InvoiceStreet;
+        CustomersHouseNo = customer.InvoiceHouseNo;
+        CustomersCity = customer.InvoiceCity;
+        CustomersPostCode = customer.InvoicePostcode;
+        CustomersCountry = customer.InvoiceCountry;
+        CustomerNumber = Convert.ToString(customer.Customernumber);
     }
 
     
@@ -222,6 +221,8 @@ public partial class InquiriesViewModel : ObservableObject
     string customersDeliveryAdressCountry;
     [ObservableProperty]
     string customersDeliveryAdressContactName;
+    [ObservableProperty]
+    string customersDeliveryAdressNo;
     [ObservableProperty] 
     private string inquiryNotes;
     
@@ -341,21 +342,24 @@ public partial class InquiriesViewModel : ObservableObject
         WHERE CompanyName = @CompanyName",
             new { CompanyName = SelectedDeliveryAdress }
         );
-
-        // If delivery address exists, assign all properties
-        if (deliveryAddress != null)
+        
+        if (deliveryAddress == null)
         {
-            CustomersDeliveryAdressStreet = deliveryAddress.Street;
-            CustomersDeliveryAdressHouseNo = deliveryAddress.HouseNo;
-            CustomersDeliveryAdressPostCode = deliveryAddress.Postcode;
-            CustomersDeliveryAdressCity = deliveryAddress.City;
-            CustomersDeliveryAdressCountry = deliveryAddress.Country;
-            CustomersDeliveryAdressContactName = deliveryAddress.ContactName;
+            return;
         }
+        
+        CustomersDeliveryAdressStreet = deliveryAddress.Street;
+        CustomersDeliveryAdressHouseNo = deliveryAddress.HouseNo;
+        CustomersDeliveryAdressPostCode = deliveryAddress.Postcode;
+        CustomersDeliveryAdressCity = deliveryAddress.City;
+        CustomersDeliveryAdressCountry = deliveryAddress.Country;
+        CustomersDeliveryAdressContactName = deliveryAddress.ContactName;
+        CustomersDeliveryAdressNo = Convert.ToString(deliveryAddress.deliveryadressNo);
+
     }
 
     private bool _deliveryEXW;
-    public bool DeliveryEXW
+    public bool CheckEXW
     {
         get => _deliveryEXW;
         set
@@ -363,7 +367,7 @@ public partial class InquiriesViewModel : ObservableObject
             if (_deliveryEXW != value)
             {
                 _deliveryEXW = value;
-                OnPropertyChanged(nameof(DeliveryEXW));
+                OnPropertyChanged(nameof(CheckEXW));
 
                 IsDeliveryEnabled = !_deliveryEXW;
             }
@@ -436,20 +440,20 @@ public partial class InquiriesViewModel : ObservableObject
                 
                 if (inquiry.EXW == 0)
                 {
-                    DeliveryEXW = true;
+                    CheckEXW = false;
                 }
                 else
                 {
-                    DeliveryEXW = false;
+                    CheckEXW = true;
                 }
                 
                 if (inquiry.English == 0)
                 {
-                    EnglishCustomer = true;
+                    EnglishCustomer = false;
                 }
                 else
                 {
-                    EnglishCustomer = false;
+                    EnglishCustomer = true;
                 }
                 
                 DeliveryAdressSearch = inquiry.DeliveryCompanyName;
@@ -457,12 +461,9 @@ public partial class InquiriesViewModel : ObservableObject
 
                 SurchargeList.Clear();
                 
-                Console.WriteLine(value);
-
-                
                 // Query and load surcharges
-                var results = await connection.QueryAsync<SurchargeItem>(
-                    @"SELECT SurchargeType, Description, Amount FROM inquirysurcharges WHERE Anfragennummer = @InquiryNo",
+                var results = await connection.QueryAsync<SurchargeListItem>(
+                    @"SELECT SurchargeItem, Description, Amount FROM inquirysurcharges WHERE Inquirynumber = @InquiryNo",
                     new { InquiryNo = value }
                 );
 
@@ -506,7 +507,9 @@ public partial class InquiriesViewModel : ObservableObject
         DeliveryAdressList.Clear();    
         
         SurchargeList.Clear();
-
+        
+        CheckEXW = false;
+        EnglishCustomer = false;
     }
     
     partial void OnInquiryNumberChanged(string value)
@@ -514,7 +517,507 @@ public partial class InquiriesViewModel : ObservableObject
         SearchInquiryNumber(value);
     }
     
+    [RelayCommand]
+    private async void InquirySave()
+    {
+        if (SelectedCustomer != null && SelectedDeliveryAdress != null && String.IsNullOrEmpty(InquiryNumber))
+        {
+            string AbWerk;
+            int AbWerkWert;
+            if (CheckEXW) { AbWerk = "Ja"; AbWerkWert = 1; } else { AbWerk = "Nein"; AbWerkWert = 0; }
+            string Englisch;
+            int EnglischWert;
+            if (EnglishCustomer) { Englisch = "Ja"; EnglischWert = 1; } else { Englisch = "Nein"; EnglischWert = 0; }
+            
+            var box = MessageBoxManager.GetMessageBoxStandard(
+                "Kunde Bestätigen",
+                $"Kundennummer?: {CustomerNumber}{Environment.NewLine}" +
+                $"Ab Werk?: {AbWerk}{Environment.NewLine}" +
+                $"Kunde: {SelectedCustomer}{Environment.NewLine}" +
+                $"Lieferanschrift: {SelectedDeliveryAdress}{Environment.NewLine}" +
+                $"Englisch?: {Englisch}{Environment.NewLine}" +
+                $"Bemerkungen: {InquiryNotes}{Environment.NewLine}",
+                ButtonEnum.YesNo
+            );
+            
+            var result = await box.ShowAsync();
+
+            if (result == ButtonResult.Yes)
+            {
+                using (var connection = new MySqlConnection(ConnectionString))
+                {
+                    connection.Open();
+
+                    // Insert new inquiry
+                    string insertQuery = @"INSERT INTO inquiries 
+                           (Customernumber, Deliveryadressnumber, EXW, English, Notes) 
+                           VALUES 
+                           (@InqCustomernumber, @InqDeliveryadressnumber, @InqEXW, @InqEnglish, @InqNotes)";
+
+                    connection.Execute(insertQuery, new
+                    {
+                        InqCustomernumber = CustomerNumber,
+                        InqDeliveryadressnumber = CustomersDeliveryAdressNo,
+                        InqEXW = AbWerkWert,
+                        InqEnglish = EnglischWert,
+                        InqNotes = InquiryNotes
+                    });
+
+                    // Retrieve the last inserted Inquirynumber
+                    string selectQuery = "SELECT Inquirynumber FROM inquiries ORDER BY Inquirynumber DESC LIMIT 1";
+                    InquiryNumber = connection.QuerySingleOrDefault<int>(selectQuery).ToString();
+                }
+            }
+        }
+        else if (!String.IsNullOrEmpty(InquiryNumber))
+        {
+            string UserConfirmationNotice = "";
+            string UserQuery;
+
+            string InquiryNotesCompare = "";
+            int DeliveryEXWCompareVal = 0;
+            string DeliveryEXWCompare = "";
+            string DeliveryEXWText = "";
+            string EnglishCustomerCompare = "";
+            string EnglishCustomerText = "";
+            int EnglishCustomerCompareVal = 0;
+            string DeliveryAdressSearchCompare = "";
+            string CustomerNameSearchCompare = "";
+
+            if (CheckEXW)
+            {
+                DeliveryEXWText = "Pickup";
+            }
+            else
+            {
+                DeliveryEXWText = "Delivery";
+            }
+
+            if (EnglishCustomer)
+            {
+                EnglishCustomerText = "English";
+            }
+            else
+            {
+                EnglishCustomerText = "German"; 
+            }
+            
+            if (string.IsNullOrWhiteSpace(InquiryNumber))
+            {
+                return; // Exit early if no inquiry number is provided
+            }
+
+            using var connection = new MySqlConnection(ConnectionString);
+            await connection.OpenAsync();
+
+            try
+            {
+                // Query to get all customer data at once
+                var inquiry = await connection.QueryFirstOrDefaultAsync<dynamic>(
+                    @"SELECT 
+                            i.Inquirynumber,
+                            i.Customernumber, 
+                            i.Deliveryadressnumber, 
+                            i.EXW, 
+                            i.English, 
+                            i.Notes,
+                            c.Companyname AS CustomerCompanyName,
+                            d.CompanyName AS DeliveryCompanyName
+                        FROM inquiries i
+                        JOIN customers c ON i.Customernumber = c.Customernumber
+                        LEFT JOIN deliveryadress d ON i.Deliveryadressnumber = d.deliveryadressNo
+                        WHERE i.Inquirynumber = @InquiryNo",
+                    new { InquiryNo = InquiryNumber }
+                );
+                
+                // If inquiry exists, assign all properties
+                if (inquiry != null)    
+                {
+                    DeliveryAdressSearchCompare = inquiry.DeliveryCompanyName;
+                    CustomerNameSearchCompare = inquiry.CustomerCompanyName;
+                    
+                    InquiryNotesCompare = inquiry.Notes;
+                    
+                    if (inquiry.EXW == 0)
+                    {
+                        DeliveryEXWCompare = "Delivery";
+                        DeliveryEXWCompareVal = 0;
+                    }
+                    else
+                    {
+                        DeliveryEXWCompare = "Pickup";
+                        DeliveryEXWCompareVal = 1;
+                    }
+                    
+                    if (inquiry.English == 0)
+                    {
+                        EnglishCustomerCompare = "German";
+                        EnglishCustomerCompareVal = 0;
+                    }
+                    else
+                    {
+                        EnglishCustomerCompare = "English";
+                        EnglishCustomerCompareVal = 1;
+                    }
+                    
+
+                }
+            }
+            catch (Exception ex)
+            {
+                // Handle any exceptions
+                var box = MessageBoxManager.GetMessageBoxStandard("Error", ex.Message, ButtonEnum.Ok);
+                await box.ShowAsync();
+            }
+
+            // Start building query
+            var updates = new List<string>();
+            var parameters = new DynamicParameters();
+
+            // Compare and build updates
+            if (!String.Equals(CustomerNameSearchCompare, SelectedCustomer))
+            {
+                UserConfirmationNotice = "Customer changed from " + CustomerNameSearchCompare + " to " + SelectedCustomer + $"{Environment.NewLine}";
+                updates.Add("Customernumber = @CustomerNumber");
+                parameters.Add("CustomerNumber", CustomerNumber); // Assuming you already have CustomerNumber as int
+            }
+
+            if (!String.Equals(DeliveryAdressSearchCompare, SelectedDeliveryAdress))
+            {
+                UserConfirmationNotice += "Delivery Address changed from " + DeliveryAdressSearchCompare + " to " + SelectedDeliveryAdress + $"{Environment.NewLine}";
+                updates.Add("Deliveryadressnumber = @DeliveryAddressNumber");
+                parameters.Add("DeliveryAddressNumber", CustomersDeliveryAdressNo); // Assuming you have this value
+            }
+
+            if (DeliveryEXWCompareVal != (CheckEXW ? 1 : 0))
+            {
+                UserConfirmationNotice += "Shipping changed from " + DeliveryEXWCompare + " to " + DeliveryEXWText + $"{Environment.NewLine}";
+                updates.Add("EXW = @EXW");
+                parameters.Add("EXW", CheckEXW ? 1 : 0);
+
+                if (CheckEXW)
+                {
+                    updates.Add("Deliveryadressnumber = NULL");
+                }
+                else if (!CheckEXW && !String.IsNullOrEmpty(SelectedDeliveryAdress))
+                {
+                    updates.Add("Deliveryadressnumber = @DeliveryAddressNumber");
+                    
+                    string CustomerIDQuery = "SELECT deliveryadressNo FROM deliveryadress WHERE CompanyName = @QueryDeliveryAdressSearch";
+                    
+                    Console.WriteLine("Query: " + CustomerIDQuery);
+                    
+                    Console.WriteLine("SearchKey: " + SelectedDeliveryAdress);
+
+
+            
+                    // Since you expect a single result, use QuerySingleOrDefault to get just one result or null if not found
+                    var deliveryAdressNo = connection.QuerySingleOrDefault<int?>(CustomerIDQuery, new { QueryDeliveryAdressSearch = SelectedDeliveryAdress });
+                    
+                    Console.WriteLine("Search Result: " + deliveryAdressNo);
+                    parameters.Add("DeliveryAddressNumber", deliveryAdressNo);
+                }
+                else if (!CheckEXW && String.IsNullOrEmpty(SelectedDeliveryAdress))
+                {
+                    var BrokenMessage = MessageBoxManager.GetMessageBoxStandard(
+                        "Fehler", "Lieferung ausgewählt aber keine Lieferadresse gewählt!",
+                        ButtonEnum.Ok
+                    );
+
+                    var Display = await BrokenMessage.ShowAsync();
+                    
+                    return;
+                }
+            }
+
+            if (EnglishCustomerCompareVal != (EnglishCustomer ? 1 : 0))
+            {
+                UserConfirmationNotice += "Language changed from " + EnglishCustomerCompare + " to " + EnglishCustomerText + $"{Environment.NewLine}";
+                updates.Add("English = @English");
+                parameters.Add("English", EnglishCustomer ? 1 : 0);
+            }
+            
+            if (!String.Equals(InquiryNotesCompare, InquiryNotes))
+            {
+                UserConfirmationNotice += "Notes changed from " + InquiryNotesCompare + " to " + InquiryNotes + $"{Environment.NewLine}";
+                updates.Add("Notes = @Notes");
+                parameters.Add("Notes", InquiryNotes);
+            }
+
+            // Show confirmation message
+            var ChangeQuery = MessageBoxManager.GetMessageBoxStandard(
+                "Änderungen Bestätigen", UserConfirmationNotice,
+                ButtonEnum.YesNo
+            );
+
+            var result = await ChangeQuery.ShowAsync();
+
+            if (result == ButtonResult.Yes && updates.Count > 0)
+            {
+                // Build final query
+                string updateQuery = $"UPDATE inquiries SET {string.Join(", ", updates)} WHERE Inquirynumber = @InquiryNumber";
+                parameters.Add("InquiryNumber", InquiryNumber);
+                
+                await connection.ExecuteAsync(updateQuery, parameters);
+            }
+        }
+    }
     
+    [RelayCommand]
+    private void InquirySavetoPDF()
+    {
+
+    }
+    
+    [ObservableProperty] 
+    private int surchargeItemSelector;    
+    [ObservableProperty] 
+    private string surchargeDescription;  
+    [ObservableProperty] 
+    private string surchargeAmount;  
+    [ObservableProperty]
+    private object surchargeItemSelectorObject;
+
+    public string SurchargeItemSelectorText => 
+        (SurchargeItemSelectorObject as ComboBoxItem)?.Content?.ToString();    
+    
+    private SurchargeListItem _selectedSurcharge;
+    public SurchargeListItem SelectedSurcharge
+    {
+        get => _selectedSurcharge;
+        set
+        {
+            if (_selectedSurcharge != value)
+            {
+                _selectedSurcharge = value;
+                OnPropertyChanged();
+                OnSelectedSurchargeChanged();
+            }
+        }
+    }
+
+    private async void OnSelectedSurchargeChanged()
+    {
+        if (SelectedSurcharge == null)
+        {
+            return;
+        }
+        
+        using var connection = new MySqlConnection(ConnectionString);
+        await connection.OpenAsync();
+
+        var sql = @"SELECT SurchargeNumber 
+            FROM inquirysurcharges 
+            WHERE SurchargeItem = @SurchargeType 
+              AND Description = @Description 
+              AND Amount = @Amount 
+              AND Inquirynumber = @Inqnumber";
+
+        var parameters = new { 
+            SurchargeType = SelectedSurcharge.SurchargeItem, 
+            Description = SelectedSurcharge.Description, 
+            Amount = SelectedSurcharge.Amount,
+            Inqnumber = InquiryNumber 
+        };
+
+        var surchargeNumber = await connection.QuerySingleOrDefaultAsync<int>(sql, parameters);
+        
+        var result = await connection.QuerySingleOrDefaultAsync<SurchargeListItemIndex>(
+            @"SELECT 
+                    DESCRIPTION, 
+                    Amount, 
+                    SurchargeIndex AS SurchargeItemIndex 
+                  FROM inquirysurcharges 
+                  WHERE SurchargeNumber = @SurchargeNumber",
+            new { SurchargeNumber = surchargeNumber }
+        );
+        
+        SurchargeAmount = result.Amount.ToString();
+        SurchargeDescription = result.Description;
+        SurchargeItemSelector = result.SurchargeItemIndex;
+        
+    }
+    
+    [RelayCommand]
+    private async void SurchargeSave()
+    {
+        if (SelectedSurcharge == null)
+        {
+            if (!String.IsNullOrEmpty(SurchargeItemSelectorText) && !String.IsNullOrEmpty(SurchargeDescription) &&
+                !String.IsNullOrEmpty(SurchargeAmount) && !String.IsNullOrEmpty(InquiryNumber))
+            {
+                using (var connection = new MySqlConnection(ConnectionString))
+                {
+                    connection.Open();
+
+                    // Insert new inquiry
+                    string insertQuery = @"INSERT INTO inquirysurcharges 
+                           (SurchargeItem, SurchargeIndex, Description, Amount, Inquirynumber) 
+                           VALUES 
+                           (@SurcSurchargeItem, @SurcSurchargeIndex, @SurcSurchargeDescription, @SurcSurchargeAmount, @SurcSurchargeInquirynumber)";
+
+                    connection.Execute(insertQuery, new
+                    {
+                        SurcSurchargeItem = SurchargeItemSelectorText,
+                        SurcSurchargeIndex = SurchargeItemSelector,
+                        SurcSurchargeDescription = SurchargeDescription,
+                        SurcSurchargeAmount = SurchargeAmount,
+                        SurcSurchargeInquirynumber = InquiryNumber,
+                    });
+                }
+
+                string CurrentInqNumber = InquiryNumber;
+
+                InquiryNumber = "";
+
+                InquiryNumber = CurrentInqNumber;
+            }
+            else
+            {
+                var ChangeQuery = MessageBoxManager.GetMessageBoxStandard(
+                    "Änderungen Bestätigen", "Missing Data!",
+                    ButtonEnum.Ok
+                );
+
+                var result = await ChangeQuery.ShowAsync();
+                
+                return;
+            }
+        }
+        else
+        {
+            using var connection = new MySqlConnection(ConnectionString);
+            await connection.OpenAsync();
+
+            var sql = @"SELECT SurchargeNumber 
+                FROM inquirysurcharges 
+                WHERE SurchargeItem = @SurchargeType 
+                  AND Description = @Description 
+                  AND Amount = @Amount 
+                  AND Inquirynumber = @Inqnumber";
+
+            var parameters = new { 
+                SurchargeType = SelectedSurcharge.SurchargeItem, 
+                Description = SelectedSurcharge.Description, 
+                Amount = SelectedSurcharge.Amount,
+                Inqnumber = InquiryNumber 
+            };
+
+            var surchargeNumber = await connection.QuerySingleOrDefaultAsync<int>(sql, parameters);
+
+
+            
+            if (SelectedSurcharge.SurchargeItem != SurchargeItemSelectorText)
+            {
+                sql = @"UPDATE inquirysurcharges SET SurchargeItem = @SurchargeItem WHERE SurchargeNumber = @SurchargeNumber";
+
+                var UpdateSurchargeItem = new 
+                {
+                    SurchargeItem = SurchargeItemSelectorText.ToString(),
+                    SurchargeNumber = surchargeNumber
+                };
+
+                var affectedRows = await connection.ExecuteAsync(sql, UpdateSurchargeItem);
+
+                Console.WriteLine($"Updated SurchargeItem from {SelectedSurcharge.SurchargeItem} to {SurchargeItemSelectorText} in {surchargeNumber}");
+            }
+            
+            if (SelectedSurcharge.Description != SurchargeDescription)
+            {
+                sql = @"UPDATE inquirysurcharges SET Description = @Description WHERE SurchargeNumber = @SurchargeNumber";
+
+                var UpdateSurchargeDescription = new 
+                {
+                    Description = SurchargeDescription,
+                    SurchargeNumber = surchargeNumber
+                };
+
+                var affectedRows = await connection.ExecuteAsync(sql, UpdateSurchargeDescription);
+
+                Console.WriteLine($"Updated SurchargeItem from {SelectedSurcharge.Description} to {SurchargeDescription} in {surchargeNumber}");
+                
+            }
+            
+            if (SelectedSurcharge.Amount.ToString() != SurchargeAmount)
+            {
+                sql = @"UPDATE inquirysurcharges SET Amount = @Amount WHERE SurchargeNumber = @SurchargeNumber";
+
+                var UpdateSurchargeAmount = new 
+                {
+                    Amount = SurchargeAmount,
+                    SurchargeNumber = surchargeNumber
+                };
+
+                var affectedRows = await connection.ExecuteAsync(sql, UpdateSurchargeAmount);
+
+                Console.WriteLine($"Updated SurchargeItem from {SelectedSurcharge.Amount} to {SurchargeAmount} in {surchargeNumber}");
+            }
+            
+            string CurrentInqNumber = InquiryNumber;
+            InquiryNumber = "";
+            InquiryNumber = CurrentInqNumber;
+        }
+    }
+
+    [RelayCommand]
+    private async void SurchargeDelete()
+    {
+        if (SelectedSurcharge == null)
+        {
+            return;
+        }
+
+        var box = MessageBoxManager.GetMessageBoxStandard(
+            "Do you really want to delete?",
+            $"Anfragenummer?: {InquiryNumber}{Environment.NewLine}" +
+            $"Surcharge Type: {SelectedSurcharge.SurchargeItem}{Environment.NewLine}" +
+            $"Description: {SelectedSurcharge.Description}{Environment.NewLine}" +
+            $"Amount: {SelectedSurcharge.Amount}{Environment.NewLine}",
+            ButtonEnum.YesNo
+        );
+
+        var result = await box.ShowAsync();
+
+        if (result == ButtonResult.Yes)
+        {
+
+            using var connection = new MySqlConnection(ConnectionString);
+            await connection.OpenAsync();
+
+            var sql = @"SELECT SurchargeNumber 
+            FROM inquirysurcharges 
+            WHERE SurchargeItem = @SurchargeType 
+              AND Description = @Description 
+              AND Amount = @Amount 
+              AND Inquirynumber = @Inqnumber";
+
+            var parameters = new
+            {
+                SurchargeType = SelectedSurcharge.SurchargeItem,
+                Description = SelectedSurcharge.Description,
+                Amount = SelectedSurcharge.Amount,
+                Inqnumber = InquiryNumber
+            };
+
+            var surchargeNumber = await connection.QuerySingleOrDefaultAsync<int>(sql, parameters);
+
+            sql = "DELETE FROM inquirysurcharges WHERE SurchargeNumber = @SurchargeNumber";
+
+            var DeleteParameters = new { SurchargeNumber = surchargeNumber };
+
+            var affectedRows = await connection.ExecuteAsync(sql, DeleteParameters);
+
+            Console.WriteLine($"{affectedRows} row(s) deleted.");
+
+            string CurrentInqNumber = InquiryNumber;
+            InquiryNumber = "";
+            InquiryNumber = CurrentInqNumber;
+        }
+    }
+
+
+
+
 
     [RelayCommand]
     private async void Test()

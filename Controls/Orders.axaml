@@ -67,7 +67,7 @@
 				</Grid.RowDefinitions>
 				<TextBlock Text="Lieferanschrift:" TextAlignment="End" Grid.Row="0" Grid.Column="0" VerticalAlignment="Center"/>
 
-				<CheckBox Grid.Row="0" Grid.Column="1" HorizontalAlignment="Right" Checked="chkOrdersDeliveryEXW_Checked" Unchecked="chkOrdersDeliveryEXW_Checked" >Ab Werk</CheckBox>
+				<CheckBox Grid.Row="0" Grid.Column="1" HorizontalAlignment="Right">Ab Werk</CheckBox>
 
 				<ListBox x:Name="ListInquiryDeliveryNames" Width="200" Grid.Column="0" Grid.Row="2" />
 

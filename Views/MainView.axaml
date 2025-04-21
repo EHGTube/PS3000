@@ -12,13 +12,18 @@
 	</UserControl.DataContext>
 	
 	<TabControl Margin="4">
-		<TabItem Header="Aufträge">
+		
+		<TabItem Header="Login">
+			<TextBlock Margin="5">Please Log In</TextBlock>
+		</TabItem>
+		
+		<TabItem Header="Aufträge" IsSelected="{Binding AuftrageTabSelected, Mode=TwoWay}">
 			<ScrollViewer HorizontalScrollBarVisibility="Visible" VerticalScrollBarVisibility="Visible">
 				<TabControl Margin="5">
-					<TabItem Header="Angebote">
-						<controls:Inquiries DataContext="{Binding InquiriesViewModel}"/>			
+					<TabItem Header="Angebote" IsSelected="{Binding Inquiries.IsActive, Mode=TwoWay}">
+						<controls:Inquiries DataContext="{Binding Inquiries}"/>
 					</TabItem>
-					<TabItem Header="Aufträge">
+					<TabItem Header="Aufträge" IsSelected="{Binding Orders.IsActive, Mode=TwoWay}">
 						<controls:Orders/>
 					</TabItem>
 					<TabItem Header="Rechnungen">
@@ -40,10 +45,10 @@
 			</ScrollViewer>
 		</TabItem>
 		
-		<TabItem Header="Lager Coils">
-				<controls:StorageCoil DataContext="{Binding StorageCoil}"/>
-
+		<TabItem Header="Lager Coils" IsSelected="{Binding StorageCoil.IsActive, Mode=TwoWay}">
+			<controls:StorageCoil DataContext="{Binding StorageCoil}"/>
 		</TabItem>
+		
 		<TabItem Header="Produktion">
 			<ScrollViewer HorizontalScrollBarVisibility="Visible" VerticalScrollBarVisibility="Visible">
 				

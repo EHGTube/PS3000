@@ -8,7 +8,7 @@
 			 x:DataType="Control:StorageCoilViewModel"
 			 x:CompileBindings="True">
 
-	<Grid ColumnDefinitions="Auto,Auto" RowDefinitions="*">
+	<Grid ColumnDefinitions="Auto,Auto" RowDefinitions="*" IsFocused="{Binding IsActive, Mode=TwoWay}">
 		
 		<Grid ColumnDefinitions="Auto,Auto,Auto,Auto,Auto" RowDefinitions="Auto,Auto,*" Grid.Row="0" Grid.Column="0">
 			<TextBlock Text="Lieferant:" Grid.Row="0" Grid.Column="0"/>

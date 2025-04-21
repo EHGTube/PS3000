@@ -95,9 +95,17 @@ namespace PS3000.Controls
         [ObservableProperty]
         private ObservableCollection<string> coilExec = new();
 
-        public StorageCoilViewModel()
+        
+        [ObservableProperty]
+        private bool _isActive;
+
+        partial void OnIsActiveChanged(bool value)
         {
-            LoadDataAsync();
+            if (value)
+            {
+                // This will be called when the tab becomes active
+                LoadDataCommand.Execute(null);
+            }
         }
 
         [RelayCommand]
@@ -129,15 +137,14 @@ namespace PS3000.Controls
                 using var connection = new MySqlConnection(ConnectionString);
                 await connection.OpenAsync();
 
-                string query = "SELECT * FROM werkstoffe;";
+                string query = "SELECT * FROM articlesgrade;";
                 using var command = new MySqlCommand(query, connection);
                 using var reader = await command.ExecuteReaderAsync();
 
                 CoilGrades.Clear();
                 while (await reader.ReadAsync())
                 {
-                    CoilGrades.Add(reader["Werkstoff"].ToString());
-
+                    CoilGrades.Add(reader["GradeDIN"].ToString());
                 }
             }
             catch (Exception ex)
@@ -158,7 +165,6 @@ namespace PS3000.Controls
                 while (await reader.ReadAsync())
                 {
                     CoilWTGroups.Add(reader["WSGruppe"].ToString());
-
                 }
             }
             catch (Exception ex)

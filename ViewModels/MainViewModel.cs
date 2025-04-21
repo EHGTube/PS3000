@@ -13,13 +13,38 @@ public partial class MainViewModel : ObservableObject
         _inquiriesViewModel = new InquiriesViewModel();
 
     }
-    
-    [ObservableProperty]
-    private InquiriesViewModel _inquiriesViewModel;
-    
-    
+
+    [ObservableProperty] private InquiriesViewModel _inquiriesViewModel;
+
+
     public ObservableCollection<CustomersViewModel> Customers { get; set; } = new()
     {
     };
+
+    public CustomersViewModel CustomersViewModel { get; } = new CustomersViewModel();
+
+    public StorageCoilViewModel StorageCoil { get; } = new StorageCoilViewModel();
     
-    public CustomersViewModel CustomersViewModel { get; } = new CustomersViewModel();}
+    [ObservableProperty]
+    private InquiriesViewModel _inquiries = new InquiriesViewModel();
+    
+    public OrdersViewModel Orders { get; } = new OrdersViewModel();
+    
+    private bool _auftrageTabSelected;
+    public bool AuftrageTabSelected
+    {
+        get => _auftrageTabSelected;
+        set
+        {
+            _auftrageTabSelected = value;
+            OnPropertyChanged();
+        
+            // Use the Inquiries property (generated from _inquiries)
+            if (value && Inquiries != null)
+            {
+                Inquiries.IsActive = true;
+            }
+        }
+    }
+    
+}

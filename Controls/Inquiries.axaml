@@ -3,6 +3,7 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
              xmlns:Control="clr-namespace:PS3000.Controls"
+             xmlns:avalonia="using:Avalonia"
              mc:Ignorable="d"
              d:DesignWidth="1920"
              d:DesignHeight="1080"
@@ -254,7 +255,7 @@
                 <StackPanel Spacing="5" Margin="0 100 0 0">
                     <Grid ColumnDefinitions="Auto,*">
                         <TextBlock Text="Auftragsposition:" Grid.Column="0" VerticalAlignment="Center" Margin="0 0 10 0"/>
-                        <TextBox Watermark="Position" Grid.Column="1"/>
+                        <TextBox Watermark="Position" Text="{Binding InquiryPositionSearch}" Grid.Column="1"/>
                     </Grid>
                     
                     <Grid>
@@ -262,180 +263,231 @@
                             <ColumnDefinition Width="Auto"/>
                             <ColumnDefinition Width="*"/>
                         </Grid.ColumnDefinitions>
-                        <DataGrid Grid.Column="0" Width="50" Height="160" HeadersVisibility="None"
-                            HorizontalScrollBarVisibility="Hidden"
-                            AutoGenerateColumns="True"
-                            GridLinesVisibility="All"
-                            BorderThickness="1" BorderBrush="Gray"/>
-                        <Button Grid.Column="1" Height="60" Width="120" HorizontalAlignment="Center" VerticalAlignment="Top" Margin="10 0">
-                            <TextBlock TextWrapping="Wrap" TextAlignment="Center">
-                                Position<LineBreak/>Speichern
-                            </TextBlock>
-                        </Button>
+                        <DataGrid Grid.Column="0" 
+                                  Width="50" 
+                                  Height="160" 
+                                  HeadersVisibility="None"
+                                  ItemsSource="{Binding InquiryPosition}" 
+                                  SelectedItem="{Binding SelectedInquiryPosition, Mode=TwoWay}"
+                                  HorizontalScrollBarVisibility="Hidden"
+                                  AutoGenerateColumns="False"
+                                  GridLinesVisibility="All"
+                                  BorderThickness="1" 
+                                  BorderBrush="Gray"
+                                  CanUserReorderColumns="False"
+                                  CanUserResizeColumns="False"
+                                  CanUserSortColumns="False">
+                            <DataGrid.Columns>
+                                <DataGridTextColumn Width="*" Binding="{Binding Positionnumber}" />
+                            </DataGrid.Columns>
+                        </DataGrid>
+                        
+                        <StackPanel Grid.Column="1" Orientation="Horizontal">
+                            <Button  Command="{Binding InquirySavePositionCommand}" HorizontalAlignment="Center" VerticalAlignment="Top" Margin="10 0">
+                                Position Speichern
+                            </Button>
+                            
+                            <Button  Command="{Binding InquirySavePositionCommand}" HorizontalAlignment="Center" VerticalAlignment="Top" Margin="10 0">
+                                Position Löschen
+                            </Button>
+                            
+                        </StackPanel>
+                        
                     </Grid>
                 </StackPanel>
             </StackPanel>
 
             <!-- Right Section: Technical Details and Notes -->
-            <StackPanel Grid.Column="2" Spacing="15">
-                <!-- Technical Specifications -->
+            <StackPanel Grid.Column="2" Spacing="10">
+                <!-- Technical Specifications - Reorganized into 3 columns -->
                 <Grid>
-                    <Grid.RowDefinitions>
-                        <RowDefinition Height="Auto"/>
-                        <RowDefinition Height="Auto"/>
-                        <RowDefinition Height="Auto"/>
-                        <RowDefinition Height="Auto"/>
-                        <RowDefinition Height="Auto"/>
-                        <RowDefinition Height="Auto"/>
-                        <RowDefinition Height="Auto"/>
-                        <RowDefinition Height="Auto"/>
-                        <RowDefinition Height="Auto"/>
-                    </Grid.RowDefinitions>
                     <Grid.ColumnDefinitions>
-                        <ColumnDefinition Width="*"/>
-                        <ColumnDefinition Width="*"/>
-                        <ColumnDefinition Width="*"/>
-                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="1*"/>
+                        <ColumnDefinition Width="1*"/>
+                        <ColumnDefinition Width="1*"/>
                     </Grid.ColumnDefinitions>
-                    
-                    <!-- Dimensions -->
-                    <TextBlock Text="Außendurchmesser:" Grid.Row="0" Grid.Column="0" Grid.ColumnSpan="2" Margin="0 0 0 5"/>
-                    <ComboBox Grid.Row="1" Grid.Column="0" Grid.ColumnSpan="2" SelectedIndex="0">
-                        <ComboBoxItem>42,4</ComboBoxItem>
-                        <ComboBoxItem>33,7</ComboBoxItem>
-                        <ComboBoxItem>168,3</ComboBoxItem>
-                        <ComboBoxItem>42,77</ComboBoxItem>
-                    </ComboBox>
-                    
-                    <TextBlock Text="Wandstärke:" Grid.Row="0" Grid.Column="2" Grid.ColumnSpan="1" Margin="10 0 0 5"/>
-                    <ComboBox Grid.Row="1" Grid.Column="2" SelectedIndex="0" Margin="10 0 0 0">
-                        <ComboBoxItem>1,00</ComboBoxItem>
-                        <ComboBoxItem>1,5</ComboBoxItem>
-                        <ComboBoxItem>2,0</ComboBoxItem>
-                        <ComboBoxItem>2,5</ComboBoxItem>
-                    </ComboBox>
-                    
-                    <TextBlock Text="Werkstoff:" Grid.Row="0" Grid.Column="3" Margin="10 0 0 5"/>
-                    <ComboBox Grid.Row="1" Grid.Column="3" SelectedIndex="0" Margin="10 0 0 0">
-                        <ComboBoxItem>1.4301</ComboBoxItem>
-                        <ComboBoxItem>1.4541</ComboBoxItem>
-                        <ComboBoxItem>1.4571</ComboBoxItem>
-                        <ComboBoxItem>1.4845</ComboBoxItem>
-                    </ComboBox>
-                    
-                    <!-- Quantity -->
-                    <TextBlock Text="Menge:" Grid.Row="2" Grid.Column="0" Margin="0 10 0 5"/>
-                    <TextBox Grid.Row="3" Grid.Column="0" Watermark="Menge"/>
-                    <ComboBox Grid.Row="3" Grid.Column="1" SelectedIndex="0" Margin="5 0 0 0">
-                        <ComboBoxItem>m</ComboBoxItem>
-                        <ComboBoxItem>Stk.</ComboBoxItem>
-                    </ComboBox>
-                    
-                    <TextBlock Text="Mengentoleranz -:" Grid.Row="2" Grid.Column="2" Margin="10 10 0 5"/>
-                    <TextBox Grid.Row="3" Grid.Column="2" Watermark="Mengentoleranz -" Margin="10 0 0 0"/>
-                    
-                    <TextBlock Text="Mengentoleranz +:" Grid.Row="2" Grid.Column="3" Margin="10 10 0 5"/>
-                    <TextBox Grid.Row="3" Grid.Column="3" Watermark="Mengentoleranz +" Margin="10 0 0 0"/>
-                    
-                    <!-- Length -->
-                    <TextBlock Text="Länge:" Grid.Row="4" Grid.Column="0" Grid.ColumnSpan="2" Margin="0 10 0 5"/>
-                    <TextBox Grid.Row="5" Grid.Column="0" Grid.ColumnSpan="2" Watermark="Länge"/>
-                    
-                    <TextBlock Text="Längentoleranz -:" Grid.Row="4" Grid.Column="2" Margin="10 10 0 5"/>
-                    <TextBox Grid.Row="5" Grid.Column="2" Watermark="Längentoleranz -" Margin="10 0 0 0"/>
-                    
-                    <TextBlock Text="Längentoleranz +:" Grid.Row="4" Grid.Column="3" Margin="10 10 0 5"/>
-                    <TextBox Grid.Row="5" Grid.Column="3" Watermark="Längentoleranz +" Margin="10 0 0 0"/>
-                    
-                    <!-- Standards -->
-                    <ComboBox Grid.Row="6" Grid.Column="0" SelectedIndex="0" Margin="0 10 0 0">
-                        <ComboBoxItem>EN10217-7</ComboBoxItem>
-                        <ComboBoxItem>EN10296-2</ComboBoxItem>
-                        <ComboBoxItem>SEW470</ComboBoxItem>
-                        <ComboBoxItem>ASME SA-249</ComboBoxItem>
-                        <ComboBoxItem>ASME SA-312</ComboBoxItem>
-                    </ComboBox>
-                    
-                    <ComboBox Grid.Row="6" Grid.Column="1" SelectedIndex="0" Margin="5 10 0 0">
-                        <ComboBoxItem>W0</ComboBoxItem>
-                        <ComboBoxItem>W1</ComboBoxItem>
-                        <ComboBoxItem>W2</ComboBoxItem>
-                        <ComboBoxItem>W1R</ComboBoxItem>
-                        <ComboBoxItem>W2R</ComboBoxItem>
-                        <ComboBoxItem>W1R/W2R</ComboBoxItem>
-                    </ComboBox>
-                    
-                    <ComboBox Grid.Row="6" Grid.Column="2" SelectedIndex="0" Margin="10 10 0 0">
-                        <ComboBoxItem>EN10204/3.1</ComboBoxItem>
-                        <ComboBoxItem>EN10204/3.2</ComboBoxItem>
-                        <ComboBoxItem>EN10204/3.1 + AD2000-W2</ComboBoxItem>
-                        <ComboBoxItem>EN10204/3.1 + AD2000-W10</ComboBoxItem>
-                        <ComboBoxItem>EN10204/3.1 + AD2000-W2/W10</ComboBoxItem>
-                        <ComboBoxItem>EN10204/3.2 + AD2000-W2</ComboBoxItem>
-                        <ComboBoxItem>EN10204/3.2 + AD2000-W10</ComboBoxItem>
-                        <ComboBoxItem>EN10204/3.2 + AD2000-W2/W10</ComboBoxItem>
-                    </ComboBox>
-                    
-                    <ComboBox Grid.Row="6" Grid.Column="3" SelectedIndex="0" Margin="10 10 0 0">
-                        <ComboBoxItem>D1</ComboBoxItem>
-                        <ComboBoxItem>D2</ComboBoxItem>
-                        <ComboBoxItem>D3</ComboBoxItem>
-                        <ComboBoxItem>D4</ComboBoxItem>
-                    </ComboBox>
-                    
-                    <!-- Additional Settings -->
-                    <TextBlock Text="KL max.:" Grid.Row="7" Grid.Column="0" Margin="0 10 0 5"/>
-                    <TextBox Grid.Row="8" Grid.Column="0" Watermark="KL max."/>
-                    
-                    <StackPanel Grid.Row="7" Grid.Column="1" Grid.RowSpan="2">
-                        <CheckBox Margin="5 10 0 5">Vorrat?</CheckBox>
-                        <CheckBox Margin="5 5 0 0">Bürsten?</CheckBox>
+
+                    <!-- First Column: Außendurchmesser, Länge, Comboboxes, KL Max, Vorrat -->
+                    <StackPanel Grid.Column="0" Spacing="5">
+                        <!-- Außendurchmesser -->
+                        <TextBlock Text="Außendurchmesser:" Margin="0 0 0 2"/>
+                        <ComboBox ItemsSource="{Binding OuterDiameterItems}"
+                                 SelectedItem="{Binding SelectedODComboBoxItem}"
+                                 Margin="0 0 5 5"
+                                 HorizontalAlignment="Stretch"
+                                 IsTextSearchEnabled="True"/>
+                        
+                        <!-- Menge -->
+                        <TextBlock Text="Menge:" Margin="0 5 0 2"/>
+                        <Grid>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="*"/>
+                                <ColumnDefinition Width="Auto"/>
+                            </Grid.ColumnDefinitions>
+                            <TextBox Grid.Column="0" Watermark="Menge" Text="{Binding InquiryPositionQuantity}"/>
+                            <ComboBox Grid.Column="1" SelectedIndex="{Binding InquiryPositionQuantityUnit}" Margin="5 0 0 0">
+                                <ComboBoxItem>m</ComboBoxItem>
+                                <ComboBoxItem>Stk.</ComboBoxItem>
+                            </ComboBox>
+                        </Grid>
+                        
+                        <!-- Länge -->
+                        <TextBlock Text="Länge:" Margin="0 5 0 2"/>
+                        <TextBox Watermark="Länge" Text="{Binding InquiryPositionLength}"/>
+                        
+                        <StackPanel Orientation="Horizontal" Margin="0 5 0 0">
+                            <!-- KL Max -->
+                            <TextBlock Text="KL max.:" VerticalAlignment="Center" Margin="0 0 5 0"/>
+                            <TextBox Watermark="KL max." HorizontalAlignment="Stretch" Text="{Binding InquiryPositionShortLengths}"/>
+                            <ComboBox Grid.Column="1" SelectedIndex="{Binding InquiryPositionShortLengthsUnit}" Margin="5 0 0 0">
+                                <ComboBoxItem>%</ComboBoxItem>
+                                <ComboBoxItem>Stk.</ComboBoxItem>
+                            </ComboBox>
+                        </StackPanel>
+                        
+                        <StackPanel Orientation="Horizontal" Margin="0 5 0 0">
+                            <!-- First ComboBox -->
+                            <ComboBox
+                                      SelectedItem="{Binding InquirySelectedNorm}"
+                                      SelectedIndex="0"
+                                      ItemsSource="{Binding InquiryNorm}"/>
+                        
+                            <!-- Second ComboBox -->
+                            <ComboBox Margin="5 0 0 0"
+                                      ItemsSource="{Binding InquiryNormOptions}"
+                                      SelectedItem="{Binding InquirySelectedNormOption, Mode=TwoWay}"
+                                      HorizontalAlignment="Right"/>
+                        </StackPanel>
+                        
+                        <!-- Vorrat/Bürsten/Geglättet -->
+                        <CheckBox IsChecked="{Binding InquiryPositionSeamFlattened}" Margin="0 5 0 0">Geglättet?</CheckBox>
+                        <CheckBox IsChecked="{Binding InquiryPositionBrushed}" Margin="0 2 0 0">Bürsten?</CheckBox>
+                        <CheckBox IsChecked="{Binding InquiryPositionFromStorage}" Margin="0 2 0 0">Vorrat?</CheckBox>
+                        
                     </StackPanel>
                     
-                    <TextBlock Text="Preis:" Grid.Row="7" Grid.Column="2" Margin="10 10 0 5"/>
-                    <TextBox Grid.Row="8" Grid.Column="2" Watermark="Preis" Margin="10 0 0 0"/>
+                    <!-- Second Column: Wandstärke, Mengentoleranz -, Certificate, Price -->
+                    <StackPanel Grid.Column="1" Spacing="5" Margin="5 0">
+                        <!-- Wandstärke -->
+                        <TextBlock Text="Wandstärke:" Margin="0 0 0 2"/>
+                        <ComboBox ItemsSource="{Binding WallthicknessItems}"
+                                 SelectedItem="{Binding SelectedWTComboBoxItem}"
+                                 Margin="0 0 0 5"
+                                 HorizontalAlignment="Stretch"
+                                 IsTextSearchEnabled="True"/>
+                        
+                        <!-- Mengentoleranz - -->
+                        <TextBlock Text="Mengentoleranz -:" Margin="0 5 0 2"/>
+                        <TextBox Watermark="Mengentoleranz -" Text="{Binding InquiryPositionQuantityTolMin}"/>
+                        
+                        <!-- Längentoleranz - -->
+                        <TextBlock Text="Längentoleranz -:" Margin="0 5 0 2"/>
+                        <TextBox Watermark="Längentoleranz -" Text="{Binding InquiryPositionLengthMin}"/>
+                        
+                        <!-- Certificate -->
+                        <TextBlock Text="Zeugnis:" Margin="0 5 0 2"/>
+                        <ComboBox 
+                                  SelectedItem="{Binding InquirySelectedCertificate}"
+                                  SelectedIndex="0"
+                                  ItemsSource="{Binding InquiryCertificate}"/>
+                        
+                        <TextBlock Text="Geschliffen:" Margin="0 5 0 2"/>
+                        <TextBox Watermark="Körnung" Text="{Binding InquiryPositionGrit}"/>
+                        
+                        <!-- Price -->
+                        <TextBlock Text="Preis:" Margin="0 5 0 2"/>
+                        <StackPanel Orientation="Horizontal" HorizontalAlignment="Stretch">
+                            <TextBox Watermark="Preis" Text="{Binding InquiryPositionPrice}" HorizontalAlignment="Stretch"/>
+                            <ComboBox SelectedIndex="{Binding InquiryPositionPriceSelectedUnit}" Margin="5 0 0 0">
+                                <ComboBoxItem>€/m</ComboBoxItem>
+                                <ComboBoxItem>€/Stk.</ComboBoxItem>
+                                <ComboBoxItem>€/kg</ComboBoxItem>
+                            </ComboBox>
+                        </StackPanel>
+                    </StackPanel>
                     
-                    <ComboBox Grid.Row="8" Grid.Column="3" SelectedIndex="0" Margin="10 0 0 0">
-                        <ComboBoxItem>€/m</ComboBoxItem>
-                        <ComboBoxItem>€/Stk.</ComboBoxItem>
-                        <ComboBoxItem>€/kg</ComboBoxItem>
-                    </ComboBox>
+                    <!-- Third Column: Werkstoff, Mengentoleranz +, Standards -->
+                    <StackPanel Grid.Column="2" Spacing="5">
+                        <!-- Werkstoff -->
+                        <TextBlock Text="Werkstoff:" Margin="0 0 0 2"/>
+                        <ComboBox ItemsSource="{Binding GradeItems}"
+                                 SelectedItem="{Binding SelectedGradeComboBoxItem}"
+                                 Margin="0 0 0 5"
+                                 HorizontalAlignment="Stretch"
+                                 IsTextSearchEnabled="True"/>
+                        
+                        <!-- Mengentoleranz + -->
+                        <TextBlock Text="Mengentoleranz +:" Margin="0 5 0 2"/>
+                        <StackPanel Orientation="Horizontal">
+                            <TextBox Watermark="Mengentoleranz +" Text="{Binding InquiryPositionQuantityTolMax}" HorizontalAlignment="Stretch"/>
+                            <ComboBox Margin="5 0 0 0" SelectedIndex="{Binding InquiryPositionQuantityTolUnit}">
+                                <ComboBoxItem>%</ComboBoxItem>
+                                <ComboBoxItem>Stk.</ComboBoxItem>
+                                <ComboBoxItem>m</ComboBoxItem>
+                            </ComboBox>
+                        </StackPanel>
+                        
+                        <!-- Längentoleranz + -->
+                        <TextBlock Text="Längentoleranz +:" Margin="0 5 0 2"/>
+                        <TextBox Watermark="Längentoleranz +" Text="{Binding InquiryPositionLengthMax}"/>
+                        
+                        <!-- Dimension Standards -->
+                        <TextBlock Text="Abmessungsnorm:" Margin="0 5 0 2"/>
+                        <ComboBox ItemsSource="{Binding DimensionNormOptions}" 
+                                 SelectedIndex="{Binding SelectedDimensionNormIndex}"/>
+                        
+                        <!-- Diameter and Thickness Options -->
+                        <StackPanel Orientation="Horizontal" IsEnabled="{Binding IsENISO1127Selected}" Margin="0 5 0 0">
+                            <ComboBox ItemsSource="{Binding DiameterOptions}" 
+                                     SelectedIndex="{Binding SelectedDiameterIndex}" 
+                                     Width="75"/>
+                            
+                            <ComboBox ItemsSource="{Binding ThicknessOptions}" 
+                                     SelectedIndex="{Binding SelectedThicknessIndex}" 
+                                     Margin="5 0 0 0"
+                                     Width="75"/>
+                        </StackPanel>
+                    </StackPanel>
                 </Grid>
                 
                 <!-- Delivery Time -->
-                <Grid ColumnDefinitions="Auto,*">
-                    <TextBlock Text="Lieferzeit:" Grid.Column="0" VerticalAlignment="Center" Margin="0 0 10 0"/>
-                    <TextBox Watermark="Lieferzeit" Grid.Column="1"/>
+                <Grid ColumnDefinitions="Auto,*,Auto" RowDefinitions="*,*" Margin="0 5 0 0">
+                    <TextBlock Text="Lieferzeit:" Grid.Column="0" Grid.Row="0" VerticalAlignment="Center" Margin="0 0 5 0"/>
+                    <TextBox Watermark="Lieferzeit" Grid.Column="1" Grid.Row="0" Text="{Binding InquiryPositionLeadTimeWeeks}"/>
+                    <TextBlock Text="Wochen" Grid.Column="2" Grid.Row="0" VerticalAlignment="Center" Margin="5 0 0 0"/>
+                    
+                    <CalendarDatePicker Grid.Row="1" Grid.Column="0" Grid.ColumnSpan="3" HorizontalAlignment="Stretch" SelectedDate="{Binding InquiryPositionSelectedDate}" Margin="0 5 0 0" />
                 </Grid>
                 
-                <Grid RowDefinitions="Auto,*,Auto,*" VerticalAlignment="Stretch" HorizontalAlignment="Stretch">
+                <Grid RowDefinitions="Auto,*,Auto,*" VerticalAlignment="Stretch" HorizontalAlignment="Stretch" Margin="0 5 0 0">
                     <!-- First Expander -->
                     <Expander Grid.Row="0" Grid.RowSpan="2" HorizontalAlignment="Stretch">
                         <Expander.Header>
                             Notizen für Extern
                         </Expander.Header>
                         <TextBox Margin="5"
-                                 Grid.Row="1"
+                                 Text="{Binding InquiryPositionNotesExternal}"
                                  TextWrapping="Wrap"
                                  AcceptsReturn="True" 
-                                 MinHeight="150"
+                                 MinHeight="100"
                                  Watermark="Beschreibung"/>
                     </Expander>
     
                     <!-- Second Expander -->
-                    <Expander Grid.Row="2" Grid.RowSpan="2" HorizontalAlignment="Stretch">
+                    <Expander Grid.Row="2" Grid.RowSpan="2" HorizontalAlignment="Stretch" Margin="0 5 0 0">
                         <Expander.Header>
                             Notizen für Intern
                         </Expander.Header>
                         <TextBox Margin="5"
-                                 Grid.Row="3"
+                                 Text="{Binding InquiryPositionNotesInternal}"
                                  TextWrapping="Wrap" 
                                  AcceptsReturn="True" 
-                                 MinHeight="150"
+                                 MinHeight="100"
                                  Watermark="Beschreibung"/>
                     </Expander>
                 </Grid>
             </StackPanel>
+            
         </Grid>
     </ScrollViewer>
 </UserControl>

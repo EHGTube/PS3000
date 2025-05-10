@@ -53,6 +53,37 @@ public class TubeDimensions
     public string Grade { get; set; }
 }
 
+public class InquiryPosition
+{
+    public string Articletube { get; set; }
+    public string Length { get; set; }
+    public string LengthTolMin { get; set; }
+    public string LengthTolMax { get; set; }
+    public string Quantity { get; set; }
+    public string QuantityUnit { get; set; }
+    public string QuantityTolMin { get; set; }
+    public string QuantityTolMax { get; set; }
+    public string QuantityTolUnit { get; set; }
+    public string ShortLengthMax { get; set; }
+    public string ShortLengthUnit { get; set; }
+    public string TechnicalStandard { get; set; }
+    public string TechnicalStandardOption { get; set; }
+    public string FlatSeam { get; set; }
+    public string Certificate { get; set; }
+    public string ToleranceStandard { get; set; }
+    public string Tolerance1127D { get; set; }
+    public string Tolerance1127T { get; set; }
+    public string Brushed { get; set; }
+    public string BrushedGrit { get; set; }
+    public string Storage { get; set; }
+    public string Price { get; set; }
+    public string PriceUnit { get; set; }
+    public string DeliveryTimeWeeks { get; set; }
+    public string DeliveryTimeDate { get; set; }
+    public string NotesExternal { get; set; }
+    public string NotesInternal { get; set; }
+}
+
 
 
 public partial class InquiriesViewModel : ObservableObject
@@ -78,6 +109,7 @@ public partial class InquiriesViewModel : ObservableObject
         LoadTubeArticles();
         LoadTechnicalStandards();
         LoadCertificates();
+        LoadDimensionNorm();
         
         _isActive = false; //DONT DELETE THIS! 
     }
@@ -150,8 +182,6 @@ public partial class InquiriesViewModel : ObservableObject
         {
             SelectedCustomer = CustomersList[0];
         }
-        
-        LoadTubeArticles();
     }    
     
     partial void OnCustomerNameSearchChanged(string value)
@@ -1097,19 +1127,26 @@ public partial class InquiriesViewModel : ObservableObject
     
     //Following is all for Inquiry Positions
     
-    [ObservableProperty] 
-    private string inquiryPositionSearch;  
+    [ObservableProperty] private string inquiryPositionSearch;  
     
     public ObservableCollection<InquiryPositionList> InquiryPosition { get; set; } = new ObservableCollection<InquiryPositionList>();
 
-    [ObservableProperty]
-    private InquiryPositionList _selectedInquiryPosition;
+    [ObservableProperty] private InquiryPositionList _selectedInquiryPosition;
+    [ObservableProperty] private int selectedWTComboBoxIndex = -1;
+    [ObservableProperty] private int selectedODComboBoxIndex = -1;
+    [ObservableProperty] private int selectedGradeComboBoxIndex = -1;
     
     partial void OnSelectedInquiryPositionChanged(InquiryPositionList value)
     {
         if (value != null)
         {
             InquiryPositionSearch = value.Positionnumber;
+        }
+        else
+        {
+            WallthicknessItems.Clear();
+            OuterDiameterItems.Clear();
+            GradeItems.Clear();
         }
     }
     
@@ -1118,64 +1155,91 @@ public partial class InquiriesViewModel : ObservableObject
         SearchInquiryPosition(value);
     }
 
+    [ObservableProperty] private string inquiryPositionQuantityTolMin;
+    [ObservableProperty] private string inquiryPositionQuantityTolMax;
+    [ObservableProperty] private string inquiryPositionLengthMin;
+    [ObservableProperty] private string inquiryPositionLengthMax;
+    [ObservableProperty] private int inquiryPositionQuantityTolUnit = -1;
+    [ObservableProperty] private int inquiryPositionQuantityUnit = -1;
+
     [RelayCommand]
     private async Task SearchInquiryPosition(string value)
     {
-        if (string.IsNullOrEmpty(value))
+        if (string.IsNullOrEmpty(value) || string.IsNullOrEmpty(InquiryNumber))
         {
             return;
         }
         
-        //AD SelectedODComboBoxItem
+        using var connection = new MySqlConnection(ConnectionString);
+        await connection.OpenAsync();
         
-        //WT SelectedWTComboBoxItem
-        //Grade SelectedGradeComboBoxItem
-        // -> Article ?
+        string Query = $"SELECT * FROM inquiryposition WHERE Positionnumber = '{InquiryPositionSearch}' AND Inquirynumber = '{InquiryNumber}'";
+        var Results = await connection.QuerySingleAsync(Query);
         
-        //Quantity InquiryPositionQuantity
-        //Quantity Unit InquiryPositionQuantityUnit
+        string queryArticle = $"SELECT OuterDiameter, Wallthickness, Grade FROM articlestube WHERE ArticleNumber = '{Results.Articletube}'";
+        var articleResult = await connection.QuerySingleOrDefaultAsync<dynamic>(queryArticle);
         
-        //Quantity Tol Min InquiryPositionQuantityTolMin
-        //Quantity Tol Max InquiryPositionQuantityTolMax
-        //Quantity Tol Unit InquiryPositionQuantityTolUnit
-        //0 %
-        //1 stk.
-        //2 m
+        WallthicknessItems.Clear();
         
-        //Length InquiryPositionLength
-        //Length Min InquiryPositionLengthMin
-        //Length Max InquiryPositionLengthMax
+        WallthicknessItems.Add(articleResult?.Wallthickness.ToString());
         
-        //Short Length max InquiryPositionShortLengths
-        //Short Length Unit InquiryPositionShortLengthsUnit
+        SelectedWTComboBoxIndex = 0;
+
+        OuterDiameterItems.Clear();
+        
+        OuterDiameterItems.Add(articleResult?.OuterDiameter.ToString());
+        
+        SelectedODComboBoxIndex = 0;
+        
+        GradeItems.Clear();
+        
+        GradeItems.Add(articleResult?.Grade.ToString());
+        
+        SelectedGradeComboBoxIndex = 0;
+
+        InquiryPositionQuantity = Results.Quantity.ToString();
+        InquiryPositionQuantityTolMin = Results.QuantityTolMin.ToString();
+        InquiryPositionQuantityTolMax = Results.QuantityTolMax.ToString();
+        
+        InquiryPositionLength = Results.Length.ToString();
+        InquiryPositionLengthMin = Results.LengthTolMin.ToString();
+        InquiryPositionLengthMax = Results.LengthTolMax.ToString();
+
+        InquiryPositionQuantityUnit = int.Parse(Results.QuantityUnit?.ToString());
+        InquiryPositionQuantityTolUnit = int.Parse(Results.QuantityTolUnit?.ToString());
+        
+        InquiryPositionShortLengths = Results.ShortLengthMax.ToString();
+        
+        InquiryPositionShortLengthsUnit = int.Parse(Results.ShortLengthUnit?.ToString());
+
         
         //Norm InquirySelectedNorm
         //Option InquirySelectedNormOption
-        
+
         //Flat Seam -> Append b if 10217 InquiryPositionSeamFlattened
-        
+
         //Certificate InquirySelectedCertificate
-        
+
         //Tolerance Norm SelectedDimensionNormIndex
         //Tolerance Class if 1127
         //D SelectedDiameterIndex
         //T SelectedThicknessIndex
-        
+
         //Brushed InquiryPositionBrushed
-        
+
         //Surface Quality / Grit InquiryPositionGrit
-        
+
         //Storage InquiryPositionFromStorage
-        
+
         //Price InquiryPositionPrice
         //Price Unit InquiryPositionPriceSelectedUnit
         //0 €/m
         //1 €/Stk.
         //2 €/kg
-        
+
         //Deliverytime Weeks  InquiryPositionLeadTimeWeeks
-        // Deliverytime Date InquiryPositionSelectedDate
-        
+        //Deliverytime Date InquiryPositionSelectedDate
+
         //Notes external InquiryPositionNotesExternal
         //Notes Internal InquiryPositionNotesInternal
     }
@@ -1191,6 +1255,19 @@ public partial class InquiriesViewModel : ObservableObject
     partial void OnInquirySelectedNormChanged(string value)
     {
         UpdateNormOptions();
+        
+        switch(value) 
+        {
+            case "ASME SA-249":
+                SelectedDimensionNormIndex = 3;
+                break;
+            case "ASME SA-312":
+                SelectedDimensionNormIndex = 4;
+                break;
+            default:
+                SelectedDimensionNormIndex = 1;
+                break;
+        }
     }
 
     public ObservableCollection<string> InquiryNorm { get; set; } = new ObservableCollection<string>();
@@ -1253,23 +1330,32 @@ public partial class InquiriesViewModel : ObservableObject
             InquiryCertificate.Add(result);
         }
     }
+    
+    private async Task LoadDimensionNorm()
+    {
+        InquiryCertificate.Clear();
+            
+        using var connection = new MySqlConnection(ConnectionString);
+        await connection.OpenAsync();
+        
+        string Query = $"SELECT Name FROM dimensionnorms;";
+        
+        var CertResults = await connection.QueryAsync<String>(Query);
+        
+        DimensionNormOptions.Add("-");
+        
+        foreach (var result in CertResults)
+        {
+            DimensionNormOptions.Add(result);
+        }
+    }
 
     
-    [ObservableProperty]
-    private ObservableCollection<string> _dimensionNormOptions = new()
-    {
-        "-",
-        "EN ISO 1127",
-        "DIN 28181",
-        "SA-999",
-        "SA-1016"
-    };
+    [ObservableProperty] private ObservableCollection<string> _dimensionNormOptions = new() { };
 
-    [ObservableProperty]
-    private int _selectedDimensionNormIndex = 0;
+    [ObservableProperty] private int _selectedDimensionNormIndex = 0;
 
-    [ObservableProperty]
-    private ObservableCollection<string> _diameterOptions = new()
+    [ObservableProperty] private ObservableCollection<string> _diameterOptions = new()
     {
         "D1",
         "D2",
@@ -1277,11 +1363,9 @@ public partial class InquiriesViewModel : ObservableObject
         "D4"
     };
 
-    [ObservableProperty]
-    private int _selectedDiameterIndex = 0;
+    [ObservableProperty] private int _selectedDiameterIndex = 0;
 
-    [ObservableProperty]
-    private ObservableCollection<string> _thicknessOptions = new()
+    [ObservableProperty] private ObservableCollection<string> _thicknessOptions = new()
     {
         "T1",
         "T2",
@@ -1289,8 +1373,7 @@ public partial class InquiriesViewModel : ObservableObject
         "T4"
     };
 
-    [ObservableProperty]
-    private int _selectedThicknessIndex = 0;
+    [ObservableProperty] private int _selectedThicknessIndex = 0;
 
     public bool IsENISO1127Selected => SelectedDimensionNormIndex == 1; // Index 1 corresponds to "EN ISO 1127"
 
@@ -1320,16 +1403,31 @@ public partial class InquiriesViewModel : ObservableObject
     // These methods will trigger the reload when selections change
     partial void OnSelectedODComboBoxItemChanged(string value)
     {
+        if (!string.IsNullOrEmpty(InquiryPositionSearch) && !string.IsNullOrEmpty(InquiryNumber))
+        {
+            return;
+        }
+        
         _ = LoadTubeArticles();
     }
     
     partial void OnSelectedWTComboBoxItemChanged(string value)
     {
+        if (!string.IsNullOrEmpty(InquiryPositionSearch) && !string.IsNullOrEmpty(InquiryNumber))
+        {
+            return;
+        }
+        
         _ = LoadTubeArticles();
     }
     
     partial void OnSelectedGradeComboBoxItemChanged(string value)
     {
+        if (!string.IsNullOrEmpty(InquiryPositionSearch) && !string.IsNullOrEmpty(InquiryNumber))
+        {
+            return;
+        }
+        
         _ = LoadTubeArticles();
     }
     
@@ -1436,20 +1534,15 @@ public partial class InquiriesViewModel : ObservableObject
         }
     }
     
-    [ObservableProperty]
-    private string inquiryPositionQuantity;
+    [ObservableProperty] private string inquiryPositionQuantity;
 
-    [ObservableProperty]
-    private int inquiryPositionQuantityUnit = 0;
-
-    [ObservableProperty]
-    private string inquiryPositionLength;
     
-    [ObservableProperty]
-    private string inquiryPositionShortLengths;
 
-    [ObservableProperty]
-    private int inquiryPositionShortLengthsUnit = 0;
+    [ObservableProperty] private string inquiryPositionLength;
+    
+    [ObservableProperty] private string inquiryPositionShortLengths;
+
+    [ObservableProperty] private int inquiryPositionShortLengthsUnit = -1;
 
     [RelayCommand]
     private async void InquirySavePosition()

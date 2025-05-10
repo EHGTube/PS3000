@@ -313,6 +313,7 @@
                         <TextBlock Text="Außendurchmesser:" Margin="0 0 0 2"/>
                         <ComboBox ItemsSource="{Binding OuterDiameterItems}"
                                  SelectedItem="{Binding SelectedODComboBoxItem}"
+                                 SelectedIndex="{Binding SelectedODComboBoxIndex}"
                                  Margin="0 0 5 5"
                                  HorizontalAlignment="Stretch"
                                  IsTextSearchEnabled="True"/>
@@ -325,7 +326,7 @@
                                 <ColumnDefinition Width="Auto"/>
                             </Grid.ColumnDefinitions>
                             <TextBox Grid.Column="0" Watermark="Menge" Text="{Binding InquiryPositionQuantity}"/>
-                            <ComboBox Grid.Column="1" SelectedIndex="{Binding InquiryPositionQuantityUnit}" Margin="5 0 0 0">
+                            <ComboBox Grid.Column="1" SelectedIndex="{Binding InquiryPositionQuantityUnit, Mode=TwoWay}" Margin="5 0 0 0">
                                 <ComboBoxItem>m</ComboBoxItem>
                                 <ComboBoxItem>Stk.</ComboBoxItem>
                             </ComboBox>
@@ -372,9 +373,11 @@
                         <TextBlock Text="Wandstärke:" Margin="0 0 0 2"/>
                         <ComboBox ItemsSource="{Binding WallthicknessItems}"
                                  SelectedItem="{Binding SelectedWTComboBoxItem}"
+                                 SelectedIndex="{Binding SelectedWTComboBoxIndex}"
                                  Margin="0 0 0 5"
                                  HorizontalAlignment="Stretch"
                                  IsTextSearchEnabled="True"/>
+                        
                         
                         <!-- Mengentoleranz - -->
                         <TextBlock Text="Mengentoleranz -:" Margin="0 5 0 2"/>
@@ -412,6 +415,7 @@
                         <TextBlock Text="Werkstoff:" Margin="0 0 0 2"/>
                         <ComboBox ItemsSource="{Binding GradeItems}"
                                  SelectedItem="{Binding SelectedGradeComboBoxItem}"
+                                 SelectedIndex="{Binding SelectedGradeComboBoxIndex}"
                                  Margin="0 0 0 5"
                                  HorizontalAlignment="Stretch"
                                  IsTextSearchEnabled="True"/>
@@ -420,7 +424,7 @@
                         <TextBlock Text="Mengentoleranz +:" Margin="0 5 0 2"/>
                         <StackPanel Orientation="Horizontal">
                             <TextBox Watermark="Mengentoleranz +" Text="{Binding InquiryPositionQuantityTolMax}" HorizontalAlignment="Stretch"/>
-                            <ComboBox Margin="5 0 0 0" SelectedIndex="{Binding InquiryPositionQuantityTolUnit}">
+                            <ComboBox Margin="5 0 0 0" SelectedIndex="{Binding InquiryPositionQuantityTolUnit, Mode=TwoWay}">
                                 <ComboBoxItem>%</ComboBoxItem>
                                 <ComboBoxItem>Stk.</ComboBoxItem>
                                 <ComboBoxItem>m</ComboBoxItem>

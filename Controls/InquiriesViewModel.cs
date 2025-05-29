@@ -60,26 +60,26 @@ public class InquiryPosition
     public string LengthTolMin { get; set; }
     public string LengthTolMax { get; set; }
     public string Quantity { get; set; }
-    public string QuantityUnit { get; set; }
+    public int QuantityUnit { get; set; }
     public string QuantityTolMin { get; set; }
     public string QuantityTolMax { get; set; }
     public string QuantityTolUnit { get; set; }
     public string ShortLengthMax { get; set; }
-    public string ShortLengthUnit { get; set; }
-    public string TechnicalStandard { get; set; }
-    public string TechnicalStandardOption { get; set; }
-    public string FlatSeam { get; set; }
-    public string Certificate { get; set; }
-    public string ToleranceStandard { get; set; }
-    public string Tolerance1127D { get; set; }
-    public string Tolerance1127T { get; set; }
-    public string Brushed { get; set; }
-    public string BrushedGrit { get; set; }
-    public string Storage { get; set; }
-    public string Price { get; set; }
-    public string PriceUnit { get; set; }
+    public int ShortLengthUnit { get; set; }
+    public int TechnicalStandard { get; set; }
+    public int TechnicalStandardOption { get; set; }
+    public int FlatSeam { get; set; }
+    public int Certificate { get; set; }
+    public int ToleranceStandard { get; set; }
+    public int Tolerance1127D { get; set; }
+    public int Tolerance1127T { get; set; }
+    public int Brushed { get; set; }
+    public int BrushedGrit { get; set; }
+    public int Storage { get; set; }
+    public decimal Price { get; set; }
+    public int PriceUnit { get; set; }
     public string DeliveryTimeWeeks { get; set; }
-    public string DeliveryTimeDate { get; set; }
+    public DateTime DeliveryTimeDate { get; set; }
     public string NotesExternal { get; set; }
     public string NotesInternal { get; set; }
 }
@@ -282,24 +282,15 @@ public partial class InquiriesViewModel : ObservableObject
     
     //Following is to search the Delivery Adresses
     
-    [ObservableProperty] 
-    private string deliveryAdressSearch;
-    [ObservableProperty]
-    string customersDeliveryAdressStreet;
-    [ObservableProperty]
-    string customersDeliveryAdressHouseNo;
-    [ObservableProperty]
-    string customersDeliveryAdressPostCode;
-    [ObservableProperty]
-    string customersDeliveryAdressCity;
-    [ObservableProperty]
-    string customersDeliveryAdressCountry;
-    [ObservableProperty]
-    string customersDeliveryAdressContactName;
-    [ObservableProperty]
-    string customersDeliveryAdressNo;
-    [ObservableProperty] 
-    private string inquiryNotes;
+    [ObservableProperty] private string deliveryAdressSearch;
+    [ObservableProperty] string customersDeliveryAdressStreet;
+    [ObservableProperty] string customersDeliveryAdressHouseNo;
+    [ObservableProperty] string customersDeliveryAdressPostCode;
+    [ObservableProperty] string customersDeliveryAdressCity;
+    [ObservableProperty] string customersDeliveryAdressCountry;
+    [ObservableProperty] string customersDeliveryAdressContactName;
+    [ObservableProperty] string customersDeliveryAdressNo;
+    [ObservableProperty] private string inquiryNotes;
     
     public ObservableCollection<string> DeliveryAdressList { get; private set; } = new ObservableCollection<string>();
 
@@ -610,11 +601,6 @@ public partial class InquiriesViewModel : ObservableObject
     {
         SearchInquiryNumber(value);
     }
-    
-    
-    
-    
-    
     
     [RelayCommand]
     private async void InquirySave()
@@ -1147,6 +1133,39 @@ public partial class InquiriesViewModel : ObservableObject
             WallthicknessItems.Clear();
             OuterDiameterItems.Clear();
             GradeItems.Clear();
+
+            InquiryPositionQuantity = "";
+            InquiryPositionQuantityUnit = -1;
+
+            InquiryPositionQuantityTolMin = "";
+            InquiryPositionQuantityTolMax = "";
+
+            InquiryPositionQuantityTolUnit = -1;
+            InquiryPositionLength = "";
+            InquiryPositionLengthMin = "";
+            InquiryPositionLengthMax = "";
+
+            InquiryPositionShortLengths = "";
+            InquiryPositionShortLengthsUnit = -1;
+            
+            InquirySelectedNorm = "";
+            
+            inquirySelectedNormOptionIndex = -1;
+            
+            InquiryPositionSeamFlattened = false;
+            InquirySelectedCertificateIndex = -1;
+            SelectedDimensionNormIndex = -1;
+            SelectedDiameterIndex = -1;
+            SelectedThicknessIndex = -1;
+            InquiryPositionBrushed = false;
+            InquiryPositionGrit = "";
+            InquiryPositionFromStorage = false;
+            InquiryPositionPrice = "";
+            InquiryPositionPriceSelectedUnit = -1;
+            InquiryPositionLeadTimeWeeks = "";
+            InquiryPositionSelectedDate = null;
+            InquiryPositionNotesExternal = "";
+            InquiryPositionNotesInternal = "";
         }
     }
     
@@ -1161,7 +1180,21 @@ public partial class InquiriesViewModel : ObservableObject
     [ObservableProperty] private string inquiryPositionLengthMax;
     [ObservableProperty] private int inquiryPositionQuantityTolUnit = -1;
     [ObservableProperty] private int inquiryPositionQuantityUnit = -1;
+    [ObservableProperty] private int inquirySelectedNormIndex = -1;
+    [ObservableProperty] private int inquirySelectedNormOptionIndex = -1;
+    [ObservableProperty] private bool inquiryPositionSeamFlattened;
+    [ObservableProperty] private bool inquiryPositionBrushed;
+    [ObservableProperty] private bool inquiryPositionFromStorage;
+    [ObservableProperty] private int inquirySelectedCertificateIndex = -1;
+    [ObservableProperty] private string inquiryPositionGrit;
+    [ObservableProperty] private string inquiryPositionPrice;
+    [ObservableProperty] private int inquiryPositionPriceSelectedUnit = -1;
+    [ObservableProperty] private string inquiryPositionLeadTimeWeeks;
+    [ObservableProperty] private DateTime? inquiryPositionSelectedDate;
+    [ObservableProperty] private string inquiryPositionNotesExternal;
+    [ObservableProperty] private string inquiryPositionNotesInternal;
 
+    
     [RelayCommand]
     private async Task SearchInquiryPosition(string value)
     {
@@ -1174,7 +1207,7 @@ public partial class InquiriesViewModel : ObservableObject
         await connection.OpenAsync();
         
         string Query = $"SELECT * FROM inquiryposition WHERE Positionnumber = '{InquiryPositionSearch}' AND Inquirynumber = '{InquiryNumber}'";
-        var Results = await connection.QuerySingleAsync(Query);
+        var Results = await connection.QuerySingleAsync<InquiryPosition>(Query);
         
         string queryArticle = $"SELECT OuterDiameter, Wallthickness, Grade FROM articlestube WHERE ArticleNumber = '{Results.Articletube}'";
         var articleResult = await connection.QuerySingleOrDefaultAsync<dynamic>(queryArticle);
@@ -1196,7 +1229,7 @@ public partial class InquiriesViewModel : ObservableObject
         GradeItems.Add(articleResult?.Grade.ToString());
         
         SelectedGradeComboBoxIndex = 0;
-
+        
         InquiryPositionQuantity = Results.Quantity.ToString();
         InquiryPositionQuantityTolMin = Results.QuantityTolMin.ToString();
         InquiryPositionQuantityTolMax = Results.QuantityTolMax.ToString();
@@ -1204,44 +1237,96 @@ public partial class InquiriesViewModel : ObservableObject
         InquiryPositionLength = Results.Length.ToString();
         InquiryPositionLengthMin = Results.LengthTolMin.ToString();
         InquiryPositionLengthMax = Results.LengthTolMax.ToString();
-
-        InquiryPositionQuantityUnit = int.Parse(Results.QuantityUnit?.ToString());
+        
+        InquiryPositionQuantityUnit = int.Parse(Results.QuantityUnit.ToString());
         InquiryPositionQuantityTolUnit = int.Parse(Results.QuantityTolUnit?.ToString());
         
         InquiryPositionShortLengths = Results.ShortLengthMax.ToString();
         
-        InquiryPositionShortLengthsUnit = int.Parse(Results.ShortLengthUnit?.ToString());
-
+        InquiryPositionShortLengthsUnit = Results.ShortLengthUnit;
         
-        //Norm InquirySelectedNorm
-        //Option InquirySelectedNormOption
+        InquirySelectedNormIndex = Results.TechnicalStandard;
+        
+        InquirySelectedNormOptionIndex = Results.TechnicalStandardOption;
 
-        //Flat Seam -> Append b if 10217 InquiryPositionSeamFlattened
+        if (Results?.FlatSeam == 0)
+        {
+            InquiryPositionSeamFlattened = false;
+        }
+        else
+        {
+            InquiryPositionSeamFlattened = true;
+            
+            InquiryNormOptions.Clear();
+            InquiryNormOptions.Add(Results?.TechnicalStandardOption.ToString() + "b");
+            InquirySelectedNormOptionIndex = 0;
+        }
+        
+        if (Results?.Brushed == 0)
+        {
+            InquiryPositionBrushed = false;
+        }
+        else
+        {
+            InquiryPositionBrushed = true;
+        }
+        
+        if (Results?.Storage == 0)
+        {
+            InquiryPositionFromStorage = false;
+        }
+        else
+        {
+            InquiryPositionFromStorage = true;
+        }
+        
+        InquirySelectedCertificateIndex = Results.Certificate;
+        
+        SelectedDimensionNormIndex = Results.ToleranceStandard;
 
-        //Certificate InquirySelectedCertificate
-
-        //Tolerance Norm SelectedDimensionNormIndex
-        //Tolerance Class if 1127
-        //D SelectedDiameterIndex
-        //T SelectedThicknessIndex
-
-        //Brushed InquiryPositionBrushed
-
-        //Surface Quality / Grit InquiryPositionGrit
-
-        //Storage InquiryPositionFromStorage
-
-        //Price InquiryPositionPrice
-        //Price Unit InquiryPositionPriceSelectedUnit
-        //0 €/m
-        //1 €/Stk.
-        //2 €/kg
-
-        //Deliverytime Weeks  InquiryPositionLeadTimeWeeks
-        //Deliverytime Date InquiryPositionSelectedDate
-
-        //Notes external InquiryPositionNotesExternal
-        //Notes Internal InquiryPositionNotesInternal
+        if (!string.IsNullOrEmpty(Results?.Tolerance1127D.ToString()))
+        {
+            SelectedDiameterIndex = Results.Tolerance1127D;
+        }
+        
+        if (!string.IsNullOrEmpty(Results?.Tolerance1127T.ToString()))
+        {
+            SelectedThicknessIndex = Results.Tolerance1127T;
+        }
+        
+        if (!string.IsNullOrEmpty(Results?.BrushedGrit.ToString()))
+        {
+            InquiryPositionGrit = Results?.BrushedGrit.ToString();
+        }
+        
+        if (!string.IsNullOrEmpty(Results?.Price.ToString()))
+        {
+            InquiryPositionPrice = Results?.Price.ToString();
+        }
+        
+        SelectedDimensionNormIndex = Results.ToleranceStandard;
+        
+        InquiryPositionPriceSelectedUnit = int.Parse(Results.PriceUnit.ToString());
+        
+        if (!string.IsNullOrEmpty(Results?.DeliveryTimeWeeks.ToString()))
+        {
+            InquiryPositionLeadTimeWeeks = Results?.DeliveryTimeWeeks;
+        }
+        
+        if (!string.IsNullOrEmpty(Results?.DeliveryTimeDate.ToString()))
+        {
+            InquiryPositionSelectedDate = Results?.DeliveryTimeDate;
+        }
+        
+        if (!string.IsNullOrEmpty(Results?.NotesExternal))
+        {
+            InquiryPositionNotesExternal = Results?.NotesExternal;
+        }
+        
+        if (!string.IsNullOrEmpty(Results?.NotesInternal))
+        {
+            InquiryPositionNotesInternal = Results?.NotesInternal;
+        }
     }
 
     
@@ -1547,10 +1632,174 @@ public partial class InquiriesViewModel : ObservableObject
     [RelayCommand]
     private async void InquirySavePosition()
     {
+        
+        //Continue with the Save Position here
+        
         if (!String.IsNullOrEmpty(InquiryPositionSearch))
         {
-            //update Position
-            //-> Find out what changed
+            WallthicknessItems.Clear();
+            OuterDiameterItems.Clear();
+            GradeItems.Clear();
+
+            InquiryPositionQuantity = "";
+            InquiryPositionQuantityUnit = -1;
+
+            InquiryPositionQuantityTolMin = "";
+            InquiryPositionQuantityTolMax = "";
+
+            InquiryPositionQuantityTolUnit = -1;
+            InquiryPositionLength = "";
+            InquiryPositionLengthMin = "";
+            InquiryPositionLengthMax = "";
+
+            InquiryPositionShortLengths = "";
+            InquiryPositionShortLengthsUnit = -1;
+            
+            InquirySelectedNorm = "";
+            
+            inquirySelectedNormOptionIndex = -1;
+            
+            InquiryPositionSeamFlattened = false;
+            InquirySelectedCertificateIndex = -1;
+            SelectedDimensionNormIndex = -1;
+            SelectedDiameterIndex = -1;
+            SelectedThicknessIndex = -1;
+            InquiryPositionBrushed = false;
+            InquiryPositionGrit = "";
+            InquiryPositionFromStorage = false;
+            InquiryPositionPrice = "";
+            InquiryPositionPriceSelectedUnit = -1;
+            InquiryPositionLeadTimeWeeks = "";
+            InquiryPositionSelectedDate = null;
+            InquiryPositionNotesExternal = "";
+            InquiryPositionNotesInternal = "";
+            
+            if (string.IsNullOrEmpty(InquiryPositionSearch) || string.IsNullOrEmpty(InquiryNumber))
+            {
+                return;
+            }
+            
+            using var connection = new MySqlConnection(ConnectionString);
+            await connection.OpenAsync();
+            
+            string Query = $"SELECT * FROM inquiryposition WHERE Positionnumber = '{InquiryPositionSearch}' AND Inquirynumber = '{InquiryNumber}'";
+            var Results = await connection.QuerySingleAsync<InquiryPosition>(Query);
+            
+            string queryArticle = $"SELECT OuterDiameter, Wallthickness, Grade FROM articlestube WHERE ArticleNumber = '{Results.Articletube}'";
+            var articleResult = await connection.QuerySingleOrDefaultAsync<dynamic>(queryArticle);
+            
+            WallthicknessItems.Add(articleResult?.Wallthickness.ToString());
+
+            OuterDiameterItems.Clear();
+            
+            OuterDiameterItems.Add(articleResult?.OuterDiameter.ToString());
+            
+            SelectedODComboBoxIndex = 0;
+            
+            GradeItems.Clear();
+            
+            GradeItems.Add(articleResult?.Grade.ToString());
+            
+            SelectedGradeComboBoxIndex = 0;
+            
+            InquiryPositionQuantity = Results.Quantity.ToString();
+            InquiryPositionQuantityTolMin = Results.QuantityTolMin.ToString();
+            InquiryPositionQuantityTolMax = Results.QuantityTolMax.ToString();
+            
+            InquiryPositionLength = Results.Length.ToString();
+            InquiryPositionLengthMin = Results.LengthTolMin.ToString();
+            InquiryPositionLengthMax = Results.LengthTolMax.ToString();
+            
+            InquiryPositionQuantityUnit = int.Parse(Results.QuantityUnit.ToString());
+            InquiryPositionQuantityTolUnit = int.Parse(Results.QuantityTolUnit?.ToString());
+            
+            InquiryPositionShortLengths = Results.ShortLengthMax.ToString();
+            
+            InquiryPositionShortLengthsUnit = Results.ShortLengthUnit;
+            
+            InquirySelectedNormIndex = Results.TechnicalStandard;
+            
+            InquirySelectedNormOptionIndex = Results.TechnicalStandardOption;
+
+            if (Results?.FlatSeam == 0)
+            {
+                InquiryPositionSeamFlattened = false;
+            }
+            else
+            {
+                InquiryPositionSeamFlattened = true;
+                
+                InquiryNormOptions.Clear();
+                InquiryNormOptions.Add(Results?.TechnicalStandardOption.ToString() + "b");
+                InquirySelectedNormOptionIndex = 0;
+            }
+            
+            if (Results?.Brushed == 0)
+            {
+                InquiryPositionBrushed = false;
+            }
+            else
+            {
+                InquiryPositionBrushed = true;
+            }
+            
+            if (Results?.Storage == 0)
+            {
+                InquiryPositionFromStorage = false;
+            }
+            else
+            {
+                InquiryPositionFromStorage = true;
+            }
+            
+            InquirySelectedCertificateIndex = Results.Certificate;
+            
+            SelectedDimensionNormIndex = Results.ToleranceStandard;
+
+            if (!string.IsNullOrEmpty(Results?.Tolerance1127D.ToString()))
+            {
+                SelectedDiameterIndex = Results.Tolerance1127D;
+            }
+            
+            if (!string.IsNullOrEmpty(Results?.Tolerance1127T.ToString()))
+            {
+                SelectedThicknessIndex = Results.Tolerance1127T;
+            }
+            
+            if (!string.IsNullOrEmpty(Results?.BrushedGrit.ToString()))
+            {
+                InquiryPositionGrit = Results?.BrushedGrit.ToString();
+            }
+            
+            if (!string.IsNullOrEmpty(Results?.Price.ToString()))
+            {
+                InquiryPositionPrice = Results?.Price.ToString();
+            }
+            
+            SelectedDimensionNormIndex = Results.ToleranceStandard;
+            
+            InquiryPositionPriceSelectedUnit = int.Parse(Results.PriceUnit.ToString());
+            
+            if (!string.IsNullOrEmpty(Results?.DeliveryTimeWeeks.ToString()))
+            {
+                InquiryPositionLeadTimeWeeks = Results?.DeliveryTimeWeeks;
+            }
+            
+            if (!string.IsNullOrEmpty(Results?.DeliveryTimeDate.ToString()))
+            {
+                InquiryPositionSelectedDate = Results?.DeliveryTimeDate;
+            }
+            
+            if (!string.IsNullOrEmpty(Results?.NotesExternal))
+            {
+                InquiryPositionNotesExternal = Results?.NotesExternal;
+            }
+            
+            if (!string.IsNullOrEmpty(Results?.NotesInternal))
+            {
+                InquiryPositionNotesInternal = Results?.NotesInternal;
+            }
+
         }
         else
         {

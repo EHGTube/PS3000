@@ -340,7 +340,7 @@
                             <!-- KL Max -->
                             <TextBlock Text="KL max.:" VerticalAlignment="Center" Margin="0 0 5 0"/>
                             <TextBox Watermark="KL max." HorizontalAlignment="Stretch" Text="{Binding InquiryPositionShortLengths}"/>
-                            <ComboBox Grid.Column="1" SelectedIndex="{Binding InquiryPositionShortLengthsUnit}" Margin="5 0 0 0">
+                            <ComboBox SelectedIndex="{Binding InquiryPositionShortLengthsUnit}" Margin="5 0 0 0">
                                 <ComboBoxItem>%</ComboBoxItem>
                                 <ComboBoxItem>Stk.</ComboBoxItem>
                             </ComboBox>
@@ -350,12 +350,13 @@
                             <!-- First ComboBox -->
                             <ComboBox
                                       SelectedItem="{Binding InquirySelectedNorm}"
-                                      SelectedIndex="0"
+                                      SelectedIndex="{Binding InquirySelectedNormIndex}"
                                       ItemsSource="{Binding InquiryNorm}"/>
                         
                             <!-- Second ComboBox -->
                             <ComboBox Margin="5 0 0 0"
                                       ItemsSource="{Binding InquiryNormOptions}"
+                                      SelectedIndex="{Binding InquirySelectedNormOptionIndex}"
                                       SelectedItem="{Binding InquirySelectedNormOption, Mode=TwoWay}"
                                       HorizontalAlignment="Right"/>
                         </StackPanel>
@@ -391,7 +392,7 @@
                         <TextBlock Text="Zeugnis:" Margin="0 5 0 2"/>
                         <ComboBox 
                                   SelectedItem="{Binding InquirySelectedCertificate}"
-                                  SelectedIndex="0"
+                                  SelectedIndex="{Binding InquirySelectedCertificateIndex}"
                                   ItemsSource="{Binding InquiryCertificate}"/>
                         
                         <TextBlock Text="Geschliffen:" Margin="0 5 0 2"/>

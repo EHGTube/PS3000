@@ -20,6 +20,15 @@ using System.Globalization;
 using Avalonia.Controls;
 
 
+
+//What to Do ?
+
+//1. Fix loading Inquiry Position Details
+//2. Fix Loading Inquiry Position Date Details
+//3. Fix Saving Changes for the Inquiry Posiiton
+
+
+
 namespace PS3000.Controls;
 
 public class SurchargeListItem
@@ -79,7 +88,7 @@ public class InquiryPosition
     public decimal Price { get; set; }
     public int PriceUnit { get; set; }
     public string DeliveryTimeWeeks { get; set; }
-    public DateTime DeliveryTimeDate { get; set; }
+    public DateTime? DeliveryTimeDate { get; set; }
     public string NotesExternal { get; set; }
     public string NotesInternal { get; set; }
 }
@@ -545,7 +554,7 @@ public partial class InquiriesViewModel : ObservableObject
                 
                 // Query and load Positions
                 var Positionresults = await connection.QueryAsync<InquiryPositionList>(
-                    @"SELECT Positionnumber FROM inquiryposition WHERE Inquirynumber = @InquiryNo",
+                    @"SELECT Positionnumber FROM inquiryposition WHERE Inquirynumber = @InquiryNo ORDER BY Positionnumber ASC",
                     new { InquiryNo = value }
                 );
 
@@ -1124,16 +1133,12 @@ public partial class InquiriesViewModel : ObservableObject
     
     partial void OnSelectedInquiryPositionChanged(InquiryPositionList value)
     {
-        if (value != null)
-        {
-            InquiryPositionSearch = value.Positionnumber;
-        }
-        else
+        if (value == null || String.IsNullOrEmpty(inquiryPositionSearch))
         {
             WallthicknessItems.Clear();
             OuterDiameterItems.Clear();
             GradeItems.Clear();
-
+            
             InquiryPositionQuantity = "";
             InquiryPositionQuantityUnit = -1;
 
@@ -1166,6 +1171,10 @@ public partial class InquiriesViewModel : ObservableObject
             InquiryPositionSelectedDate = null;
             InquiryPositionNotesExternal = "";
             InquiryPositionNotesInternal = "";
+        }
+        else
+        {
+            InquiryPositionSearch = value.Positionnumber;
         }
     }
     
@@ -1208,27 +1217,15 @@ public partial class InquiriesViewModel : ObservableObject
         
         string Query = $"SELECT * FROM inquiryposition WHERE Positionnumber = '{InquiryPositionSearch}' AND Inquirynumber = '{InquiryNumber}'";
         var Results = await connection.QuerySingleAsync<InquiryPosition>(Query);
-        
+            
         string queryArticle = $"SELECT OuterDiameter, Wallthickness, Grade FROM articlestube WHERE ArticleNumber = '{Results.Articletube}'";
         var articleResult = await connection.QuerySingleOrDefaultAsync<dynamic>(queryArticle);
         
-        WallthicknessItems.Clear();
+        SelectedWTComboBoxIndex = WallthicknessItems.IndexOf(articleResult?.Wallthickness.ToString().Replace(",", "."));
         
-        WallthicknessItems.Add(articleResult?.Wallthickness.ToString());
+        SelectedODComboBoxIndex = OuterDiameterItems.IndexOf(articleResult?.OuterDiameter.ToString().Replace(",", "."));
         
-        SelectedWTComboBoxIndex = 0;
-
-        OuterDiameterItems.Clear();
-        
-        OuterDiameterItems.Add(articleResult?.OuterDiameter.ToString());
-        
-        SelectedODComboBoxIndex = 0;
-        
-        GradeItems.Clear();
-        
-        GradeItems.Add(articleResult?.Grade.ToString());
-        
-        SelectedGradeComboBoxIndex = 0;
+        SelectedGradeComboBoxIndex = GradeItems.IndexOf(articleResult?.Grade.ToString().Replace(",", "."));
         
         InquiryPositionQuantity = Results.Quantity.ToString();
         InquiryPositionQuantityTolMin = Results.QuantityTolMin.ToString();
@@ -1313,9 +1310,10 @@ public partial class InquiriesViewModel : ObservableObject
             InquiryPositionLeadTimeWeeks = Results?.DeliveryTimeWeeks;
         }
         
-        if (!string.IsNullOrEmpty(Results?.DeliveryTimeDate.ToString()))
+        if (Results.DeliveryTimeDate != default(DateTime))
         {
-            InquiryPositionSelectedDate = Results?.DeliveryTimeDate;
+            InquiryPositionSelectedDate = Results.DeliveryTimeDate;
+            Console.WriteLine($"Date retrieved: {InquiryPositionSelectedDate:yyyy-MM-dd}");
         }
         
         if (!string.IsNullOrEmpty(Results?.NotesExternal))
@@ -1628,183 +1626,981 @@ public partial class InquiriesViewModel : ObservableObject
     [ObservableProperty] private string inquiryPositionShortLengths;
 
     [ObservableProperty] private int inquiryPositionShortLengthsUnit = -1;
+    
+    [ObservableProperty] private string inquiryPositionShortLengthsUnitText;
+    [ObservableProperty] private string inquiryPositionQuantityUnitText;
+    [ObservableProperty] private string inquiryPositionPriceSelectedUnitText;
+    [ObservableProperty] private string inquiryPositionQuantityTolUnitItem;
+    [ObservableProperty] private string selectedDimensionNormItem;
+    [ObservableProperty] private string selectedThicknessItem;
+    [ObservableProperty] private string selectedDiameterItem;
+    [ObservableProperty] private string inquirySelectedNormOption;
+
 
     [RelayCommand]
     private async void InquirySavePosition()
     {
+        if (string.IsNullOrEmpty(InquiryPositionSearch) && !string.IsNullOrEmpty(InquiryNumber))
+        {
+            Console.WriteLine("NEW Pos");
+
+            string DimensionNormText = SelectedDimensionNormItem;
+            if (IsENISO1127Selected)
+            {
+                DimensionNormText += " " + selectedDiameterItem + "/" + selectedThicknessItem;
+            }
+    
+            string BrushedText = "Nein";
+    
+            if (InquiryPositionBrushed)
+            {
+                BrushedText = "Ja";
+            }
+    
+            if (!String.IsNullOrEmpty(InquiryPositionGrit))
+            {
+                BrushedText += $" Körnung {InquiryPositionGrit}";
+            }
+    
+            string FlattenedText = "Nein";
+    
+            if (InquiryPositionSeamFlattened)
+            {
+                FlattenedText = "Ja";
+            }
+    
+            string StorageText = "Nein";
+    
+            if (InquiryPositionFromStorage)
+            {
+                StorageText = "Ja";
+            }
+    
+            string Liefertermin = "";
+    
+            if (!String.IsNullOrEmpty(InquiryPositionLeadTimeWeeks))
+            {
+                Liefertermin = InquiryPositionLeadTimeWeeks + " Wochen";
+            }
+    
+            if (!String.IsNullOrEmpty(InquiryPositionSelectedDate.ToString()))
+            {
+                Liefertermin =
+                    InquiryPositionSelectedDate?.ToString("dd.MM.yyyy", new System.Globalization.CultureInfo("de-DE"));
+            }
+    
+            string QuantityUnitText = "";
+    
+            if (InquiryPositionQuantityUnit == 0)
+            {
+                QuantityUnitText = "m";
+            }
+            else if (InquiryPositionQuantityUnit == 1)
+            {
+                QuantityUnitText = "Stk.";
+            }
+    
+            string QuantityTolUnitText = "";
+    
+            if (InquiryPositionQuantityTolUnit == 0)
+            {
+                QuantityTolUnitText = "%";
+            }
+            else if (InquiryPositionQuantityTolUnit == 1)
+            {
+                QuantityTolUnitText = "Stk.";
+            }
+            else if (InquiryPositionQuantityTolUnit == 2)
+            {
+                QuantityTolUnitText = "m";
+            }
+    
+            string ShortLengthUnitText = "";
+    
+            if (InquiryPositionShortLengthsUnit == 0)
+            {
+                ShortLengthUnitText = "%";
+            }
+            else if (InquiryPositionShortLengthsUnit == 1)
+            {
+                ShortLengthUnitText = "Stk.";
+            }
+    
+            string PriceUnit = "";
+    
+            switch (InquiryPositionPriceSelectedUnit)
+            {
+                case 0:
+                    PriceUnit = "\u20ac/m";
+                    break;
+                case 1:
+                    PriceUnit = "\u20ac/Stk.";
+                    break;
+                case 2:
+                    PriceUnit = "\u20ac/kg";
+                    break;
+            }
+    
+            var box = MessageBoxManager.GetMessageBoxStandard(
+                "Anfragenposition Bestätigen",
+                $"AD: {SelectedODComboBoxItem}{Environment.NewLine}" +
+                $"WS: {SelectedWTComboBoxItem}{Environment.NewLine}" +
+                $"Werkstoff: {SelectedGradeComboBoxItem}{Environment.NewLine}" +
+                $"Menge: {InquiryPositionQuantity} {QuantityUnitText} -{InquiryPositionQuantityTolMin}/+{InquiryPositionQuantityTolMax} {QuantityTolUnitText}{Environment.NewLine}" +
+                $"Länge: {InquiryPositionLength} -{InquiryPositionLengthMin}/+{InquiryPositionLengthMax} mm {Environment.NewLine}" +
+                $"KL. Max.: {InquiryPositionShortLengths} {ShortLengthUnitText}{Environment.NewLine}" +
+                $"Norm: {InquirySelectedNorm} {InquirySelectedNormOption}{Environment.NewLine}" +
+                $"Zeugnis: {InquirySelectedCertificate}{Environment.NewLine}" +
+                $"Toleranzen: {DimensionNormText}{Environment.NewLine}" +
+                $"Geglättet: {FlattenedText}{Environment.NewLine}" +
+                $"Gebürstet: {BrushedText}{Environment.NewLine}" +
+                $"Vorrat: {StorageText}{Environment.NewLine}" +
+                $"Preis: {InquiryPositionPrice} {PriceUnit}{Environment.NewLine}" +
+                $"Lieferzeit: {Liefertermin}{Environment.NewLine}" +
+                $"Notizen Ext.: {InquiryPositionNotesExternal}{Environment.NewLine}" +
+                $"Notizen Int.: {InquiryPositionNotesInternal}{Environment.NewLine}",
+                ButtonEnum.YesNo
+            );
+    
+            var result = await box.ShowAsync();
+    
+            if (result == ButtonResult.Yes)
+            {
+                using (var connection = new MySqlConnection(ConnectionString))
+                {
+                    connection.Open();
+    
+                    string queryArticle =
+                        "SELECT ArticleNumber FROM articlestube WHERE OuterDiameter = @OD AND Wallthickness = @WT AND Grade = @Grade";
+                    int articleNumber = await connection.QuerySingleAsync<int>(queryArticle, new
+                    {
+                        OD = SelectedODComboBoxItem,
+                        WT = SelectedWTComboBoxItem,
+                        Grade = SelectedGradeComboBoxItem
+                    });
+    
+                    string getNextPosition = @"
+                            SELECT COALESCE(
+                              (SELECT t1.Positionnumber + 1
+                               FROM inquiryposition t1
+                               LEFT JOIN inquiryposition t2 ON t1.Inquirynumber = t2.Inquirynumber AND t1.Positionnumber + 1 = t2.Positionnumber
+                               WHERE t1.Inquirynumber = @inquiryNumber 
+                                 AND t2.Positionnumber IS NULL
+                                 AND t1.Positionnumber + 1 <= (SELECT MAX(Positionnumber) FROM inquiryposition WHERE Inquirynumber = @inquiryNumber)
+                               ORDER BY t1.Positionnumber
+                               LIMIT 1),
+                              (SELECT IFNULL(MAX(Positionnumber) + 1, 1) FROM inquiryposition WHERE Inquirynumber = @inquiryNumber)
+                            ) AS next_position";
+    
+                    int nextPosition = await connection.QuerySingleAsync<int>(getNextPosition, new { inquiryNumber = InquiryNumber });
+    
+                    string insertQuery = @"INSERT INTO inquiryposition 
+                        (Inquirynumber, Positionnumber, ArticleTube, Length, LengthTolMin, LengthTolMax, Quantity, QuantityUnit, 
+                        QuantityTolMin, QuantityTolMax, QuantityTolUnit, ShortLengthMax, ShortLengthUnit, 
+                        TechnicalStandard, TechnicalStandardOption, FlatSeam, Certificate, ToleranceStandard, 
+                        Tolerance1127D, Tolerance1127T, Brushed, BrushedGrit, Storage, Price, PriceUnit, 
+                        DeliveryTimeWeeks, DeliveryTimeDate, NotesExternal, NotesInternal) 
+                        VALUES 
+                        (@Inquirynumber, @Positionnumber, @ArticleTube, @Length, @LengthTolMin, @LengthTolMax, @Quantity, @QuantityUnit, 
+                        @QuantityTolMin, @QuantityTolMax, @QuantityTolUnit, @ShortLengthMax, @ShortLengthUnit, 
+                        @TechnicalStandard, @TechnicalStandardOption, @FlatSeam, @Certificate, @ToleranceStandard, 
+                        @Tolerance1127D, @Tolerance1127T, @Brushed, @BrushedGrit, @Storage, @Price, @PriceUnit, 
+                        @DeliveryTimeWeeks, @DeliveryTimeDate, @NotesExternal, @NotesInternal)";
+    
+                    connection.Execute(insertQuery, new
+                    {
+                        Inquirynumber = InquiryNumber,
+                        Positionnumber = nextPosition,
+                        ArticleTube = articleNumber,
+                        Length = InquiryPositionLength,
+                        LengthTolMin = InquiryPositionLengthMin,
+                        LengthTolMax = InquiryPositionLengthMax,
+                        Quantity = InquiryPositionQuantity,
+                        QuantityUnit = InquiryPositionQuantityUnit,
+                        QuantityTolMin = InquiryPositionQuantityTolMin,
+                        QuantityTolMax = InquiryPositionQuantityTolMax,
+                        QuantityTolUnit = InquiryPositionQuantityTolUnit,
+                        ShortLengthMax = InquiryPositionShortLengths,
+                        ShortLengthUnit = InquiryPositionShortLengthsUnit,
+                        TechnicalStandard = InquirySelectedNormIndex,
+                        TechnicalStandardOption = InquirySelectedNormOptionIndex,
+                        FlatSeam = InquiryPositionSeamFlattened,
+                        Certificate = InquirySelectedCertificateIndex,
+                        ToleranceStandard = SelectedDimensionNormIndex,
+                        Tolerance1127D = SelectedDiameterIndex,
+                        Tolerance1127T = SelectedThicknessIndex,
+                        Brushed = InquiryPositionBrushed,
+                        BrushedGrit = InquiryPositionGrit,
+                        Storage = InquiryPositionFromStorage,
+                        Price = InquiryPositionPrice.Replace(',', '.'),
+                        PriceUnit = InquiryPositionPriceSelectedUnit,
+                        DeliveryTimeWeeks = InquiryPositionLeadTimeWeeks,
+                        DeliveryTimeDate = InquiryPositionSelectedDate,
+                        NotesExternal = InquiryPositionNotesExternal,
+                        NotesInternal = InquiryPositionNotesInternal
+                    });
+    
+                    string selectQuery =
+                        $"SELECT Positionnumber FROM inquiryposition WHERE Inquirynumber = {InquiryNumber} ORDER BY LaufendeAnfragenPositionsnummer DESC LIMIT 1";
+                    InquiryPositionSearch = connection.QuerySingleOrDefault<int>(selectQuery).ToString();
+                }
+            }
+        }
+        else if (!string.IsNullOrEmpty(InquiryPositionSearch) && !string.IsNullOrEmpty(InquiryNumber))
+        {
+            Console.WriteLine("Update Pos");
+
+            using (var connection = new MySqlConnection(ConnectionString))
+            {
+                connection.Open();
+                
+                // Get the current values from the database
+                string queryCurrentValues = @"
+                    SELECT 
+                        ip.ArticleTube,
+                        ip.Length, ip.LengthTolMin, ip.LengthTolMax, 
+                        ip.Quantity, ip.QuantityUnit, ip.QuantityTolMin, ip.QuantityTolMax, ip.QuantityTolUnit,
+                        ip.ShortLengthMax, ip.ShortLengthUnit, 
+                        ip.TechnicalStandard, ip.TechnicalStandardOption, ip.FlatSeam, ip.Certificate,
+                        ip.ToleranceStandard, ip.Tolerance1127D, ip.Tolerance1127T,
+                        ip.Brushed, ip.BrushedGrit, ip.Storage,
+                        ip.Price, ip.PriceUnit, ip.DeliveryTimeWeeks, ip.DeliveryTimeDate,
+                        ip.NotesExternal, ip.NotesInternal,
+                        a.OuterDiameter, a.Wallthickness, a.Grade
+                    FROM inquiryposition ip
+                    JOIN articlestube a ON ip.ArticleTube = a.ArticleNumber
+                    WHERE ip.Inquirynumber = @inquiryNumber AND ip.Positionnumber = @positionNumber";
+                
+                var parameters = new
+                {
+                    inquiryNumber = InquiryNumber,
+                    positionNumber = int.Parse(InquiryPositionSearch)
+                };
+
+                // Use an anonymous type to explicitly specify the column types
+                var dbValues = await connection.QuerySingleOrDefaultAsync<dynamic>(queryCurrentValues, parameters);
+                
+                if (dbValues == null)
+                {
+                    // Position not found, show error message
+                    var errorBox = MessageBoxManager.GetMessageBoxStandard(
+                        "Fehler",
+                        $"Die Position {InquiryPositionSearch} der Anfrage {InquiryNumber} wurde nicht gefunden.",
+                        ButtonEnum.Ok
+                    );
+                    await errorBox.ShowAsync();
+                    return;
+                }
+                
+                // Get article number for the current selection
+                int newArticleNumber;
+                
+                try
+                {
+                    string queryArticle = "SELECT ArticleNumber FROM articlestube WHERE OuterDiameter = @OD AND Wallthickness = @WT AND Grade = @Grade";
+                    newArticleNumber = await connection.QuerySingleAsync<int>(queryArticle, new 
+                    {
+                        OD = SelectedODComboBoxItem,
+                        WT = SelectedWTComboBoxItem,
+                        Grade = SelectedGradeComboBoxItem
+                    });
+                }
+                catch (InvalidOperationException ex)
+                {
+                    // Or log the error
+                    Console.WriteLine($"No article found with specified parameters: {ex.Message}");
+                    Console.WriteLine($"SELECT ArticleNumber FROM articlestube WHERE OuterDiameter = {SelectedODComboBoxItem} AND Wallthickness = {SelectedWTComboBoxItem} AND Grade = {SelectedGradeComboBoxItem}");
+                    return;
+                }
+                
+                var currentPosition = new InquiryPosition
+                {
+                    // String properties with ToString() to ensure string type
+                    Articletube = dbValues.ArticleTube?.ToString(),
+                    Length = dbValues.Length?.ToString(),
+                    LengthTolMin = dbValues.LengthTolMin?.ToString(),
+                    LengthTolMax = dbValues.LengthTolMax?.ToString(),
+                    Quantity = dbValues.Quantity?.ToString(),
+                    QuantityTolMin = dbValues.QuantityTolMin?.ToString(),
+                    QuantityTolMax = dbValues.QuantityTolMax?.ToString(),
+                    QuantityTolUnit = dbValues.QuantityTolUnit?.ToString(),
+                    ShortLengthMax = dbValues.ShortLengthMax?.ToString(),
+                    NotesExternal = dbValues.NotesExternal?.ToString(),
+                    NotesInternal = dbValues.NotesInternal?.ToString(),
+                    DeliveryTimeWeeks = dbValues.DeliveryTimeWeeks?.ToString(),
+                    
+                    // Integer properties with explicit conversion to avoid uint to int implicit conversion issues
+                    QuantityUnit = dbValues.QuantityUnit != null ? (int)Convert.ToInt32(dbValues.QuantityUnit) : 0,
+                    ShortLengthUnit = dbValues.ShortLengthUnit != null ? (int)Convert.ToInt32(dbValues.ShortLengthUnit) : 0,
+                    TechnicalStandard = dbValues.TechnicalStandard != null ? (int)Convert.ToInt32(dbValues.TechnicalStandard) : 0,
+                    TechnicalStandardOption = dbValues.TechnicalStandardOption != null ? (int)Convert.ToInt32(dbValues.TechnicalStandardOption) : 0,
+                    FlatSeam = dbValues.FlatSeam != null ? (int)Convert.ToInt32(dbValues.FlatSeam) : 0,
+                    Certificate = dbValues.Certificate != null ? (int)Convert.ToInt32(dbValues.Certificate) : 0,
+                    ToleranceStandard = dbValues.ToleranceStandard != null ? (int)Convert.ToInt32(dbValues.ToleranceStandard) : 0,
+                    Tolerance1127D = dbValues.Tolerance1127D != null ? (int)Convert.ToInt32(dbValues.Tolerance1127D) : 0,
+                    Tolerance1127T = dbValues.Tolerance1127T != null ? (int)Convert.ToInt32(dbValues.Tolerance1127T) : 0,
+                    Brushed = dbValues.Brushed != null ? (int)Convert.ToInt32(dbValues.Brushed) : 0,
+                    BrushedGrit = dbValues.BrushedGrit != null ? (int)Convert.ToInt32(dbValues.BrushedGrit) : 0,
+                    Storage = dbValues.Storage != null ? (int)Convert.ToInt32(dbValues.Storage) : 0,
+                    PriceUnit = dbValues.PriceUnit != null ? (int)Convert.ToInt32(dbValues.PriceUnit) : 0,
+                    
+                    // Decimal property
+                    Price = dbValues.Price != null ? Convert.ToDecimal(dbValues.Price) : 0m,
+                    
+                    // DateTime property
+                    DeliveryTimeDate = dbValues.DeliveryTimeDate != null 
+                        ? Convert.ToDateTime(dbValues.DeliveryTimeDate).Date // Use .Date to remove time component
+                        : default(DateTime)
+                };
+                
+                var newPosition = new InquiryPosition
+                {
+                    Articletube = newArticleNumber.ToString(),
+                    Length = InquiryPositionLength,
+                    LengthTolMin = InquiryPositionLengthMin,
+                    LengthTolMax = InquiryPositionLengthMax,
+                    Quantity = InquiryPositionQuantity,
+                    QuantityUnit = InquiryPositionQuantityUnit,
+                    QuantityTolMin = InquiryPositionQuantityTolMin,
+                    QuantityTolMax = InquiryPositionQuantityTolMax,
+                    QuantityTolUnit = InquiryPositionQuantityTolUnit.ToString(),
+                    ShortLengthMax = InquiryPositionShortLengths,
+                    ShortLengthUnit = InquiryPositionShortLengthsUnit,
+                    TechnicalStandard = InquirySelectedNormIndex,
+                    TechnicalStandardOption = InquirySelectedNormOptionIndex,
+                    FlatSeam = InquiryPositionSeamFlattened ? 1 : 0,
+                    Certificate = InquirySelectedCertificateIndex,
+                    ToleranceStandard = SelectedDimensionNormIndex,
+                    Tolerance1127D = SelectedDiameterIndex,
+                    Tolerance1127T = SelectedThicknessIndex,
+                    Brushed = InquiryPositionBrushed ? 1 : 0,
+                    BrushedGrit = !string.IsNullOrEmpty(InquiryPositionGrit) ? int.Parse(InquiryPositionGrit) : 0,
+                    Storage = InquiryPositionFromStorage ? 1 : 0,
+                    Price = !string.IsNullOrEmpty(InquiryPositionPrice) ? decimal.Parse(InquiryPositionPrice.Replace(',','.'), System.Globalization.CultureInfo.InvariantCulture) : 0m,
+                    PriceUnit = InquiryPositionPriceSelectedUnit,
+                    DeliveryTimeWeeks = InquiryPositionLeadTimeWeeks,
+                    DeliveryTimeDate = InquiryPositionSelectedDate ?? default(DateTime),
+                    NotesExternal = InquiryPositionNotesExternal,
+                    NotesInternal = InquiryPositionNotesInternal
+                };
+                
+                // Build a list of changes
+                var changes = new List<string>();
+                
+                // Compare article data
+                if (dbValues.OuterDiameter?.ToString() != SelectedODComboBoxItem)
+                    changes.Add($"AD: {dbValues.OuterDiameter} → {SelectedODComboBoxItem}");
+                
+                if (dbValues.Wallthickness?.ToString() != SelectedWTComboBoxItem)
+                    changes.Add($"WS: {dbValues.Wallthickness} → {SelectedWTComboBoxItem}");
+                
+                if (dbValues.Grade?.ToString() != SelectedGradeComboBoxItem)
+                    changes.Add($"Werkstoff: {dbValues.Grade} → {SelectedGradeComboBoxItem}");
+                
+                // Compare dimensions
+                if (currentPosition.Length != newPosition.Length)
+                    changes.Add($"Länge: {currentPosition.Length} → {newPosition.Length}");
+                
+                if (currentPosition.LengthTolMin != newPosition.LengthTolMin)
+                    changes.Add($"Länge Toleranz Min: {currentPosition.LengthTolMin} → {newPosition.LengthTolMin}");
+                
+                if (currentPosition.LengthTolMax != newPosition.LengthTolMax)
+                    changes.Add($"Länge Toleranz Max: {currentPosition.LengthTolMax} → {newPosition.LengthTolMax}");
+                
+                // Compare quantity
+                if (currentPosition.Quantity != newPosition.Quantity)
+                    changes.Add($"Menge: {currentPosition.Quantity} → {newPosition.Quantity}");
+                
+                if (currentPosition.QuantityUnit != newPosition.QuantityUnit)
+                {
+                    string oldUnit = currentPosition.QuantityUnit == 0 ? "m" : "Stk.";
+                    string newUnit = newPosition.QuantityUnit == 0 ? "m" : "Stk.";
+                    changes.Add($"Mengeneinheit: {oldUnit} → {newUnit}");
+                }
+                
+                if (currentPosition.QuantityTolMin != newPosition.QuantityTolMin)
+                    changes.Add($"Menge Toleranz Min: {currentPosition.QuantityTolMin} → {newPosition.QuantityTolMin}");
+                
+                if (currentPosition.QuantityTolMax != newPosition.QuantityTolMax)
+                    changes.Add($"Menge Toleranz Max: {currentPosition.QuantityTolMax} → {newPosition.QuantityTolMax}");
+                
+                if (currentPosition.QuantityTolUnit != newPosition.QuantityTolUnit)
+                {
+                    string oldUnit = "";
+                    if (currentPosition.QuantityTolUnit == "0") oldUnit = "%";
+                    else if (currentPosition.QuantityTolUnit == "1") oldUnit = "Stk.";
+                    else if (currentPosition.QuantityTolUnit == "2") oldUnit = "m";
+                    
+                    string newUnit = "";
+                    if (newPosition.QuantityTolUnit == "0") newUnit = "%";
+                    else if (newPosition.QuantityTolUnit == "1") newUnit = "Stk.";
+                    else if (newPosition.QuantityTolUnit == "2") newUnit = "m";
+                    
+                    changes.Add($"Menge Toleranz Einheit: {oldUnit} → {newUnit}");
+                }
+                
+                // Compare short lengths
+                if (currentPosition.ShortLengthMax != newPosition.ShortLengthMax)
+                    changes.Add($"KL. Max.: {currentPosition.ShortLengthMax} → {newPosition.ShortLengthMax}");
+                
+                if (currentPosition.ShortLengthUnit != newPosition.ShortLengthUnit)
+                {
+                    string oldUnit = currentPosition.ShortLengthUnit == 0 ? "%" : "Stk.";
+                    string newUnit = newPosition.ShortLengthUnit == 0 ? "%" : "Stk.";
+                    changes.Add($"KL. Max. Einheit: {oldUnit} → {newUnit}");
+                }
+                
+                // Compare technical standards
+                if (currentPosition.TechnicalStandard != newPosition.TechnicalStandard)
+                    changes.Add($"Norm Index: {currentPosition.TechnicalStandard} → {newPosition.TechnicalStandard}");
+                
+                if (currentPosition.TechnicalStandardOption != newPosition.TechnicalStandardOption)
+                    changes.Add($"Norm Option Index: {currentPosition.TechnicalStandardOption} → {newPosition.TechnicalStandardOption}");
+                
+                // Compare seam flattening
+                if (currentPosition.FlatSeam != newPosition.FlatSeam)
+                    changes.Add($"Geglättet: {(currentPosition.FlatSeam == 1 ? "Ja" : "Nein")} → {(newPosition.FlatSeam == 1 ? "Ja" : "Nein")}");
+                
+                // Compare certificate
+                if (currentPosition.Certificate != newPosition.Certificate)
+                    changes.Add($"Zeugnis Index: {currentPosition.Certificate} → {newPosition.Certificate}");
+                
+                // Compare tolerance standard
+                if (currentPosition.ToleranceStandard != newPosition.ToleranceStandard)
+                    changes.Add($"Toleranz Standard: {currentPosition.ToleranceStandard} → {newPosition.ToleranceStandard}");
+                
+                if (currentPosition.Tolerance1127D != newPosition.Tolerance1127D)
+                    changes.Add($"Toleranz 1127D: {currentPosition.Tolerance1127D} → {newPosition.Tolerance1127D}");
+                
+                if (currentPosition.Tolerance1127T != newPosition.Tolerance1127T)
+                    changes.Add($"Toleranz 1127T: {currentPosition.Tolerance1127T} → {newPosition.Tolerance1127T}");
+                
+                // Compare brushed
+                if (currentPosition.Brushed != newPosition.Brushed)
+                    changes.Add($"Gebürstet: {(currentPosition.Brushed == 1 ? "Ja" : "Nein")} → {(newPosition.Brushed == 1 ? "Ja" : "Nein")}");
+                
+                if (currentPosition.BrushedGrit != newPosition.BrushedGrit)
+                    changes.Add($"Gebürstet Körnung: {currentPosition.BrushedGrit} → {newPosition.BrushedGrit}");
+                
+                // Compare storage
+                if (currentPosition.Storage != newPosition.Storage)
+                    changes.Add($"Vorrat: {(currentPosition.Storage == 1 ? "Ja" : "Nein")} → {(newPosition.Storage == 1 ? "Ja" : "Nein")}");
+                
+                // Compare price
+                if (currentPosition.Price != newPosition.Price)
+                    changes.Add($"Preis: {currentPosition.Price} → {newPosition.Price}");
+                
+                if (currentPosition.PriceUnit != newPosition.PriceUnit)
+                {
+                    string oldUnit = "";
+                    switch (currentPosition.PriceUnit)
+                    {
+                        case 0: oldUnit = "€/m"; break;
+                        case 1: oldUnit = "€/Stk."; break;
+                        case 2: oldUnit = "€/kg"; break;
+                    }
+                    
+                    string newUnit = "";
+                    switch (newPosition.PriceUnit)
+                    {
+                        case 0: newUnit = "€/m"; break;
+                        case 1: newUnit = "€/Stk."; break;
+                        case 2: newUnit = "€/kg"; break;
+                    }
+                    
+                    changes.Add($"Preis Einheit: {oldUnit} → {newUnit}");
+                }
+                
+                // Compare delivery time
+                if (currentPosition.DeliveryTimeWeeks != newPosition.DeliveryTimeWeeks)
+                    changes.Add($"Lieferzeit Wochen: {currentPosition.DeliveryTimeWeeks ?? "Keine"} → {newPosition.DeliveryTimeWeeks ?? "Keine"}");
+                
+                // string currentDateStr = currentPosition.DeliveryTimeDate != null && currentPosition.DeliveryTimeDate != default(DateTime) 
+                //     ? currentPosition.DeliveryTimeDate.ToString("dd.MM.yyyy") 
+                //     : "Kein Datum";
+                //
+                // string newDateStr = newPosition.DeliveryTimeDate != null && newPosition.DeliveryTimeDate != default(DateTime)
+                //     ? newPosition.DeliveryTimeDate.ToString("dd.MM.yyyy") 
+                //     : "Kein Datum";
+                //
+                // if (currentDateStr != newDateStr)
+                //     changes.Add($"Lieferdatum: {currentDateStr} → {newDateStr}");
+                
+                // Compare notes
+                if (currentPosition.NotesExternal != newPosition.NotesExternal)
+                    changes.Add($"Notizen Ext.: {currentPosition.NotesExternal ?? ""} → {newPosition.NotesExternal ?? ""}");
+                
+                if (currentPosition.NotesInternal != newPosition.NotesInternal)
+                    changes.Add($"Notizen Int.: {currentPosition.NotesInternal ?? ""} → {newPosition.NotesInternal ?? ""}");
+                
+                // If there are changes, show them and ask for confirmation
+                if (changes.Count > 0)
+                {
+                    string changesText = string.Join(Environment.NewLine, changes);
+                    var confirmBox = MessageBoxManager.GetMessageBoxStandard(
+                        "Änderungen bestätigen",
+                        $"Folgende Änderungen werden vorgenommen:{Environment.NewLine}{changesText}",
+                        ButtonEnum.YesNo
+                    );
+                    
+                    var result = await confirmBox.ShowAsync();
+                    
+                    if (result == ButtonResult.Yes)
+                    {
+                        // Update the database
+                        string updateQuery = @"UPDATE inquiryposition SET 
+                            ArticleTube = @ArticleTube,
+                            Length = @Length,
+                            LengthTolMin = @LengthTolMin,
+                            LengthTolMax = @LengthTolMax,
+                            Quantity = @Quantity,
+                            QuantityUnit = @QuantityUnit,
+                            QuantityTolMin = @QuantityTolMin,
+                            QuantityTolMax = @QuantityTolMax,
+                            QuantityTolUnit = @QuantityTolUnit,
+                            ShortLengthMax = @ShortLengthMax,
+                            ShortLengthUnit = @ShortLengthUnit,
+                            TechnicalStandard = @TechnicalStandard,
+                            TechnicalStandardOption = @TechnicalStandardOption,
+                            FlatSeam = @FlatSeam,
+                            Certificate = @Certificate,
+                            ToleranceStandard = @ToleranceStandard,
+                            Tolerance1127D = @Tolerance1127D,
+                            Tolerance1127T = @Tolerance1127T,
+                            Brushed = @Brushed,
+                            BrushedGrit = @BrushedGrit,
+                            Storage = @Storage,
+                            Price = @Price,
+                            PriceUnit = @PriceUnit,
+                            DeliveryTimeWeeks = @DeliveryTimeWeeks,
+                            DeliveryTimeDate = @DeliveryTimeDate,
+                            NotesExternal = @NotesExternal,
+                            NotesInternal = @NotesInternal
+                        WHERE Inquirynumber = @Inquirynumber AND Positionnumber = @Positionnumber";
+                        
+                        await connection.ExecuteAsync(updateQuery, new
+                        {
+                            Inquirynumber = InquiryNumber,
+                            Positionnumber = int.Parse(InquiryPositionSearch),
+                            ArticleTube = newArticleNumber,
+                            Length = InquiryPositionLength,
+                            LengthTolMin = InquiryPositionLengthMin,
+                            LengthTolMax = InquiryPositionLengthMax,
+                            Quantity = InquiryPositionQuantity,
+                            QuantityUnit = InquiryPositionQuantityUnit,
+                            QuantityTolMin = InquiryPositionQuantityTolMin,
+                            QuantityTolMax = InquiryPositionQuantityTolMax,
+                            QuantityTolUnit = InquiryPositionQuantityTolUnit,
+                            ShortLengthMax = InquiryPositionShortLengths,
+                            ShortLengthUnit = InquiryPositionShortLengthsUnit,
+                            TechnicalStandard = InquirySelectedNormIndex,
+                            TechnicalStandardOption = InquirySelectedNormOptionIndex,
+                            FlatSeam = InquiryPositionSeamFlattened,
+                            Certificate = InquirySelectedCertificateIndex,
+                            ToleranceStandard = SelectedDimensionNormIndex,
+                            Tolerance1127D = SelectedDiameterIndex,
+                            Tolerance1127T = SelectedThicknessIndex,
+                            Brushed = InquiryPositionBrushed,
+                            BrushedGrit = InquiryPositionGrit,
+                            Storage = InquiryPositionFromStorage,
+                            Price = InquiryPositionPrice.Replace(',','.'),
+                            PriceUnit = InquiryPositionPriceSelectedUnit,
+                            DeliveryTimeWeeks = InquiryPositionLeadTimeWeeks,
+                            DeliveryTimeDate = InquiryPositionSelectedDate,
+                            NotesExternal = InquiryPositionNotesExternal,
+                            NotesInternal = InquiryPositionNotesInternal
+                        });
+                        
+                        // Show success message
+                        var successBox = MessageBoxManager.GetMessageBoxStandard(
+                            "Erfolg",
+                            $"Die Position {InquiryPositionSearch} der Anfrage {InquiryNumber} wurde erfolgreich aktualisiert.",
+                            ButtonEnum.Ok
+                        );
+                        await successBox.ShowAsync();
+                    }
+                }
+                else
+                {
+                    // No changes detected
+                    var noChangesBox = MessageBoxManager.GetMessageBoxStandard(
+                        "Keine Änderungen",
+                        "Es wurden keine Änderungen festgestellt.",
+                        ButtonEnum.Ok
+                    );
+                    await noChangesBox.ShowAsync();
+                }
+            }
+        }
+        else if ((string.IsNullOrEmpty(InquiryPositionSearch) && string.IsNullOrEmpty(InquiryNumber)) || (!string.IsNullOrEmpty(InquiryPositionSearch) && string.IsNullOrEmpty(InquiryNumber)))
+        {
+            Console.WriteLine("No Pos");
+        }
+    }
+    
+    
+    // else if (!String.IsNullOrEmpty(InquiryNumber))
+        // {
+        //     string UserConfirmationNotice = "";
+        //     string UserQuery;
+        //
+        //     string InquiryNotesCompare = "";
+        //     int DeliveryEXWCompareVal = 0;
+        //     string DeliveryEXWCompare = "";
+        //     string DeliveryEXWText = "";
+        //     string EnglishCustomerCompare = "";
+        //     string EnglishCustomerText = "";
+        //     int EnglishCustomerCompareVal = 0;
+        //     string DeliveryAdressSearchCompare = "";
+        //     string CustomerNameSearchCompare = "";
+        //
+        //     if (CheckEXW)
+        //     {
+        //         DeliveryEXWText = "Pickup";
+        //     }
+        //     else
+        //     {
+        //         DeliveryEXWText = "Delivery";
+        //     }
+        //
+        //     if (EnglishCustomer)
+        //     {
+        //         EnglishCustomerText = "English";
+        //     }
+        //     else
+        //     {
+        //         EnglishCustomerText = "German"; 
+        //     }
+        //     
+        //     if (string.IsNullOrWhiteSpace(InquiryNumber))
+        //     {
+        //         return; // Exit early if no inquiry number is provided
+        //     }
+        //
+        //     using var connection = new MySqlConnection(ConnectionString);
+        //     await connection.OpenAsync();
+        //
+        //     try
+        //     {
+        //         // Query to get all customer data at once
+        //         var inquiry = await connection.QueryFirstOrDefaultAsync<dynamic>(
+        //             @"SELECT 
+        //                     i.Inquirynumber,
+        //                     i.Customernumber, 
+        //                     i.Deliveryadressnumber, 
+        //                     i.EXW, 
+        //                     i.English, 
+        //                     i.Notes,
+        //                     c.Companyname AS CustomerCompanyName,
+        //                     d.CompanyName AS DeliveryCompanyName
+        //                 FROM inquiries i
+        //                 JOIN customers c ON i.Customernumber = c.Customernumber
+        //                 LEFT JOIN deliveryadress d ON i.Deliveryadressnumber = d.deliveryadressNo
+        //                 WHERE i.Inquirynumber = @InquiryNo",
+        //             new { InquiryNo = InquiryNumber }
+        //         );
+        //         
+        //         // If inquiry exists, assign all properties
+        //         if (inquiry != null)    
+        //         {
+        //             DeliveryAdressSearchCompare = inquiry.DeliveryCompanyName;
+        //             CustomerNameSearchCompare = inquiry.CustomerCompanyName;
+        //             
+        //             InquiryNotesCompare = inquiry.Notes;
+        //             
+        //             if (inquiry.EXW == 0)
+        //             {
+        //                 DeliveryEXWCompare = "Delivery";
+        //                 DeliveryEXWCompareVal = 0;
+        //             }
+        //             else
+        //             {
+        //                 DeliveryEXWCompare = "Pickup";
+        //                 DeliveryEXWCompareVal = 1;
+        //             }
+        //             
+        //             if (inquiry.English == 0)
+        //             {
+        //                 EnglishCustomerCompare = "German";
+        //                 EnglishCustomerCompareVal = 0;
+        //             }
+        //             else
+        //             {
+        //                 EnglishCustomerCompare = "English";
+        //                 EnglishCustomerCompareVal = 1;
+        //             }
+        //             
+        //
+        //         }
+        //     }
+        //     catch (Exception ex)
+        //     {
+        //         // Handle any exceptions
+        //         var box = MessageBoxManager.GetMessageBoxStandard("Error", ex.Message, ButtonEnum.Ok);
+        //         await box.ShowAsync();
+        //     }
+        //
+        //     // Start building query
+        //     var updates = new List<string>();
+        //     var parameters = new DynamicParameters();
+        //
+        //     // Compare and build updates
+        //     if (!String.Equals(CustomerNameSearchCompare, SelectedCustomer))
+        //     {
+        //         UserConfirmationNotice = "Customer changed from " + CustomerNameSearchCompare + " to " + SelectedCustomer + $"{Environment.NewLine}";
+        //         updates.Add("Customernumber = @CustomerNumber");
+        //         parameters.Add("CustomerNumber", CustomerNumber); // Assuming you already have CustomerNumber as int
+        //     }
+        //
+        //     if (!String.Equals(DeliveryAdressSearchCompare, SelectedDeliveryAdress))
+        //     {
+        //         UserConfirmationNotice += "Delivery Address changed from " + DeliveryAdressSearchCompare + " to " + SelectedDeliveryAdress + $"{Environment.NewLine}";
+        //         updates.Add("Deliveryadressnumber = @DeliveryAddressNumber");
+        //         parameters.Add("DeliveryAddressNumber", CustomersDeliveryAdressNo); // Assuming you have this value
+        //     }
+        //
+        //     if (DeliveryEXWCompareVal != (CheckEXW ? 1 : 0))
+        //     {
+        //         UserConfirmationNotice += "Shipping changed from " + DeliveryEXWCompare + " to " + DeliveryEXWText + $"{Environment.NewLine}";
+        //         updates.Add("EXW = @EXW");
+        //         parameters.Add("EXW", CheckEXW ? 1 : 0);
+        //
+        //         if (CheckEXW)
+        //         {
+        //             updates.Add("Deliveryadressnumber = NULL");
+        //         }
+        //         else if (!CheckEXW && !String.IsNullOrEmpty(SelectedDeliveryAdress))
+        //         {
+        //             updates.Add("Deliveryadressnumber = @DeliveryAddressNumber");
+        //             
+        //             string CustomerIDQuery = "SELECT deliveryadressNo FROM deliveryadress WHERE CompanyName = @QueryDeliveryAdressSearch";
+        //             
+        //             Console.WriteLine("Query: " + CustomerIDQuery);
+        //             
+        //             Console.WriteLine("SearchKey: " + SelectedDeliveryAdress);
+        //
+        //
+        //     
+        //             // Since you expect a single result, use QuerySingleOrDefault to get just one result or null if not found
+        //             var deliveryAdressNo = connection.QuerySingleOrDefault<int?>(CustomerIDQuery, new { QueryDeliveryAdressSearch = SelectedDeliveryAdress });
+        //             
+        //             Console.WriteLine("Search Result: " + deliveryAdressNo);
+        //             parameters.Add("DeliveryAddressNumber", deliveryAdressNo);
+        //         }
+        //         else if (!CheckEXW && String.IsNullOrEmpty(SelectedDeliveryAdress))
+        //         {
+        //             var BrokenMessage = MessageBoxManager.GetMessageBoxStandard(
+        //                 "Fehler", "Lieferung ausgewählt aber keine Lieferadresse gewählt!",
+        //                 ButtonEnum.Ok
+        //             );
+        //
+        //             var Display = await BrokenMessage.ShowAsync();
+        //             
+        //             return;
+        //         }
+        //     }
+        //
+        //     if (EnglishCustomerCompareVal != (EnglishCustomer ? 1 : 0))
+        //     {
+        //         UserConfirmationNotice += "Language changed from " + EnglishCustomerCompare + " to " + EnglishCustomerText + $"{Environment.NewLine}";
+        //         updates.Add("English = @English");
+        //         parameters.Add("English", EnglishCustomer ? 1 : 0);
+        //     }
+        //     
+        //     if (!String.Equals(InquiryNotesCompare, InquiryNotes))
+        //     {
+        //         UserConfirmationNotice += "Notes changed from " + InquiryNotesCompare + " to " + InquiryNotes + $"{Environment.NewLine}";
+        //         updates.Add("Notes = @Notes");
+        //         parameters.Add("Notes", InquiryNotes);
+        //     }
+        //
+        //     // Show confirmation message
+        //     var ChangeQuery = MessageBoxManager.GetMessageBoxStandard(
+        //         "Änderungen Bestätigen", UserConfirmationNotice,
+        //         ButtonEnum.YesNo
+        //     );
+        //
+        //     var result = await ChangeQuery.ShowAsync();
+        //
+        //     if (result == ButtonResult.Yes && updates.Count > 0)
+        //     {
+        //         // Build final query
+        //         string updateQuery = $"UPDATE inquiries SET {string.Join(", ", updates)} WHERE Inquirynumber = @InquiryNumber";
+        //         parameters.Add("InquiryNumber", InquiryNumber);
+        //         
+        //         await connection.ExecuteAsync(updateQuery, parameters);
+        //     }
+        // }
         
         //Continue with the Save Position here
         
-        if (!String.IsNullOrEmpty(InquiryPositionSearch))
-        {
-            WallthicknessItems.Clear();
-            OuterDiameterItems.Clear();
-            GradeItems.Clear();
-
-            InquiryPositionQuantity = "";
-            InquiryPositionQuantityUnit = -1;
-
-            InquiryPositionQuantityTolMin = "";
-            InquiryPositionQuantityTolMax = "";
-
-            InquiryPositionQuantityTolUnit = -1;
-            InquiryPositionLength = "";
-            InquiryPositionLengthMin = "";
-            InquiryPositionLengthMax = "";
-
-            InquiryPositionShortLengths = "";
-            InquiryPositionShortLengthsUnit = -1;
-            
-            InquirySelectedNorm = "";
-            
-            inquirySelectedNormOptionIndex = -1;
-            
-            InquiryPositionSeamFlattened = false;
-            InquirySelectedCertificateIndex = -1;
-            SelectedDimensionNormIndex = -1;
-            SelectedDiameterIndex = -1;
-            SelectedThicknessIndex = -1;
-            InquiryPositionBrushed = false;
-            InquiryPositionGrit = "";
-            InquiryPositionFromStorage = false;
-            InquiryPositionPrice = "";
-            InquiryPositionPriceSelectedUnit = -1;
-            InquiryPositionLeadTimeWeeks = "";
-            InquiryPositionSelectedDate = null;
-            InquiryPositionNotesExternal = "";
-            InquiryPositionNotesInternal = "";
-            
-            if (string.IsNullOrEmpty(InquiryPositionSearch) || string.IsNullOrEmpty(InquiryNumber))
-            {
-                return;
-            }
-            
-            using var connection = new MySqlConnection(ConnectionString);
-            await connection.OpenAsync();
-            
-            string Query = $"SELECT * FROM inquiryposition WHERE Positionnumber = '{InquiryPositionSearch}' AND Inquirynumber = '{InquiryNumber}'";
-            var Results = await connection.QuerySingleAsync<InquiryPosition>(Query);
-            
-            string queryArticle = $"SELECT OuterDiameter, Wallthickness, Grade FROM articlestube WHERE ArticleNumber = '{Results.Articletube}'";
-            var articleResult = await connection.QuerySingleOrDefaultAsync<dynamic>(queryArticle);
-            
-            WallthicknessItems.Add(articleResult?.Wallthickness.ToString());
-
-            OuterDiameterItems.Clear();
-            
-            OuterDiameterItems.Add(articleResult?.OuterDiameter.ToString());
-            
-            SelectedODComboBoxIndex = 0;
-            
-            GradeItems.Clear();
-            
-            GradeItems.Add(articleResult?.Grade.ToString());
-            
-            SelectedGradeComboBoxIndex = 0;
-            
-            InquiryPositionQuantity = Results.Quantity.ToString();
-            InquiryPositionQuantityTolMin = Results.QuantityTolMin.ToString();
-            InquiryPositionQuantityTolMax = Results.QuantityTolMax.ToString();
-            
-            InquiryPositionLength = Results.Length.ToString();
-            InquiryPositionLengthMin = Results.LengthTolMin.ToString();
-            InquiryPositionLengthMax = Results.LengthTolMax.ToString();
-            
-            InquiryPositionQuantityUnit = int.Parse(Results.QuantityUnit.ToString());
-            InquiryPositionQuantityTolUnit = int.Parse(Results.QuantityTolUnit?.ToString());
-            
-            InquiryPositionShortLengths = Results.ShortLengthMax.ToString();
-            
-            InquiryPositionShortLengthsUnit = Results.ShortLengthUnit;
-            
-            InquirySelectedNormIndex = Results.TechnicalStandard;
-            
-            InquirySelectedNormOptionIndex = Results.TechnicalStandardOption;
-
-            if (Results?.FlatSeam == 0)
-            {
-                InquiryPositionSeamFlattened = false;
-            }
-            else
-            {
-                InquiryPositionSeamFlattened = true;
-                
-                InquiryNormOptions.Clear();
-                InquiryNormOptions.Add(Results?.TechnicalStandardOption.ToString() + "b");
-                InquirySelectedNormOptionIndex = 0;
-            }
-            
-            if (Results?.Brushed == 0)
-            {
-                InquiryPositionBrushed = false;
-            }
-            else
-            {
-                InquiryPositionBrushed = true;
-            }
-            
-            if (Results?.Storage == 0)
-            {
-                InquiryPositionFromStorage = false;
-            }
-            else
-            {
-                InquiryPositionFromStorage = true;
-            }
-            
-            InquirySelectedCertificateIndex = Results.Certificate;
-            
-            SelectedDimensionNormIndex = Results.ToleranceStandard;
-
-            if (!string.IsNullOrEmpty(Results?.Tolerance1127D.ToString()))
-            {
-                SelectedDiameterIndex = Results.Tolerance1127D;
-            }
-            
-            if (!string.IsNullOrEmpty(Results?.Tolerance1127T.ToString()))
-            {
-                SelectedThicknessIndex = Results.Tolerance1127T;
-            }
-            
-            if (!string.IsNullOrEmpty(Results?.BrushedGrit.ToString()))
-            {
-                InquiryPositionGrit = Results?.BrushedGrit.ToString();
-            }
-            
-            if (!string.IsNullOrEmpty(Results?.Price.ToString()))
-            {
-                InquiryPositionPrice = Results?.Price.ToString();
-            }
-            
-            SelectedDimensionNormIndex = Results.ToleranceStandard;
-            
-            InquiryPositionPriceSelectedUnit = int.Parse(Results.PriceUnit.ToString());
-            
-            if (!string.IsNullOrEmpty(Results?.DeliveryTimeWeeks.ToString()))
-            {
-                InquiryPositionLeadTimeWeeks = Results?.DeliveryTimeWeeks;
-            }
-            
-            if (!string.IsNullOrEmpty(Results?.DeliveryTimeDate.ToString()))
-            {
-                InquiryPositionSelectedDate = Results?.DeliveryTimeDate;
-            }
-            
-            if (!string.IsNullOrEmpty(Results?.NotesExternal))
-            {
-                InquiryPositionNotesExternal = Results?.NotesExternal;
-            }
-            
-            if (!string.IsNullOrEmpty(Results?.NotesInternal))
-            {
-                InquiryPositionNotesInternal = Results?.NotesInternal;
-            }
-
-        }
-        else
-        {
-            //new Position
-        }
+        // if (!String.IsNullOrEmpty(InquiryPositionSearch))
+        // {
+        //     WallthicknessItems.Clear();
+        //     OuterDiameterItems.Clear();
+        //     GradeItems.Clear();
+        //
+        //     InquiryPositionQuantity = "";
+        //     InquiryPositionQuantityUnit = -1;
+        //
+        //     InquiryPositionQuantityTolMin = "";
+        //     InquiryPositionQuantityTolMax = "";
+        //
+        //     InquiryPositionQuantityTolUnit = -1;
+        //     InquiryPositionLength = "";
+        //     InquiryPositionLengthMin = "";
+        //     InquiryPositionLengthMax = "";
+        //
+        //     InquiryPositionShortLengths = "";
+        //     InquiryPositionShortLengthsUnit = -1;
+        //     
+        //     InquirySelectedNorm = "";
+        //     
+        //     inquirySelectedNormOptionIndex = -1;
+        //     
+        //     InquiryPositionSeamFlattened = false;
+        //     InquirySelectedCertificateIndex = -1;
+        //     SelectedDimensionNormIndex = -1;
+        //     SelectedDiameterIndex = -1;
+        //     SelectedThicknessIndex = -1;
+        //     InquiryPositionBrushed = false;
+        //     InquiryPositionGrit = "";
+        //     InquiryPositionFromStorage = false;
+        //     InquiryPositionPrice = "";
+        //     InquiryPositionPriceSelectedUnit = -1;
+        //     InquiryPositionLeadTimeWeeks = "";
+        //     InquiryPositionSelectedDate = null;
+        //     InquiryPositionNotesExternal = "";
+        //     InquiryPositionNotesInternal = "";
+        //     
+        //
+        //     
+        //     using var connection = new MySqlConnection(ConnectionString);
+        //     await connection.OpenAsync();
+        //     
+        //     string Query = $"SELECT * FROM inquiryposition WHERE Positionnumber = '{InquiryPositionSearch}' AND Inquirynumber = '{InquiryNumber}'";
+        //     var Results = await connection.QuerySingleAsync<InquiryPosition>(Query);
+        //     
+        //     string queryArticle = $"SELECT OuterDiameter, Wallthickness, Grade FROM articlestube WHERE ArticleNumber = '{Results.Articletube}'";
+        //     var articleResult = await connection.QuerySingleOrDefaultAsync<dynamic>(queryArticle);
+        //     
+        //     WallthicknessItems.Add(articleResult?.Wallthickness.ToString());
+        //
+        //     OuterDiameterItems.Clear();
+        //     
+        //     OuterDiameterItems.Add(articleResult?.OuterDiameter.ToString());
+        //     
+        //     SelectedODComboBoxIndex = 0;
+        //     
+        //     GradeItems.Clear();
+        //     
+        //     GradeItems.Add(articleResult?.Grade.ToString());
+        //     
+        //     SelectedGradeComboBoxIndex = 0;
+        //     
+        //     InquiryPositionQuantity = Results.Quantity.ToString();
+        //     InquiryPositionQuantityTolMin = Results.QuantityTolMin.ToString();
+        //     InquiryPositionQuantityTolMax = Results.QuantityTolMax.ToString();
+        //     
+        //     InquiryPositionLength = Results.Length.ToString();
+        //     InquiryPositionLengthMin = Results.LengthTolMin.ToString();
+        //     InquiryPositionLengthMax = Results.LengthTolMax.ToString();
+        //     
+        //     InquiryPositionQuantityUnit = int.Parse(Results.QuantityUnit.ToString());
+        //     InquiryPositionQuantityTolUnit = int.Parse(Results.QuantityTolUnit?.ToString());
+        //     
+        //     InquiryPositionShortLengths = Results.ShortLengthMax.ToString();
+        //     
+        //     InquiryPositionShortLengthsUnit = Results.ShortLengthUnit;
+        //     
+        //     InquirySelectedNormIndex = Results.TechnicalStandard;
+        //     
+        //     InquirySelectedNormOptionIndex = Results.TechnicalStandardOption;
+        //
+        //     if (Results?.FlatSeam == 0)
+        //     {
+        //         InquiryPositionSeamFlattened = false;
+        //     }
+        //     else
+        //     {
+        //         InquiryPositionSeamFlattened = true;
+        //         
+        //         InquiryNormOptions.Clear();
+        //         InquiryNormOptions.Add(Results?.TechnicalStandardOption.ToString() + "b");
+        //         InquirySelectedNormOptionIndex = 0;
+        //     }
+        //     
+        //     if (Results?.Brushed == 0)
+        //     {
+        //         InquiryPositionBrushed = false;
+        //     }
+        //     else
+        //     {
+        //         InquiryPositionBrushed = true;
+        //     }
+        //     
+        //     if (Results?.Storage == 0)
+        //     {
+        //         InquiryPositionFromStorage = false;
+        //     }
+        //     else
+        //     {
+        //         InquiryPositionFromStorage = true;
+        //     }
+        //     
+        //     InquirySelectedCertificateIndex = Results.Certificate;
+        //     
+        //     SelectedDimensionNormIndex = Results.ToleranceStandard;
+        //
+        //     if (!string.IsNullOrEmpty(Results?.Tolerance1127D.ToString()))
+        //     {
+        //         SelectedDiameterIndex = Results.Tolerance1127D;
+        //     }
+        //     
+        //     if (!string.IsNullOrEmpty(Results?.Tolerance1127T.ToString()))
+        //     {
+        //         SelectedThicknessIndex = Results.Tolerance1127T;
+        //     }
+        //     
+        //     if (!string.IsNullOrEmpty(Results?.BrushedGrit.ToString()))
+        //     {
+        //         InquiryPositionGrit = Results?.BrushedGrit.ToString();
+        //     }
+        //     
+        //     if (!string.IsNullOrEmpty(Results?.Price.ToString()))
+        //     {
+        //         InquiryPositionPrice = Results?.Price.ToString();
+        //     }
+        //     
+        //     SelectedDimensionNormIndex = Results.ToleranceStandard;
+        //     
+        //     InquiryPositionPriceSelectedUnit = int.Parse(Results.PriceUnit.ToString());
+        //     
+        //     if (!string.IsNullOrEmpty(Results?.DeliveryTimeWeeks.ToString()))
+        //     {
+        //         InquiryPositionLeadTimeWeeks = Results?.DeliveryTimeWeeks;
+        //     }
+        //     
+        //     if (!string.IsNullOrEmpty(Results?.DeliveryTimeDate.ToString()))
+        //     {
+        //         InquiryPositionSelectedDate = Results?.DeliveryTimeDate;
+        //     }
+        //     
+        //     if (!string.IsNullOrEmpty(Results?.NotesExternal))
+        //     {
+        //         InquiryPositionNotesExternal = Results?.NotesExternal;
+        //     }
+        //     
+        //     if (!string.IsNullOrEmpty(Results?.NotesInternal))
+        //     {
+        //         InquiryPositionNotesInternal = Results?.NotesInternal;
+        //     }
+        //
+        // }
+        // else
+        // {
+        //     //new Position
+        // }
         
         //AD SelectedODComboBoxItem
         
@@ -1858,8 +2654,6 @@ public partial class InquiriesViewModel : ObservableObject
         
         //Notes external InquiryPositionNotesExternal
         //Notes Internal InquiryPositionNotesInternal
-        
-    }
     
     
     

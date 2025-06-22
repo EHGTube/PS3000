@@ -312,7 +312,7 @@
                         <!-- Außendurchmesser -->
                         <TextBlock Text="Außendurchmesser:" Margin="0 0 0 2"/>
                         <ComboBox ItemsSource="{Binding OuterDiameterItems}"
-                                 SelectedItem="{Binding SelectedODComboBoxItem}"
+                                  SelectedValue="{Binding SelectedODComboBoxItem}"
                                  SelectedIndex="{Binding SelectedODComboBoxIndex}"
                                  Margin="0 0 5 5"
                                  HorizontalAlignment="Stretch"
@@ -357,7 +357,7 @@
                             <ComboBox Margin="5 0 0 0"
                                       ItemsSource="{Binding InquiryNormOptions}"
                                       SelectedIndex="{Binding InquirySelectedNormOptionIndex}"
-                                      SelectedItem="{Binding InquirySelectedNormOption, Mode=TwoWay}"
+                                      SelectedValue="{Binding InquirySelectedNormOption, Mode=TwoWay}"
                                       HorizontalAlignment="Right"/>
                         </StackPanel>
                         
@@ -373,7 +373,7 @@
                         <!-- Wandstärke -->
                         <TextBlock Text="Wandstärke:" Margin="0 0 0 2"/>
                         <ComboBox ItemsSource="{Binding WallthicknessItems}"
-                                 SelectedItem="{Binding SelectedWTComboBoxItem}"
+                                  SelectedValue="{Binding SelectedWTComboBoxItem}"
                                  SelectedIndex="{Binding SelectedWTComboBoxIndex}"
                                  Margin="0 0 0 5"
                                  HorizontalAlignment="Stretch"
@@ -402,7 +402,7 @@
                         <TextBlock Text="Preis:" Margin="0 5 0 2"/>
                         <StackPanel Orientation="Horizontal" HorizontalAlignment="Stretch">
                             <TextBox Watermark="Preis" Text="{Binding InquiryPositionPrice}" HorizontalAlignment="Stretch"/>
-                            <ComboBox SelectedIndex="{Binding InquiryPositionPriceSelectedUnit}" Margin="5 0 0 0">
+                            <ComboBox SelectedIndex="{Binding InquiryPositionPriceSelectedUnit}" SelectedValue="{Binding InquiryPositionPriceSelectedUnitText}" Margin="5 0 0 0">
                                 <ComboBoxItem>€/m</ComboBoxItem>
                                 <ComboBoxItem>€/Stk.</ComboBoxItem>
                                 <ComboBoxItem>€/kg</ComboBoxItem>
@@ -415,7 +415,7 @@
                         <!-- Werkstoff -->
                         <TextBlock Text="Werkstoff:" Margin="0 0 0 2"/>
                         <ComboBox ItemsSource="{Binding GradeItems}"
-                                 SelectedItem="{Binding SelectedGradeComboBoxItem}"
+                                  SelectedValue="{Binding SelectedGradeComboBoxItem}"
                                  SelectedIndex="{Binding SelectedGradeComboBoxIndex}"
                                  Margin="0 0 0 5"
                                  HorizontalAlignment="Stretch"
@@ -439,15 +439,18 @@
                         <!-- Dimension Standards -->
                         <TextBlock Text="Abmessungsnorm:" Margin="0 5 0 2"/>
                         <ComboBox ItemsSource="{Binding DimensionNormOptions}" 
-                                 SelectedIndex="{Binding SelectedDimensionNormIndex}"/>
+                                 SelectedIndex="{Binding SelectedDimensionNormIndex}"
+                                 SelectedItem="{Binding SelectedDimensionNormItem}"/>
                         
                         <!-- Diameter and Thickness Options -->
                         <StackPanel Orientation="Horizontal" IsEnabled="{Binding IsENISO1127Selected}" Margin="0 5 0 0">
                             <ComboBox ItemsSource="{Binding DiameterOptions}" 
+                                      SelectedItem="{Binding SelectedDiameterItem}"
                                      SelectedIndex="{Binding SelectedDiameterIndex}" 
                                      Width="75"/>
                             
                             <ComboBox ItemsSource="{Binding ThicknessOptions}" 
+                                      SelectedItem="{Binding SelectedThicknessItem}" 
                                      SelectedIndex="{Binding SelectedThicknessIndex}" 
                                      Margin="5 0 0 0"
                                      Width="75"/>

@@ -1245,7 +1245,7 @@ public partial class InquiriesViewModel : ObservableObject
         InquirySelectedNormIndex = Results.TechnicalStandard;
         
         InquirySelectedNormOptionIndex = Results.TechnicalStandardOption;
-
+        
         if (Results?.FlatSeam == 0)
         {
             InquiryPositionSeamFlattened = false;
@@ -1280,7 +1280,7 @@ public partial class InquiriesViewModel : ObservableObject
         InquirySelectedCertificateIndex = Results.Certificate;
         
         SelectedDimensionNormIndex = Results.ToleranceStandard;
-
+        
         if (!string.IsNullOrEmpty(Results?.Tolerance1127D.ToString()))
         {
             SelectedDiameterIndex = Results.Tolerance1127D;
